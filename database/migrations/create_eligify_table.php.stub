@@ -45,8 +45,8 @@ return new class extends Migration
             $table->id();
             $table->uuid('uuid')->unique()->index();
             $table->foreignId('criteria_id')->constrained('eligify_criteria');
-            $table->string('evaluable_type'); // Polymorphic relation (User, Application, etc.)
-            $table->unsignedBigInteger('evaluable_id');
+            $table->string('evaluable_type')->nullable(); // Polymorphic relation (User, Application, etc.)
+            $table->unsignedBigInteger('evaluable_id')->nullable();
             $table->boolean('passed')->index(); // Final result
             $table->decimal('score', 8, 2)->default(0); // Calculated score
             $table->json('failed_rules')->nullable(); // IDs of failed rules

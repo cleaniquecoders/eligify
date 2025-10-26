@@ -28,12 +28,10 @@ class TestCase extends Orchestra
     {
         config()->set('database.default', 'testing');
 
-        // Load and run migrations
-        $migrationPath = __DIR__.'/../database/migrations';
-        if (is_dir($migrationPath)) {
-            foreach (glob($migrationPath.'/*.php') as $migration) {
-                (include $migration)->up();
-            }
+        // Load and run the migration stub directly
+        $migrationStub = __DIR__.'/../database/migrations/create_eligify_table.php.stub';
+        if (file_exists($migrationStub)) {
+            (include $migrationStub)->up();
         }
     }
 }

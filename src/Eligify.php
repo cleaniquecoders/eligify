@@ -194,12 +194,13 @@ class Eligify
     {
         Evaluation::create([
             'criteria_id' => $criteria->id,
-            'data' => $data,
-            'result' => $result,
             'passed' => $result['passed'],
             'score' => $result['score'],
-            'decision' => $result['decision'],
-            'execution_log' => $result['execution_log'],
+            'decision' => $result['decision'] ?? null,
+            'context' => $data,
+            'failed_rules' => $result['failed_rules'] ?? [],
+            'rule_results' => $result['rule_results'] ?? [],
+            'evaluated_at' => now(),
         ]);
     }
 
