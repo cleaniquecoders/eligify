@@ -1,12 +1,12 @@
 <?php
 
-namespace VendorName\Skeleton\Commands;
+namespace CleaniqueCoders\Eligify\Commands;
 
 use Illuminate\Console\Command;
 
-class SkeletonCommand extends Command
+class EligifyCommand extends Command
 {
-    public $signature = 'skeleton';
+    public $signature = 'eligify';
 
     public $description = 'My command';
 

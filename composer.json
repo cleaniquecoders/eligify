@@ -1,17 +1,17 @@
 {
-    "name": ":vendor_slug/:package_slug",
-    "description": ":package_description",
+    "name": "cleaniquecoders/eligify",
+    "description": "Eligify is a flexible rule and criteria engine that determines whether an entity — such as a person, application, or transaction — meets the defined acceptance conditions. It powers decision-making systems by making eligibility data-driven, traceable, and automatable.",
     "keywords": [
-        ":vendor_name",
+        "Cleanique Coders",
         "laravel",
-        ":package_slug"
+        "eligify"
     ],
-    "homepage": "https://github.com/:vendor_slug/:package_slug",
+    "homepage": "https://github.com/cleaniquecoders/eligify",
     "license": "MIT",
     "authors": [
         {
-            "name": ":author_name",
-            "email": "author@domain.com",
+            "name": "Nasrul Hazim Bin Mohamad",
+            "email": "nasrulhazim.m@gmail.com",
             "role": "Developer"
         }
     ],
@@ -30,18 +30,17 @@
         "pestphp/pest-plugin-laravel": "^4.0",
         "phpstan/extension-installer": "^1.4",
         "phpstan/phpstan-deprecation-rules": "^2.0",
-        "phpstan/phpstan-phpunit": "^2.0",
-        "spatie/laravel-ray": "^1.35"
+        "phpstan/phpstan-phpunit": "^2.0"
     },
     "autoload": {
         "psr-4": {
-            "VendorName\\Skeleton\\": "src/",
-            "VendorName\\Skeleton\\Database\\Factories\\": "database/factories/"
+            "CleaniqueCoders\\Eligify\\": "src/",
+            "CleaniqueCoders\\Eligify\\Database\\Factories\\": "database/factories/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "VendorName\\Skeleton\\Tests\\": "tests/",
+            "CleaniqueCoders\\Eligify\\Tests\\": "tests/",
             "Workbench\\App\\": "workbench/app/"
         }
     },
@@ -63,10 +62,10 @@
     "extra": {
         "laravel": {
             "providers": [
-                "VendorName\\Skeleton\\SkeletonServiceProvider"
+                "CleaniqueCoders\\Eligify\\EligifyServiceProvider"
             ],
             "aliases": {
-                "Skeleton": "VendorName\\Skeleton\\Facades\\Skeleton"
+                "Eligify": "CleaniqueCoders\\Eligify\\Facades\\Eligify"
             }
         }
     },
