@@ -63,17 +63,140 @@ class Eligify
         // Save pending rules first
         $builder->save();
 
-        // Run evaluation
-        $result = $this->evaluate($builder->getCriteria(), $data);
+        $criteria = $builder->getCriteria();
+        $workflowManager = $builder->getWorkflowManager();
 
-        // Execute callbacks based on result
+        // Run evaluation
+        $result = $this->evaluate($criteria, $data, false); // Don't save evaluation twice
+
+        // Execute basic callbacks (backward compatibility)
         if ($result['passed'] && $builder->getOnPassCallback()) {
             call_user_func($builder->getOnPassCallback(), $data, $result);
         } elseif (! $result['passed'] && $builder->getOnFailCallback()) {
             call_user_func($builder->getOnFailCallback(), $data, $result);
         }
 
+        // Execute workflow callbacks
+        $workflowManager->executeEvaluationWorkflow($criteria, $data, $result);
+
+        // Save evaluation record
+        $this->saveEvaluation($criteria, $data, $result);
+
         return $result;
+    }
+
+    /**
+     * Evaluate multiple data sets against a criteria (batch evaluation)
+     */
+    public function evaluateBatch(string|Criteria $criteria, array $dataCollection, bool $saveEvaluations = true): array
+    {
+        // Get criteria model if string provided
+        if (is_string($criteria)) {
+            $criteriaModel = Criteria::where('slug', str($criteria)->slug())->first();
+
+            if (! $criteriaModel) {
+                throw new \InvalidArgumentException("Criteria '{$criteria}' not found");
+            }
+        } else {
+            $criteriaModel = $criteria;
+        }
+
+        $results = [];
+        $batchSize = config('eligify.performance.batch_size', 100);
+
+        // Process in chunks to avoid memory issues
+        $chunks = array_chunk($dataCollection, $batchSize);
+
+        foreach ($chunks as $chunk) {
+            foreach ($chunk as $index => $data) {
+                try {
+                    $result = $this->ruleEngine->evaluate($criteriaModel, $data);
+
+                    // Save evaluation if requested
+                    if ($saveEvaluations) {
+                        $this->saveEvaluation($criteriaModel, $data, $result);
+                    }
+
+                    // Log for audit
+                    $this->logAudit($criteriaModel, $data, $result);
+
+                    $results[] = array_merge($result, [
+                        'index' => $index,
+                        'data_hash' => md5(serialize($data)),
+                    ]);
+                } catch (\Throwable $e) {
+                    $results[] = [
+                        'index' => $index,
+                        'error' => $e->getMessage(),
+                        'passed' => false,
+                        'score' => 0,
+                        'data_hash' => md5(serialize($data)),
+                    ];
+                }
+            }
+        }
+
+        return [
+            'total_evaluated' => count($results),
+            'total_passed' => count(array_filter($results, fn ($r) => $r['passed'] ?? false)),
+            'total_failed' => count(array_filter($results, fn ($r) => ! ($r['passed'] ?? false))),
+            'results' => $results,
+            'criteria' => $criteriaModel->toArray(),
+        ];
+    }
+
+    /**
+     * Evaluate multiple data sets with callbacks (batch with workflow)
+     */
+    public function evaluateBatchWithCallbacks(CriteriaBuilder $builder, array $dataCollection): array
+    {
+        // Save pending rules first
+        $builder->save();
+
+        $criteria = $builder->getCriteria();
+        $workflowManager = $builder->getWorkflowManager();
+        $results = [];
+
+        foreach ($dataCollection as $index => $data) {
+            try {
+                // Run evaluation
+                $result = $this->ruleEngine->evaluate($criteria, $data);
+
+                // Execute basic callbacks (backward compatibility)
+                if ($result['passed'] && $builder->getOnPassCallback()) {
+                    call_user_func($builder->getOnPassCallback(), $data, $result);
+                } elseif (! $result['passed'] && $builder->getOnFailCallback()) {
+                    call_user_func($builder->getOnFailCallback(), $data, $result);
+                }
+
+                // Execute workflow callbacks
+                $workflowManager->executeEvaluationWorkflow($criteria, $data, $result);
+
+                // Save evaluation record
+                $this->saveEvaluation($criteria, $data, $result);
+
+                $results[] = array_merge($result, [
+                    'index' => $index,
+                    'data_hash' => md5(serialize($data)),
+                ]);
+            } catch (\Throwable $e) {
+                $results[] = [
+                    'index' => $index,
+                    'error' => $e->getMessage(),
+                    'passed' => false,
+                    'score' => 0,
+                    'data_hash' => md5(serialize($data)),
+                ];
+            }
+        }
+
+        return [
+            'total_evaluated' => count($results),
+            'total_passed' => count(array_filter($results, fn ($r) => $r['passed'] ?? false)),
+            'total_failed' => count(array_filter($results, fn ($r) => ! ($r['passed'] ?? false))),
+            'results' => $results,
+            'criteria' => $criteria->toArray(),
+        ];
     }
 
     /**

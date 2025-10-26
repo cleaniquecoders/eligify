@@ -410,4 +410,55 @@ return [
         'compilation_cache_ttl' => 1440, // 24 hours
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Workflow Configuration
+    |--------------------------------------------------------------------------
+    |
+    | Configure workflow and callback behavior.
+    |
+    */
+    'workflow' => [
+        // Enable workflow system
+        'enabled' => true,
+
+        // Callback execution timeout in seconds
+        'callback_timeout' => 30,
+
+        // Log callback execution errors
+        'log_callback_errors' => true,
+
+        // Fail evaluation if callback throws error
+        'fail_on_callback_error' => false,
+
+        // Dispatch Laravel events
+        'dispatch_events' => true,
+
+        // Enable async callbacks (requires queue)
+        'enable_async_callbacks' => false,
+
+        // Queue connection for async callbacks
+        'async_queue_connection' => 'default',
+
+        // Queue name for async callbacks
+        'async_queue_name' => 'eligify',
+
+        // Retry failed async callbacks
+        'async_retry_attempts' => 3,
+
+        // Score thresholds for automatic callbacks
+        'score_thresholds' => [
+            'excellent' => 90,
+            'good' => 80,
+            'average' => 60,
+            'poor' => 40,
+        ],
+
+        // Default callback conditions
+        'default_conditions' => [
+            'max_execution_time' => 10, // seconds
+            'memory_limit' => 128, // MB
+        ],
+    ],
+
 ];

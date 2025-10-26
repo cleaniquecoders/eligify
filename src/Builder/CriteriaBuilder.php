@@ -7,6 +7,7 @@ use CleaniqueCoders\Eligify\Enums\RulePriority;
 use CleaniqueCoders\Eligify\Models\Criteria;
 use CleaniqueCoders\Eligify\Models\Rule;
 use CleaniqueCoders\Eligify\Support\Config;
+use CleaniqueCoders\Eligify\Workflow\WorkflowManager;
 use Illuminate\Support\Collection;
 use InvalidArgumentException;
 
@@ -20,12 +21,15 @@ class CriteriaBuilder
 
     protected $onFailCallback = null;
 
+    protected WorkflowManager $workflowManager;
+
     protected array $config;
 
     public function __construct(string $criteriaName)
     {
         $this->config = config('eligify');
         $this->pendingRules = collect();
+        $this->workflowManager = new WorkflowManager;
 
         // Find or create criteria
         $this->criteria = Criteria::firstOrCreate(
@@ -101,6 +105,90 @@ class CriteriaBuilder
     }
 
     /**
+     * Set callback for before evaluation starts
+     */
+    public function beforeEvaluation(callable $callback): self
+    {
+        $this->workflowManager->addCallback('before_evaluation', $callback);
+
+        return $this;
+    }
+
+    /**
+     * Set callback for after evaluation completes
+     */
+    public function afterEvaluation(callable $callback): self
+    {
+        $this->workflowManager->addCallback('after_evaluation', $callback);
+
+        return $this;
+    }
+
+    /**
+     * Set callback for excellent scores (90+)
+     */
+    public function onExcellent(callable $callback): self
+    {
+        $this->workflowManager->addCallback('on_excellent', $callback);
+
+        return $this;
+    }
+
+    /**
+     * Set callback for good scores (80-89)
+     */
+    public function onGood(callable $callback): self
+    {
+        $this->workflowManager->addCallback('on_good', $callback);
+
+        return $this;
+    }
+
+    /**
+     * Set conditional callback with specific conditions
+     */
+    public function onCondition(array $conditions, callable $callback): self
+    {
+        $this->workflowManager->addConditionalCallback($callback, $conditions);
+
+        return $this;
+    }
+
+    /**
+     * Set callback for specific score range
+     */
+    public function onScoreRange(int $minScore, int $maxScore, callable $callback): self
+    {
+        $this->workflowManager->addScoreRangeCallback($minScore, $maxScore, $callback);
+
+        return $this;
+    }
+
+    /**
+     * Set async callback (queued)
+     */
+    public function onPassAsync(callable $callback): self
+    {
+        $this->workflowManager->addCallback('on_pass_async', function ($data, $result, $context) use ($callback) {
+            $this->workflowManager->executeAsyncCallback($callback, $context);
+        });
+
+        return $this;
+    }
+
+    /**
+     * Set async callback for failures (queued)
+     */
+    public function onFailAsync(callable $callback): self
+    {
+        $this->workflowManager->addCallback('on_fail_async', function ($data, $result, $context) use ($callback) {
+            $this->workflowManager->executeAsyncCallback($callback, $context);
+        });
+
+        return $this;
+    }
+
+    /**
      * Set the pass threshold for this criteria
      */
     public function passThreshold(int $threshold): self
@@ -164,6 +252,14 @@ class CriteriaBuilder
     public function getOnFailCallback()
     {
         return $this->onFailCallback;
+    }
+
+    /**
+     * Get the workflow manager
+     */
+    public function getWorkflowManager(): WorkflowManager
+    {
+        return $this->workflowManager;
     }
 
     /**
