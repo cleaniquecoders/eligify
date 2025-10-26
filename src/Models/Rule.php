@@ -45,7 +45,7 @@ class Rule extends Model
      */
     public function getSlugSourceAttribute(): string
     {
-        return $this->field.'_'.$this->operator;
+        return $this->getAttribute('field').'_'.$this->getAttribute('operator');
     }
 
     /**
@@ -93,9 +93,11 @@ class Rule extends Model
      */
     public function getEvaluationValue()
     {
-        return is_array($this->value) && count($this->value) === 1
-            ? $this->value[0]
-            : $this->value;
+        $value = $this->getAttribute('value');
+
+        return is_array($value) && count($value) === 1
+            ? $value[0]
+            : $value;
     }
 
     /**
@@ -103,6 +105,6 @@ class Rule extends Model
      */
     public function supportsMultipleValues(): bool
     {
-        return in_array($this->operator, ['in', 'not_in', 'between']);
+        return in_array($this->getAttribute('operator'), ['in', 'not_in', 'between']);
     }
 }

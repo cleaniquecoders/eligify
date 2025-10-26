@@ -114,7 +114,7 @@ class Config
      */
     public static function getScoringMethods(): array
     {
-        return ScoringMethod::toArray();
+        return array_map(fn ($case) => $case->value, ScoringMethod::cases());
     }
 
     /**

@@ -51,7 +51,9 @@ class Evaluation extends Model
      */
     public function getSlugSourceAttribute(): string
     {
-        return $this->criteria->name.'_'.$this->evaluable_type.'_'.$this->evaluable_id;
+        $criteriaName = $this->criteria ? $this->criteria->getAttribute('name') : 'unknown';
+
+        return $criteriaName.'_'.$this->getAttribute('evaluable_type').'_'.$this->getAttribute('evaluable_id');
     }
 
     /**
@@ -107,7 +109,7 @@ class Evaluation extends Model
      */
     public function getFailedRuleIds()
     {
-        return collect($this->failed_rules ?? []);
+        return collect($this->getAttribute('failed_rules') ?? []);
     }
 
     /**
@@ -116,11 +118,11 @@ class Evaluation extends Model
     public function getSummary(): array
     {
         return [
-            'passed' => $this->passed,
-            'score' => $this->score,
-            'decision' => $this->decision,
-            'failed_rules_count' => count($this->failed_rules ?? []),
-            'evaluated_at' => $this->evaluated_at,
+            'passed' => $this->getAttribute('passed'),
+            'score' => $this->getAttribute('score'),
+            'decision' => $this->getAttribute('decision'),
+            'failed_rules_count' => count($this->getAttribute('failed_rules') ?? []),
+            'evaluated_at' => $this->getAttribute('evaluated_at'),
         ];
     }
 
@@ -129,6 +131,6 @@ class Evaluation extends Model
      */
     public function ruleFailedById(int $ruleId): bool
     {
-        return in_array($ruleId, $this->failed_rules ?? []);
+        return in_array($ruleId, $this->getAttribute('failed_rules') ?? []);
     }
 }

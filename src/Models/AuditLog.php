@@ -47,7 +47,7 @@ class AuditLog extends Model
      */
     public function getSlugSourceAttribute(): string
     {
-        return $this->event.'_'.$this->auditable_type.'_'.$this->auditable_id;
+        return $this->getAttribute('event').'_'.$this->getAttribute('auditable_type').'_'.$this->getAttribute('auditable_id');
     }
 
     /**
@@ -118,11 +118,11 @@ class AuditLog extends Model
      */
     public function getDescription(): string
     {
-        $description = ucfirst(str_replace('_', ' ', $this->event));
-        $description .= " on {$this->auditable_type}";
+        $description = ucfirst(str_replace('_', ' ', $this->getAttribute('event')));
+        $description .= " on {$this->getAttribute('auditable_type')}";
 
-        if ($this->user_type && $this->user_id) {
-            $description .= " by {$this->user_type}#{$this->user_id}";
+        if ($this->getAttribute('user_type') && $this->getAttribute('user_id')) {
+            $description .= " by {$this->getAttribute('user_type')}#{$this->getAttribute('user_id')}";
         }
 
         return $description;
@@ -142,14 +142,14 @@ class AuditLog extends Model
         return static::create([
             'event' => $event,
             'auditable_type' => get_class($auditable),
-            'auditable_id' => $auditable->id,
+            'auditable_id' => $auditable->getAttribute('id'),
             'old_values' => $oldValues,
             'new_values' => $newValues,
             'context' => $context,
             'user_type' => $userInfo['user_type'] ?? null,
             'user_id' => $userInfo['user_id'] ?? null,
-            'ip_address' => $userInfo['ip_address'] ?? request()?->ip(),
-            'user_agent' => $userInfo['user_agent'] ?? request()?->userAgent(),
+            'ip_address' => $userInfo['ip_address'] ?? (app()->bound('request') ? app('request')->ip() : null),
+            'user_agent' => $userInfo['user_agent'] ?? (app()->bound('request') ? app('request')->userAgent() : null),
         ]);
     }
 }

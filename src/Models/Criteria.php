@@ -38,7 +38,7 @@ class Criteria extends Model
      */
     public function getSlugSourceAttribute(): string
     {
-        return $this->name;
+        return $this->getAttribute('name');
     }
 
     /**

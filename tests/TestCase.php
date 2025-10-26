@@ -28,10 +28,12 @@ class TestCase extends Orchestra
     {
         config()->set('database.default', 'testing');
 
-        /*
-         foreach (\Illuminate\Support\Facades\File::allFiles(__DIR__ . '/../database/migrations') as $migration) {
-            (include $migration->getRealPath())->up();
-         }
-         */
+        // Load and run migrations
+        $migrationPath = __DIR__.'/../database/migrations';
+        if (is_dir($migrationPath)) {
+            foreach (glob($migrationPath.'/*.php') as $migration) {
+                (include $migration)->up();
+            }
+        }
     }
 }
