@@ -1,0 +1,108 @@
+<?php
+
+namespace CleaniqueCoders\Eligify\Models;
+
+use CleaniqueCoders\Traitify\Concerns\InteractsWithEnum;
+use CleaniqueCoders\Traitify\Concerns\InteractsWithMeta;
+use CleaniqueCoders\Traitify\Concerns\InteractsWithSlug;
+use CleaniqueCoders\Traitify\Concerns\InteractsWithUuid;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+
+class Rule extends Model
+{
+    use HasFactory;
+    use InteractsWithEnum;
+    use InteractsWithMeta;
+    use InteractsWithSlug;
+    use InteractsWithUuid;
+
+    protected $table = 'eligify_rules';
+
+    protected $fillable = [
+        'criteria_id',
+        'field',
+        'operator',
+        'value',
+        'slug',
+        'weight',
+        'order',
+        'is_active',
+        'meta',
+    ];
+
+    protected $casts = [
+        'value' => 'array',
+        'weight' => 'integer',
+        'order' => 'integer',
+        'is_active' => 'boolean',
+        'meta' => 'array',
+    ];
+
+    /**
+     * Configure the slug source field
+     */
+    public function getSlugSourceAttribute(): string
+    {
+        return $this->field.'_'.$this->operator;
+    }
+
+    /**
+     * The criteria this rule belongs to
+     */
+    public function criteria(): BelongsTo
+    {
+        return $this->belongsTo(Criteria::class);
+    }
+
+    /**
+     * Scope for active rules
+     */
+    public function scopeActive($query)
+    {
+        return $query->where('is_active', true);
+    }
+
+    /**
+     * Scope to order rules by execution order
+     */
+    public function scopeOrdered($query)
+    {
+        return $query->orderBy('order');
+    }
+
+    /**
+     * Scope to filter by field
+     */
+    public function scopeByField($query, string $field)
+    {
+        return $query->where('field', $field);
+    }
+
+    /**
+     * Scope to filter by operator
+     */
+    public function scopeByOperator($query, string $operator)
+    {
+        return $query->where('operator', $operator);
+    }
+
+    /**
+     * Get the actual value for evaluation
+     */
+    public function getEvaluationValue()
+    {
+        return is_array($this->value) && count($this->value) === 1
+            ? $this->value[0]
+            : $this->value;
+    }
+
+    /**
+     * Check if this rule supports multiple values
+     */
+    public function supportsMultipleValues(): bool
+    {
+        return in_array($this->operator, ['in', 'not_in', 'between']);
+    }
+}

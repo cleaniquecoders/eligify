@@ -8,12 +8,88 @@ return new class extends Migration
 {
     public function up()
     {
-        Schema::create('eligify_table', function (Blueprint $table) {
+        // Criteria table - defines eligibility criteria sets
+        Schema::create('eligify_criteria', function (Blueprint $table) {
             $table->id();
-
-            // add fields
-
+            $table->uuid('uuid')->unique()->index();
+            $table->string('name'); // e.g., 'Loan Approval', 'Scholarship Eligibility'
+            $table->string('slug', 255)->unique();
+            $table->text('description')->nullable();
+            $table->boolean('is_active')->default(true);
+            $table->json('meta')->nullable(); // Additional metadata
             $table->timestamps();
+
+            $table->index(['name', 'is_active']);
         });
+
+        // Rules table - individual rules within criteria
+        Schema::create('eligify_rules', function (Blueprint $table) {
+            $table->id();
+            $table->uuid('uuid')->unique()->index();
+            $table->foreignId('criteria_id')->constrained('eligify_criteria')->onDelete('cascade');
+            $table->string('field'); // Field to evaluate (e.g., 'income', 'credit_score')
+            $table->string('operator'); // Operator (>=, <=, ==, !=, in, not_in, etc.)
+            $table->json('value'); // Value to compare against (stored as JSON for flexibility)
+            $table->integer('weight')->default(1); // Rule weight for scoring
+            $table->integer('order')->default(0); // Rule execution order
+            $table->boolean('is_active')->default(true);
+            $table->json('meta')->nullable(); // Additional rule metadata
+            $table->timestamps();
+
+            $table->index(['criteria_id', 'is_active']);
+            $table->index(['field', 'operator']);
+        });
+
+        // Evaluations table - evaluation results and audit trail
+        Schema::create('eligify_evaluations', function (Blueprint $table) {
+            $table->id();
+            $table->uuid('uuid')->unique()->index();
+            $table->foreignId('criteria_id')->constrained('eligify_criteria');
+            $table->string('evaluable_type'); // Polymorphic relation (User, Application, etc.)
+            $table->unsignedBigInteger('evaluable_id');
+            $table->boolean('passed')->index(); // Final result
+            $table->decimal('score', 8, 2)->default(0); // Calculated score
+            $table->json('failed_rules')->nullable(); // IDs of failed rules
+            $table->json('rule_results')->nullable(); // Detailed results per rule
+            $table->string('decision')->nullable(); // Human-readable decision
+            $table->json('context')->nullable(); // Evaluation context/data
+            $table->json('meta')->nullable(); // Additional evaluation metadata
+            $table->timestamp('evaluated_at');
+            $table->timestamps();
+
+            $table->index(['evaluable_type', 'evaluable_id']);
+            $table->index(['passed', 'evaluated_at']);
+            $table->index(['criteria_id', 'passed']);
+        });
+
+        // Audit logs table - comprehensive audit trail
+        Schema::create('eligify_audit_logs', function (Blueprint $table) {
+            $table->id();
+            $table->uuid('uuid')->unique()->index();
+            $table->string('event'); // Event type (evaluation_completed, rule_executed, etc.)
+            $table->string('auditable_type'); // Polymorphic relation
+            $table->unsignedBigInteger('auditable_id');
+            $table->json('old_values')->nullable(); // Previous state
+            $table->json('new_values')->nullable(); // New state
+            $table->json('context')->nullable(); // Additional context
+            $table->string('user_type')->nullable(); // User who triggered the action
+            $table->unsignedBigInteger('user_id')->nullable();
+            $table->string('ip_address')->nullable();
+            $table->string('user_agent')->nullable();
+            $table->json('meta')->nullable(); // Additional audit metadata
+            $table->timestamps();
+
+            $table->index(['auditable_type', 'auditable_id']);
+            $table->index(['event', 'created_at']);
+            $table->index(['user_type', 'user_id']);
+        });
+    }
+
+    public function down()
+    {
+        Schema::dropIfExists('eligify_audit_logs');
+        Schema::dropIfExists('eligify_evaluations');
+        Schema::dropIfExists('eligify_rules');
+        Schema::dropIfExists('eligify_criteria');
     }
 };
