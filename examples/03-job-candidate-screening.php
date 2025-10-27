@@ -103,7 +103,7 @@ $criteria = Eligify::criteria('senior_software_engineer_2025')
                 if (isset($ruleResult['rule'])) {
                     $rule = $ruleResult['rule'];
                     $field = $rule->field ?? $rule->getAttribute('field');
-                    
+
                     $messages = [
                         'years_experience' => 'Insufficient work experience',
                         'has_bachelor_degree' => 'Education requirement not met',

@@ -112,7 +112,7 @@ $criteria = Eligify::criteria('health_insurance_underwriting_2025')
                 if (isset($ruleResult['rule'])) {
                     $rule = $ruleResult['rule'];
                     $field = $rule->field ?? $rule->getAttribute('field');
-                    
+
                     $concerns = [
                         'age' => 'Age outside acceptable range',
                         'has_heart_disease' => 'Pre-existing heart condition',
