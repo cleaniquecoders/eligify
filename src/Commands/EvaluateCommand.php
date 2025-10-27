@@ -18,7 +18,7 @@ class EvaluateCommand extends Command
                         {--format=table : Output format (table, json, detailed)}
                         {--save : Save evaluation results to database}
                         {--callbacks : Execute configured callbacks}
-                        {--verbose : Show detailed output}';
+                        {--verbose-output : Show detailed output}';
 
     public $description = 'Run eligibility evaluations from command line';
 
@@ -96,7 +96,7 @@ class EvaluateCommand extends Command
             $extractor = new ModelDataExtractor;
             $data = $extractor->extract($model);
 
-            if ($this->option('verbose')) {
+            if ($this->option('verbose-output')) {
                 $this->info("Extracted data from {$modelClass}#{$id}:");
                 $this->line(json_encode($data, JSON_PRETTY_PRINT));
                 $this->newLine();
@@ -169,7 +169,7 @@ class EvaluateCommand extends Command
     protected function evaluateSingle(Criteria $criteria, array $data): int
     {
         $this->info("🎯 Evaluating against criteria: {$criteria->name}");
-        if ($this->option('verbose')) {
+        if ($this->option('verbose-output')) {
             $this->line("Criteria UUID: {$criteria->uuid}");
             $this->line("Rules count: {$criteria->rules->count()}");
         }
@@ -194,7 +194,7 @@ class EvaluateCommand extends Command
         } catch (\Exception $e) {
             $this->error("Evaluation failed: {$e->getMessage()}");
 
-            if ($this->option('verbose')) {
+            if ($this->option('verbose-output')) {
                 $this->line("Stack trace: {$e->getTraceAsString()}");
             }
 
@@ -210,7 +210,8 @@ class EvaluateCommand extends Command
             return self::FAILURE;
         }
 
-        $this->info("🎯 Batch evaluating {count($dataCollection)} records against: {$criteria->name}");
+        $count = count($dataCollection);
+        $this->info("🎯 Batch evaluating {$count} records against: {$criteria->name}");
         $this->newLine();
 
         try {
@@ -262,7 +263,7 @@ class EvaluateCommand extends Command
         }
 
         // Detailed format
-        if ($format === 'detailed' || $this->option('verbose')) {
+        if ($format === 'detailed' || $this->option('verbose-output')) {
             $this->info('📊 Detailed Information:');
 
             // Show input data
@@ -306,9 +307,10 @@ class EvaluateCommand extends Command
 
         // Show summary table
         $tableData = [];
+        $counter = 1;
         foreach ($results as $index => $result) {
             $tableData[] = [
-                $index + 1,
+                $counter++,
                 $result['passed'] ? '✅ PASSED' : '❌ FAILED',
                 $result['score'],
                 $result['decision'],
@@ -322,7 +324,7 @@ class EvaluateCommand extends Command
         );
 
         // Show failed cases details if verbose
-        if ($this->option('verbose') && $failed > 0) {
+        if ($this->option('verbose-output') && $failed > 0) {
             $this->newLine();
             $this->warn('❌ Failed Cases Details:');
 

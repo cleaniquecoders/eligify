@@ -111,8 +111,8 @@ class EligifyCommand extends Command
         $this->newLine();
         $this->info('🏆 Top Criteria by Usage:');
 
-        $topCriteria = Evaluation::selectRaw('criteria_uuid, COUNT(*) as evaluation_count')
-            ->groupBy('criteria_uuid')
+        $topCriteria = Evaluation::selectRaw('criteria_id, COUNT(*) as evaluation_count')
+            ->groupBy('criteria_id')
             ->orderBy('evaluation_count', 'desc')
             ->limit(5)
             ->with('criteria')
@@ -120,7 +120,7 @@ class EligifyCommand extends Command
 
         if ($topCriteria->isNotEmpty()) {
             $topData = $topCriteria->map(function ($item) {
-                $criteria = Criteria::where('uuid', $item->criteria_uuid)->first();
+                $criteria = $item->criteria;
 
                 return [
                     $criteria ? $criteria->name : 'Unknown',

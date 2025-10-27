@@ -178,7 +178,7 @@ class CriteriaCommand extends Command
             $rulesData = $criteria->rules->map(function ($rule) {
                 return [
                     $rule->field,
-                    $rule->operator->value,
+                    is_string($rule->operator) ? $rule->operator : $rule->operator->value,
                     $this->formatValue($rule->value),
                     $rule->weight,
                     $rule->is_active ? '✅' : '❌',
@@ -316,7 +316,7 @@ class CriteriaCommand extends Command
                     'rules' => $criterion->rules->map(function ($rule) {
                         return [
                             'field' => $rule->field,
-                            'operator' => $rule->operator->value,
+                            'operator' => is_string($rule->operator) ? $rule->operator : $rule->operator->value,
                             'value' => $rule->value,
                             'weight' => $rule->weight,
                             'order' => $rule->order,
