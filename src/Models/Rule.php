@@ -4,7 +4,6 @@ namespace CleaniqueCoders\Eligify\Models;
 
 use CleaniqueCoders\Traitify\Concerns\InteractsWithEnum;
 use CleaniqueCoders\Traitify\Concerns\InteractsWithMeta;
-use CleaniqueCoders\Traitify\Concerns\InteractsWithSlug;
 use CleaniqueCoders\Traitify\Concerns\InteractsWithUuid;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -15,7 +14,6 @@ class Rule extends Model
     use HasFactory;
     use InteractsWithEnum;
     use InteractsWithMeta;
-    use InteractsWithSlug;
     use InteractsWithUuid;
 
     protected $table = 'eligify_rules';
@@ -26,7 +24,6 @@ class Rule extends Model
         'field',
         'operator',
         'value',
-        'slug',
         'weight',
         'order',
         'is_active',
@@ -40,14 +37,6 @@ class Rule extends Model
         'is_active' => 'boolean',
         'meta' => 'array',
     ];
-
-    /**
-     * Configure the slug source field
-     */
-    public function getSlugSourceAttribute(): string
-    {
-        return $this->getAttribute('field').'_'.$this->getAttribute('operator');
-    }
 
     /**
      * The criteria this rule belongs to

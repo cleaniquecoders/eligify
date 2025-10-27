@@ -21,7 +21,6 @@ class RuleFactory extends Factory
             'field' => $field,
             'operator' => $operator,
             'value' => [$this->generateValueForField($field, $operator)],
-            'slug' => Str::slug($field.'_'.$operator.'_'.fake()->word()),
             'weight' => fake()->numberBetween(1, 10),
             'order' => fake()->numberBetween(0, 100),
             'is_active' => fake()->boolean(85), // 85% chance of being active

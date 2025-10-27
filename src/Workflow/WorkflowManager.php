@@ -2,6 +2,7 @@
 
 namespace CleaniqueCoders\Eligify\Workflow;
 
+use CleaniqueCoders\Eligify\Audit\AuditLogger;
 use CleaniqueCoders\Eligify\Events\EvaluationCompleted;
 use CleaniqueCoders\Eligify\Models\Criteria;
 
@@ -11,6 +12,8 @@ class WorkflowManager
 
     protected array $config;
 
+    protected ?AuditLogger $auditLogger = null;
+
     public function __construct()
     {
         $this->config = config('eligify.workflow', [
@@ -19,6 +22,10 @@ class WorkflowManager
             'log_callback_errors' => true,
             'fail_on_callback_error' => false,
         ]);
+
+        if (config('eligify.audit.enabled', true)) {
+            $this->auditLogger = app(AuditLogger::class);
+        }
     }
 
     /**
@@ -52,10 +59,37 @@ class WorkflowManager
             return;
         }
 
+        $executionStart = microtime(true);
+        $executedCallbacks = 0;
+        $errors = [];
+
         foreach ($this->callbacks[$event] as $callbackData) {
             if ($this->shouldExecuteCallback($callbackData['conditions'], $context)) {
-                $this->executeCallback($callbackData['callback'], $context);
+                try {
+                    $this->executeCallback($callbackData['callback'], $context);
+                    $executedCallbacks++;
+                } catch (\Throwable $e) {
+                    $errors[] = $e->getMessage();
+                }
             }
+        }
+
+        $executionTime = microtime(true) - $executionStart;
+
+        // Log workflow execution if audit logger is available
+        if ($this->auditLogger && isset($context['criteria'])) {
+            $this->auditLogger->logWorkflowExecution(
+                $context['criteria'],
+                $event,
+                [
+                    'callbacks_executed' => $executedCallbacks,
+                    'total_callbacks' => count($this->callbacks[$event]),
+                    'context_keys' => array_keys($context),
+                ],
+                $executionTime,
+                empty($errors),
+                implode('; ', $errors) ?: null
+            );
         }
     }
 
@@ -64,6 +98,10 @@ class WorkflowManager
      */
     protected function executeCallback(callable $callback, array $context): void
     {
+        $callbackStart = microtime(true);
+        $success = false;
+        $error = null;
+
         try {
             // Set execution timeout if configured
             $timeout = $this->config['callback_timeout'] ?? 30;
@@ -73,7 +111,10 @@ class WorkflowManager
             }
 
             call_user_func($callback, $context['data'] ?? [], $context['result'] ?? [], $context);
+            $success = true;
         } catch (\Throwable $e) {
+            $error = $e->getMessage();
+
             // Log callback execution errors
             if ($this->config['log_callback_errors'] ?? true) {
                 logger()->error('Eligify callback execution failed', [
@@ -85,6 +126,19 @@ class WorkflowManager
             // Re-throw if configured to fail on callback errors
             if ($this->config['fail_on_callback_error'] ?? false) {
                 throw $e;
+            }
+        } finally {
+            $executionTime = microtime(true) - $callbackStart;
+
+            // Log individual callback execution if audit logger is available
+            if ($this->auditLogger && isset($context['criteria'])) {
+                $this->auditLogger->logCallbackExecution(
+                    $context['criteria'],
+                    'callback_execution',
+                    $success,
+                    $executionTime,
+                    $error
+                );
             }
         }
     }

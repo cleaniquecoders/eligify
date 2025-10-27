@@ -325,6 +325,7 @@ return [
             'rule_created',
             'rule_updated',
             'rule_deleted',
+            'rule_executed',
             'criteria_created',
             'criteria_updated',
             'criteria_activated',
@@ -339,6 +340,9 @@ return [
 
         // Include sensitive data in audit logs
         'include_sensitive_data' => false,
+
+        // Schedule automatic cleanup (cron expression or null to disable)
+        'cleanup_schedule' => 'daily', // daily, weekly, monthly, or cron expression like '0 2 * * *'
     ],
 
     /*

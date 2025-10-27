@@ -2,9 +2,9 @@
 
 namespace CleaniqueCoders\Eligify;
 
+use CleaniqueCoders\Eligify\Audit\AuditLogger;
 use CleaniqueCoders\Eligify\Builder\CriteriaBuilder;
 use CleaniqueCoders\Eligify\Engine\RuleEngine;
-use CleaniqueCoders\Eligify\Models\AuditLog;
 use CleaniqueCoders\Eligify\Models\Criteria;
 use CleaniqueCoders\Eligify\Models\Evaluation;
 
@@ -352,20 +352,8 @@ class Eligify
             return;
         }
 
-        AuditLog::create([
-            'uuid' => (string) str()->uuid(),
-            'event' => 'evaluation_completed',
-            'auditable_type' => Criteria::class,
-            'auditable_id' => $criteria->id,
-            'context' => [
-                'criteria' => $criteria->getAttribute('name'),
-                'input_data' => config('eligify.audit.include_sensitive_data', false) ? $data : [],
-                'result' => $result,
-            ],
-            'user_id' => null, // Will be set by model observers if needed
-            'ip_address' => app('request')->ip(),
-            'user_agent' => app('request')->userAgent(),
-        ]);
+        $auditLogger = app(AuditLogger::class);
+        $auditLogger->logEvaluation($criteria, $data, $result);
     }
 
     /**
