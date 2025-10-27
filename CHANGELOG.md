@@ -2,6 +2,42 @@
 
 All notable changes to `eligify` will be documented in this file.
 
+## Update documentation - 2025-10-27
+
+### Release Notes - Eligify v1.0.1
+
+**Released:** October 27, 2025
+**Type:** Documentation Release
+
+Complete documentation overhaul with **4,600+ lines** of guides and **200+ code examples**. No code changes—purely better docs to help you ship faster.
+
+#### ✨ What's New
+
+##### Documentation Added
+
+- **📖 Main README** - Quick start, core concepts, troubleshooting
+- **⚙️ Configuration Guide** - All config options, scoring methods, presets
+- **🎯 Usage Guide** - Basic to advanced patterns with examples
+- **🗄️ Migration Guide** - Complete database schema and customization
+- **💻 CLI Commands** - Full reference for 10+ Artisan commands
+- **🚀 Advanced Features** - Custom operators, scoring, workflows, events
+- **🔐 Policy Integration** - Laravel authorization patterns
+
+##### Key Coverage
+
+✅ **16 operators** explained with examples
+✅ **5 scoring methods** (weighted, pass/fail, sum, average, percentage)
+✅ **10 real-world use cases** (finance, education, HR, insurance, e-commerce, government, SaaS)
+✅ **Batch operations** and performance optimization
+✅ **Multi-tenancy** patterns
+✅ **Event-driven workflows**
+✅ **Custom implementations**
+
+
+---
+
+**Full Changelog**: [v1.0.0...v1.0.1](https://github.com/cleaniquecoders/eligify/compare/v1.0.0...v1.0.1)
+
 ## First Release - 2025-10-27
 
 1.0.0 Release Notes
@@ -40,6 +76,7 @@ Eligify::criteria('loan_approval')
     ->onPass(fn($applicant) => $applicant->approveLoan())
     ->onFail(fn($applicant) => $applicant->notifyRejection())
     ->evaluate($applicant);
+
 
 ```
 #### 🧠 Advanced Rule Engine
@@ -128,6 +165,7 @@ Eligify::criteria('complex_approval')
     ])
     ->evaluate($applicant);
 
+
 ```
 #### Policy Integration
 
@@ -149,6 +187,7 @@ class LoanPolicy
     }
 }
 
+
 ```
 #### Artisan Commands
 
@@ -165,6 +204,7 @@ php artisan eligify:evaluate loan_approval --model="App\Models\Loan:1"
 # Audit management
 php artisan eligify:audit-query --event=evaluation_completed
 php artisan eligify:cleanup-audit --days=90
+
 
 ```
 
@@ -184,11 +224,13 @@ php artisan eligify:cleanup-audit --days=90
 ```bash
 composer require cleaniquecoders/eligify
 
+
 ```
 ```bash
 php artisan vendor:publish --tag="eligify-migrations"
 php artisan vendor:publish --tag="eligify-config"
 php artisan migrate
+
 
 ```
 
