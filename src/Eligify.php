@@ -4,6 +4,7 @@ namespace CleaniqueCoders\Eligify;
 
 use CleaniqueCoders\Eligify\Audit\AuditLogger;
 use CleaniqueCoders\Eligify\Builder\CriteriaBuilder;
+use CleaniqueCoders\Eligify\Engine\AdvancedRuleEngine;
 use CleaniqueCoders\Eligify\Engine\RuleEngine;
 use CleaniqueCoders\Eligify\Models\Criteria;
 use CleaniqueCoders\Eligify\Models\Evaluation;
@@ -11,6 +12,8 @@ use CleaniqueCoders\Eligify\Models\Evaluation;
 class Eligify
 {
     protected RuleEngine $ruleEngine;
+
+    protected ?AdvancedRuleEngine $advancedEngine = null;
 
     public function __construct()
     {
@@ -41,8 +44,9 @@ class Eligify
             $criteriaModel = $criteria;
         }
 
-        // Run the evaluation
-        $result = $this->ruleEngine->evaluate($criteriaModel, $data);
+        // Run the evaluation using appropriate engine
+        $engine = $this->getEngineForCriteria($criteriaModel);
+        $result = $engine->evaluate($criteriaModel, $data);
 
         // Save evaluation record if requested
         if ($saveEvaluation) {
@@ -372,5 +376,35 @@ class Eligify
         $this->ruleEngine = $engine;
 
         return $this;
+    }
+
+    /**
+     * Get advanced rule engine instance
+     */
+    public function getAdvancedRuleEngine(): AdvancedRuleEngine
+    {
+        if ($this->advancedEngine === null) {
+            $this->advancedEngine = new AdvancedRuleEngine($this->ruleEngine);
+        }
+
+        return $this->advancedEngine;
+    }
+
+    /**
+     * Get appropriate engine for criteria
+     */
+    protected function getEngineForCriteria(Criteria $criteria)
+    {
+        $useAdvanced = $criteria->meta['use_advanced_engine'] ?? false;
+
+        // Also check if criteria has complex features that require advanced engine
+        $hasComplexFeatures =
+            isset($criteria->meta['group_combination_logic']) ||
+            isset($criteria->meta['decision_thresholds']) ||
+            $criteria->rules()->whereNotNull('meta')->exists();
+
+        return ($useAdvanced || $hasComplexFeatures)
+            ? $this->getAdvancedRuleEngine()
+            : $this->ruleEngine;
     }
 }

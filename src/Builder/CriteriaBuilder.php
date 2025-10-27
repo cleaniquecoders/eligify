@@ -394,4 +394,121 @@ class CriteriaBuilder
 
         return $value;
     }
+
+    /**
+     * Start a new rule group with specific logic
+     */
+    public function startGroup(string $logic = 'AND'): self
+    {
+        // Set group logic in the next rule's metadata
+        $this->pendingGroupLogic = $logic;
+
+        return $this;
+    }
+
+    /**
+     * Add rule with dependency
+     */
+    public function addRuleDependency(
+        string $ruleField,
+        string $ruleOperator,
+        mixed $ruleValue,
+        string $dependencyField,
+        string $dependencyOperator,
+        mixed $dependencyValue,
+        ?int $weight = null,
+        RulePriority $priority = RulePriority::MEDIUM
+    ): self {
+        $dependencies = [
+            [
+                'field' => $dependencyField,
+                'operator' => $dependencyOperator,
+                'value' => $dependencyValue,
+            ],
+        ];
+
+        return $this->addRuleWithMetadata(
+            $ruleField,
+            $ruleOperator,
+            $ruleValue,
+            $weight,
+            $priority,
+            ['dependencies' => $dependencies]
+        );
+    }
+
+    /**
+     * Add rule with custom metadata
+     */
+    public function addRuleWithMetadata(
+        string $field,
+        string $operator,
+        mixed $value,
+        ?int $weight = null,
+        RulePriority $priority = RulePriority::MEDIUM,
+        array $metadata = []
+    ): self {
+        $this->validateRule($field, $operator, $value);
+
+        $ruleData = [
+            'field' => $field,
+            'operator' => $operator,
+            'value' => $this->normalizeValue($value),
+            'weight' => $weight ?? $this->config['rule_weights'][$priority->value],
+            'order' => $this->pendingRules->count() + 1,
+            'is_active' => true,
+            'meta' => $metadata,
+        ];
+
+        // Add group logic if specified
+        if (isset($this->pendingGroupLogic)) {
+            $ruleData['meta']['group_logic'] = $this->pendingGroupLogic;
+            unset($this->pendingGroupLogic);
+        }
+
+        $this->pendingRules->push($ruleData);
+
+        return $this;
+    }
+
+    /**
+     * Set group combination logic for the criteria
+     */
+    public function setGroupCombinationLogic(string $logic = 'AND'): self
+    {
+        $currentMeta = $this->criteria->meta ?? [];
+        $currentMeta['group_combination_logic'] = $logic;
+
+        $this->criteria->update(['meta' => $currentMeta]);
+
+        return $this;
+    }
+
+    /**
+     * Set decision thresholds
+     */
+    public function setDecisionThresholds(array $thresholds): self
+    {
+        $currentMeta = $this->criteria->meta ?? [];
+        $currentMeta['decision_thresholds'] = $thresholds;
+
+        $this->criteria->update(['meta' => $currentMeta]);
+
+        return $this;
+    }
+
+    /**
+     * Use advanced rule engine for evaluation
+     */
+    public function useAdvancedEngine(bool $advanced = true): self
+    {
+        $currentMeta = $this->criteria->meta ?? [];
+        $currentMeta['use_advanced_engine'] = $advanced;
+
+        $this->criteria->update(['meta' => $currentMeta]);
+
+        return $this;
+    }
+
+    protected ?string $pendingGroupLogic = null;
 }

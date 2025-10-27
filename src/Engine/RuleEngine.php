@@ -72,9 +72,9 @@ class RuleEngine
     }
 
     /**
-     * Evaluate a single rule against data
+     * Evaluate a single rule against data (public method for advanced engine)
      */
-    protected function evaluateRule(Rule $rule, array $data): array
+    public function evaluateRule(Rule $rule, array $data): array
     {
         $startTime = microtime(true);
 
@@ -331,5 +331,15 @@ class RuleEngine
     public function clearExecutionLog(): void
     {
         $this->executionLog = [];
+    }
+
+    /**
+     * Compare values using a specific operator (public method for advanced engine)
+     */
+    public function compareValues(mixed $fieldValue, string $operator, mixed $expectedValue): bool
+    {
+        $ruleOperator = RuleOperator::from($operator);
+
+        return $this->executeOperator($ruleOperator, $fieldValue, $expectedValue);
     }
 }

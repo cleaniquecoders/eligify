@@ -5,7 +5,9 @@ namespace CleaniqueCoders\Eligify;
 use CleaniqueCoders\Eligify\Audit\AuditLogger;
 use CleaniqueCoders\Eligify\Commands\AuditQueryCommand;
 use CleaniqueCoders\Eligify\Commands\CleanupAuditLogsCommand;
+use CleaniqueCoders\Eligify\Commands\CriteriaCommand;
 use CleaniqueCoders\Eligify\Commands\EligifyCommand;
+use CleaniqueCoders\Eligify\Commands\EvaluateCommand;
 use CleaniqueCoders\Eligify\Engine\RuleEngine;
 use CleaniqueCoders\Eligify\Events\CriteriaCreated;
 use CleaniqueCoders\Eligify\Events\EvaluationCompleted;
@@ -38,6 +40,8 @@ class EligifyServiceProvider extends PackageServiceProvider
             ->hasMigration('create_eligify_table')
             ->hasCommands([
                 EligifyCommand::class,
+                CriteriaCommand::class,
+                EvaluateCommand::class,
                 AuditQueryCommand::class,
                 CleanupAuditLogsCommand::class,
             ]);

@@ -465,4 +465,68 @@ return [
         ],
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Model Data Extraction Configuration
+    |--------------------------------------------------------------------------
+    |
+    | Configure how data is extracted from Eloquent models for eligibility
+    | evaluation. These settings control what data is included and how
+    | it's processed before evaluation.
+    |
+    */
+    'model_extraction' => [
+        // Include timestamp-based computed fields
+        'include_timestamps' => true,
+
+        // Include relationship data and counts
+        'include_relationships' => true,
+
+        // Include computed fields like age, duration, etc.
+        'include_computed_fields' => true,
+
+        // Maximum depth for relationship extraction
+        'max_relationship_depth' => 2,
+
+        // Exclude sensitive fields from extraction
+        'exclude_sensitive_fields' => true,
+
+        // List of sensitive fields to exclude
+        'sensitive_fields' => [
+            'password',
+            'remember_token',
+            'api_token',
+            'secret',
+            'private_key',
+            'access_token',
+            'refresh_token',
+        ],
+
+        // Date format for extracted date fields
+        'date_format' => 'Y-m-d H:i:s',
+
+        // Enable automatic model-specific field extraction
+        'auto_configure' => true,
+
+        // Custom field mappings for common model types
+        'model_mappings' => [
+            'User' => [
+                'field_mappings' => [
+                    'email_verified_at' => 'email_verified_timestamp',
+                    'created_at' => 'registration_date',
+                ],
+                'computed_fields' => [
+                    'is_verified' => 'email_verified_at !== null',
+                    'account_age_days' => 'created_at.diffInDays(now())',
+                ],
+            ],
+            'Order' => [
+                'computed_fields' => [
+                    'order_age_days' => 'created_at.diffInDays(now())',
+                    'is_recent' => 'created_at.isAfter(now().subDays(30))',
+                ],
+            ],
+        ],
+    ],
+
 ];
