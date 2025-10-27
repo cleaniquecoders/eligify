@@ -1,0 +1,680 @@
+# CLI Commands Reference
+
+Eligify provides a comprehensive set of Artisan commands for managing eligibility criteria, evaluations, and audits.
+
+## Table of Contents
+
+- [Status Commands](#status-commands)
+- [Criteria Management](#criteria-management)
+- [Evaluation Commands](#evaluation-commands)
+- [Audit Commands](#audit-commands)
+- [Maintenance Commands](#maintenance-commands)
+
+## Status Commands
+
+### eligify
+
+View package status, statistics, and health information.
+
+```bash
+php artisan eligify [action] [--format=]
+```
+
+**Actions:**
+
+- `status` (default) - Show package status and recent criteria
+- `stats` - Display detailed statistics
+- `health` - Run system health checks
+
+**Options:**
+
+- `--format` - Output format: `table`, `json`, `csv` (default: `table`)
+
+**Examples:**
+
+```bash
+# Show status
+php artisan eligify status
+
+# View statistics
+php artisan eligify stats
+
+# Health check
+php artisan eligify health
+
+# Export as JSON
+php artisan eligify stats --format=json
+```
+
+**Output Example:**
+
+```
+🎯 Eligify Package Status
+
+Component      Count  Status
+────────────────────────────────
+Criteria       12     ✅ Active
+Rules          48     ✅ Active
+Evaluations    1,234  ✅ Active
+Audit Logs     5,678  ✅ Active
+
+📋 Recent Criteria:
+Name                 Slug                 Rules      Status     Created
+─────────────────────────────────────────────────────────────────────────
+Loan Approval       loan-approval        5 rules    ✅ Active  2025-10-27
+Scholarship         scholarship          8 rules    ✅ Active  2025-10-26
+```
+
+## Criteria Management
+
+### eligify:criteria
+
+Manage eligibility criteria.
+
+```bash
+php artisan eligify:criteria {action} [arguments] [options]
+```
+
+**Actions:**
+
+#### create
+
+Create a new criteria interactively:
+
+```bash
+php artisan eligify:criteria create
+```
+
+**Interactive Prompts:**
+
+```
+Criteria name: Loan Approval
+Description: Standard loan approval process
+Pass threshold (0-100): 75
+Add rules? (yes/no): yes
+
+Rule 1:
+Field name: credit_score
+Operator (>=, <=, ==, etc.): >=
+Value: 650
+Weight (1-10): 8
+
+Add another rule? (yes/no): yes
+...
+```
+
+#### list
+
+List all criteria:
+
+```bash
+php artisan eligify:criteria list [options]
+```
+
+**Options:**
+
+- `--active` - Show only active criteria
+- `--inactive` - Show only inactive criteria
+- `--with-rules` - Include rule counts
+- `--format=table|json|csv` - Output format
+
+**Examples:**
+
+```bash
+# List all criteria
+php artisan eligify:criteria list
+
+# Active criteria only
+php artisan eligify:criteria list --active
+
+# With rule counts
+php artisan eligify:criteria list --with-rules
+
+# Export as JSON
+php artisan eligify:criteria list --format=json
+```
+
+#### show
+
+Show detailed information about a criteria:
+
+```bash
+php artisan eligify:criteria show {slug}
+```
+
+**Example:**
+
+```bash
+php artisan eligify:criteria show loan-approval
+```
+
+**Output:**
+
+```
+📋 Criteria: Loan Approval
+Slug: loan-approval
+Status: ✅ Active
+Pass Threshold: 75%
+Created: 2025-10-27 10:30:00
+
+Rules (5):
+1. credit_score >= 650 (weight: 8)
+2. income >= 30000 (weight: 7)
+3. employment_status in ['employed', 'self-employed'] (weight: 6)
+4. debt_to_income_ratio <= 43 (weight: 5)
+5. active_loans <= 3 (weight: 4)
+
+Recent Evaluations (10):
+ID    Score  Passed  Evaluated At
+─────────────────────────────────────
+123   85%    ✅      2025-10-27 10:00
+122   62%    ❌      2025-10-27 09:45
+...
+```
+
+#### activate
+
+Activate a criteria:
+
+```bash
+php artisan eligify:criteria activate {slug}
+```
+
+#### deactivate
+
+Deactivate a criteria:
+
+```bash
+php artisan eligify:criteria deactivate {slug}
+```
+
+#### delete
+
+Delete a criteria (with confirmation):
+
+```bash
+php artisan eligify:criteria delete {slug} [--force]
+```
+
+**Options:**
+
+- `--force` - Skip confirmation
+
+#### duplicate
+
+Create a copy of an existing criteria:
+
+```bash
+php artisan eligify:criteria duplicate {slug} {new-name}
+```
+
+**Example:**
+
+```bash
+php artisan eligify:criteria duplicate loan-approval loan-approval-tier-2
+```
+
+## Evaluation Commands
+
+### eligify:evaluate
+
+Evaluate eligibility from the command line.
+
+```bash
+php artisan eligify:evaluate {criteria} [options]
+```
+
+**Options:**
+
+- `--data=` - JSON string of data to evaluate
+- `--file=` - Path to JSON file with data
+- `--interactive` - Interactive data entry
+- `--save` - Save evaluation to database (default: true)
+- `--no-save` - Don't save evaluation
+- `--user=` - User ID to associate with evaluation
+- `--verbose` - Show detailed output
+
+**Examples:**
+
+#### Inline Data
+
+```bash
+php artisan eligify:evaluate loan-approval \
+    --data='{"credit_score":720,"income":55000,"employment":"employed"}'
+```
+
+#### From File
+
+```bash
+php artisan eligify:evaluate loan-approval --file=applicant-data.json
+```
+
+#### Interactive Mode
+
+```bash
+php artisan eligify:evaluate loan-approval --interactive
+```
+
+**Interactive Prompts:**
+
+```
+Enter value for credit_score: 720
+Enter value for income: 55000
+Enter value for employment: employed
+Enter value for debt_to_income_ratio: 0.35
+Enter value for active_loans: 2
+
+Evaluating...
+
+✅ PASSED
+Score: 87%
+Decision: Approved
+
+Rule Results:
+✅ credit_score >= 650 (actual: 720)
+✅ income >= 30000 (actual: 55000)
+✅ employment in ['employed','self-employed'] (actual: employed)
+✅ debt_to_income_ratio <= 43 (actual: 0.35)
+✅ active_loans <= 3 (actual: 2)
+
+Evaluation saved with ID: 456
+```
+
+#### Batch Evaluation
+
+Evaluate multiple records from a JSON file:
+
+```bash
+php artisan eligify:evaluate loan-approval --file=batch-applicants.json --batch
+```
+
+**JSON Format:**
+
+```json
+[
+  {
+    "credit_score": 720,
+    "income": 55000,
+    "employment": "employed"
+  },
+  {
+    "credit_score": 680,
+    "income": 45000,
+    "employment": "self-employed"
+  }
+]
+```
+
+## Audit Commands
+
+### eligify:audit
+
+Query and export audit logs.
+
+```bash
+php artisan eligify:audit [options]
+```
+
+**Options:**
+
+- `--event=` - Filter by event type
+- `--from=` - Start date (Y-m-d)
+- `--to=` - End date (Y-m-d)
+- `--user=` - Filter by user ID
+- `--limit=` - Number of records (default: 100)
+- `--export=` - Export to file (csv, json)
+- `--format=` - Output format (table, json, csv)
+
+**Examples:**
+
+#### View Recent Logs
+
+```bash
+php artisan eligify:audit --limit=50
+```
+
+#### Filter by Event
+
+```bash
+php artisan eligify:audit --event=evaluation_completed
+```
+
+#### Date Range
+
+```bash
+php artisan eligify:audit --from=2025-10-01 --to=2025-10-27
+```
+
+#### Filter by User
+
+```bash
+php artisan eligify:audit --user=123
+```
+
+#### Export to CSV
+
+```bash
+php artisan eligify:audit --export=audit-report.csv --from=2025-10-01
+```
+
+#### Export to JSON
+
+```bash
+php artisan eligify:audit --export=audit-logs.json --format=json
+```
+
+**Output Example:**
+
+```
+📊 Audit Logs
+
+ID    Event                 Auditable        User  IP Address    Created At
+──────────────────────────────────────────────────────────────────────────────
+123   evaluation_completed  Evaluation #456  101   192.168.1.1   2025-10-27 10:00
+122   rule_created         Rule #89          101   192.168.1.1   2025-10-27 09:45
+121   criteria_activated   Criteria #5       102   192.168.1.2   2025-10-27 09:30
+```
+
+### eligify:cleanup-audit
+
+Clean up old audit logs.
+
+```bash
+php artisan eligify:cleanup-audit [options]
+```
+
+**Options:**
+
+- `--days=` - Delete logs older than X days (default: from config)
+- `--dry-run` - Preview what would be deleted
+- `--force` - Skip confirmation
+- `--event=` - Only clean specific event types
+
+**Examples:**
+
+#### Default Cleanup
+
+```bash
+php artisan eligify:cleanup-audit
+```
+
+**Output:**
+
+```
+🗑️  Cleaning audit logs older than 365 days...
+
+Found 1,234 audit logs to delete.
+Continue? (yes/no): yes
+
+✅ Deleted 1,234 audit logs.
+```
+
+#### Custom Retention
+
+```bash
+php artisan eligify:cleanup-audit --days=90
+```
+
+#### Dry Run
+
+```bash
+php artisan eligify:cleanup-audit --dry-run
+```
+
+**Output:**
+
+```
+🔍 Dry run mode - no data will be deleted
+
+Would delete:
+- 450 evaluation_completed logs
+- 234 rule_executed logs
+- 156 criteria_modified logs
+─────────────────────────────────
+Total: 840 logs
+```
+
+#### Specific Events
+
+```bash
+php artisan eligify:cleanup-audit --event=evaluation_completed --days=180
+```
+
+## Maintenance Commands
+
+### eligify:cleanup-evaluations
+
+Clean up old evaluation records.
+
+```bash
+php artisan eligify:cleanup-evaluations [options]
+```
+
+**Options:**
+
+- `--days=` - Delete evaluations older than X days (default: 730)
+- `--passed-only` - Only delete passed evaluations
+- `--failed-only` - Only delete failed evaluations
+- `--dry-run` - Preview deletions
+- `--force` - Skip confirmation
+
+**Examples:**
+
+```bash
+# Clean evaluations older than 2 years
+php artisan eligify:cleanup-evaluations --days=730
+
+# Clean old passed evaluations only
+php artisan eligify:cleanup-evaluations --days=365 --passed-only
+
+# Dry run
+php artisan eligify:cleanup-evaluations --dry-run
+```
+
+### eligify:optimize
+
+Optimize database tables and cache.
+
+```bash
+php artisan eligify:optimize [options]
+```
+
+**Options:**
+
+- `--tables` - Optimize database tables
+- `--cache` - Clear and rebuild cache
+- `--all` - Optimize everything
+
+**Examples:**
+
+```bash
+# Optimize tables
+php artisan eligify:optimize --tables
+
+# Clear and rebuild cache
+php artisan eligify:optimize --cache
+
+# Full optimization
+php artisan eligify:optimize --all
+```
+
+### eligify:export
+
+Export criteria, rules, and evaluations.
+
+```bash
+php artisan eligify:export {file} [options]
+```
+
+**Options:**
+
+- `--type=` - What to export: `criteria`, `rules`, `evaluations`, `all` (default: all)
+- `--criteria=` - Export specific criteria (by slug)
+- `--format=` - Export format: `json`, `csv` (default: json)
+- `--with-evaluations` - Include evaluations
+- `--from=` - Start date for evaluations
+- `--to=` - End date for evaluations
+
+**Examples:**
+
+```bash
+# Export all data
+php artisan eligify:export backup.json
+
+# Export specific criteria
+php artisan eligify:export loan-data.json --criteria=loan-approval
+
+# Export evaluations to CSV
+php artisan eligify:export evaluations.csv --type=evaluations --format=csv
+
+# Export with date range
+php artisan eligify:export report.json --from=2025-10-01 --to=2025-10-27
+```
+
+### eligify:import
+
+Import criteria and rules from file.
+
+```bash
+php artisan eligify:import {file} [options]
+```
+
+**Options:**
+
+- `--validate` - Validate before importing
+- `--dry-run` - Preview import without saving
+- `--overwrite` - Overwrite existing criteria
+- `--force` - Skip confirmation
+
+**Examples:**
+
+```bash
+# Import from file
+php artisan eligify:import criteria.json
+
+# Validate before import
+php artisan eligify:import criteria.json --validate
+
+# Dry run
+php artisan eligify:import criteria.json --dry-run
+
+# Overwrite existing
+php artisan eligify:import criteria.json --overwrite --force
+```
+
+### eligify:seed
+
+Seed database with sample data.
+
+```bash
+php artisan eligify:seed [options]
+```
+
+**Options:**
+
+- `--criteria=` - Number of criteria to create (default: 5)
+- `--rules=` - Rules per criteria (default: 5)
+- `--evaluations=` - Evaluations per criteria (default: 20)
+
+**Example:**
+
+```bash
+php artisan eligify:seed --criteria=10 --rules=8 --evaluations=50
+```
+
+## Scheduling Commands
+
+Add to `app/Console/Kernel.php`:
+
+```php
+protected function schedule(Schedule $schedule)
+{
+    // Clean audit logs daily
+    $schedule->command('eligify:cleanup-audit')
+        ->daily()
+        ->at('02:00');
+
+    // Clean old evaluations weekly
+    $schedule->command('eligify:cleanup-evaluations --days=365')
+        ->weekly()
+        ->sundays()
+        ->at('03:00');
+
+    // Optimize monthly
+    $schedule->command('eligify:optimize --all')
+        ->monthly()
+        ->at('04:00');
+
+    // Generate weekly report
+    $schedule->command('eligify:audit --export=weekly-audit.csv --from=-7days')
+        ->weekly()
+        ->mondays()
+        ->at('08:00');
+}
+```
+
+## Command Aliases
+
+Add aliases to `.bashrc` or `.zshrc`:
+
+```bash
+alias eli='php artisan eligify'
+alias eli:crit='php artisan eligify:criteria'
+alias eli:eval='php artisan eligify:evaluate'
+alias eli:audit='php artisan eligify:audit'
+```
+
+**Usage:**
+
+```bash
+eli status
+eli:crit list --active
+eli:eval loan-approval --interactive
+eli:audit --event=evaluation_completed
+```
+
+## Tips and Tricks
+
+### 1. JSON Piping
+
+```bash
+# Pipe evaluation results to jq
+php artisan eligify:evaluate loan-approval --data='...' --format=json | jq '.score'
+```
+
+### 2. Batch Processing
+
+```bash
+# Process multiple files
+for file in data/*.json; do
+    php artisan eligify:evaluate loan-approval --file="$file"
+done
+```
+
+### 3. Monitoring
+
+```bash
+# Watch for new evaluations
+watch -n 5 'php artisan eligify stats'
+```
+
+### 4. Backup Before Cleanup
+
+```bash
+# Export before cleaning
+php artisan eligify:export backup-$(date +%Y%m%d).json
+php artisan eligify:cleanup-audit --days=90
+```
+
+### 5. Cron Integration
+
+```bash
+# Daily evaluation report
+0 8 * * * cd /path/to/app && php artisan eligify:audit --export=/reports/daily-$(date +\%Y\%m\%d).csv --from=-1day
+```
+
+## Next Steps
+
+- [Configuration Guide](configuration.md)
+- [Usage Guide](usage-guide.md)
+- [Advanced Features](advanced-features.md)

@@ -28,25 +28,9 @@ You can publish the config file with:
 php artisan vendor:publish --tag="eligify-config"
 ```
 
-This is the contents of the published config file:
-
-```php
-return [
-];
-```
-
-Optionally, you can publish the views using
-
-```bash
-php artisan vendor:publish --tag="eligify-views"
-```
-
 ## Usage
 
-```php
-$eligify = new CleaniqueCoders\Eligify();
-echo $eligify->echoPhrase('Hello, CleaniqueCoders!');
-```
+See [documentation](docs/README.md)
 
 ## Testing
 
