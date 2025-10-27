@@ -10,7 +10,6 @@ All notable changes to `eligify` will be documented in this file.
 
 We're thrilled to announce the first stable release of Eligify - a powerful Laravel package that transforms eligibility decisions into data-driven, traceable, and automatable processes.
 
-
 ---
 
 ### 🌟 What is Eligify?
@@ -24,7 +23,6 @@ Eligify is a flexible rule and criteria engine for Laravel that helps you determ
 - **HR**: Candidate screening, promotion qualification
 - **Government**: Aid distribution, program qualification
 - **E-commerce**: Discount eligibility, loyalty tier determination
-
 
 ---
 
@@ -42,6 +40,7 @@ Eligify::criteria('loan_approval')
     ->evaluate($applicant);
 
 ```
+
 #### 🧠 Advanced Rule Engine
 
 - **Complex Logic**: AND/OR/NAND/NOR/XOR/MAJORITY operators for nested conditions
@@ -77,7 +76,6 @@ Eligify::criteria('loan_approval')
 - **Database Support**: Full Eloquent integration with optimized queries
 - **Factory Support**: Comprehensive testing factories included
 
-
 ---
 
 ### 📦 Core Components
@@ -102,7 +100,6 @@ Eligify::criteria('loan_approval')
 - ✅ `CriteriaBuilder` - Fluent interface for building criteria
 - ✅ `WorkflowManager` - Advanced workflow execution pipeline
 - ✅ `AuditLogger` - Comprehensive audit logging system
-
 
 ---
 
@@ -129,13 +126,14 @@ Eligify::criteria('complex_approval')
     ->evaluate($applicant);
 
 ```
+
 #### Policy Integration
 
 ```php
 class LoanPolicy
 {
     use HasEligibility;
-    
+
     public function approve(User $user, Loan $loan)
     {
         return $this->checkEligibility(
@@ -150,6 +148,7 @@ class LoanPolicy
 }
 
 ```
+
 #### Artisan Commands
 
 ```bash
@@ -165,7 +164,6 @@ php artisan eligify:evaluate loan_approval --model="App\Models\Loan:1"
 # Audit management
 php artisan eligify:audit-query --event=evaluation_completed
 php artisan eligify:cleanup-audit --days=90
-
 ```
 
 ---
@@ -183,8 +181,8 @@ php artisan eligify:cleanup-audit --days=90
 
 ```bash
 composer require cleaniquecoders/eligify
-
 ```
+
 ```bash
 php artisan vendor:publish --tag="eligify-migrations"
 php artisan vendor:publish --tag="eligify-config"
@@ -204,7 +202,6 @@ php artisan migrate
 - Real-time evaluation via WebSockets
 - Multi-tenancy support
 - Enhanced performance optimization
-
 
 ---
 
