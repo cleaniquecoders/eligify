@@ -29,7 +29,7 @@ return new class extends Migration
             $table->foreignId('criteria_id')->constrained('eligify_criteria')->onDelete('cascade');
             $table->string('field'); // Field to evaluate (e.g., 'income', 'credit_score')
             $table->string('operator'); // Operator (>=, <=, ==, !=, in, not_in, etc.)
-            $table->json('value'); // Value to compare against (stored as JSON for flexibility)
+            $table->json('value')->nullable(); // Value to compare against (stored as JSON for flexibility)
             $table->integer('weight')->default(1); // Rule weight for scoring
             $table->integer('order')->default(0); // Rule execution order
             $table->boolean('is_active')->default(true);
