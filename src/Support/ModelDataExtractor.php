@@ -377,9 +377,9 @@ class ModelDataExtractor
                     'created_at' => 'registration_date',
                 ])
                     ->setComputedFields([
-                        'is_premium_user' => fn ($model) => $this->safeRelationshipCheck($model, 'subscriptions', 'active'),
-                        'total_orders' => fn ($model) => $this->safeRelationshipCount($model, 'orders'),
-                        'lifetime_value' => fn ($model) => $this->safeRelationshipSum($model, 'orders', 'total'),
+                        'is_premium_user' => fn ($model) => $extractor->safeRelationshipCheck($model, 'subscriptions', 'active'),
+                        'total_orders' => fn ($model) => $extractor->safeRelationshipCount($model, 'orders'),
+                        'lifetime_value' => fn ($model) => $extractor->safeRelationshipSum($model, 'orders', 'total'),
                     ]);
                 break;
 

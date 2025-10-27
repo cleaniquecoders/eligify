@@ -160,7 +160,7 @@ trait HasEligibility
                 continue;
             }
 
-            $results[$model->getKey()] = $this->checkEligibility($model, $criteriaName);
+            $results[] = $this->checkEligibility($model, $criteriaName);
         }
 
         return $results;

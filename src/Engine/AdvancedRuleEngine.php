@@ -51,30 +51,48 @@ class AdvancedRuleEngine
     {
         $rules = $criteria->rules()->orderBy('order')->get();
         $groups = [];
-        $currentGroup = ['logic' => 'AND', 'rules' => []];
+        $currentGroup = null;
+        $lastGroupLogic = null;
 
         foreach ($rules as $rule) {
             // Check for group metadata
             $metadata = $rule->meta ?? [];
             $ruleGroupLogic = $metadata['group_logic'] ?? null;
 
-            if ($ruleGroupLogic && $ruleGroupLogic !== $currentGroup['logic']) {
-                // Start new group only if logic is different
-                if (! empty($currentGroup['rules'])) {
-                    $groups[] = $currentGroup;
+            // If this rule has group logic metadata, it indicates a new group or continuation
+            if ($ruleGroupLogic !== null) {
+                // Start new group if logic changed or no current group
+                if ($currentGroup === null || $ruleGroupLogic !== $lastGroupLogic) {
+                    // Save previous group if exists
+                    if ($currentGroup !== null && ! empty($currentGroup['rules'])) {
+                        $groups[] = $currentGroup;
+                    }
+                    // Start new group
+                    $currentGroup = [
+                        'logic' => $ruleGroupLogic,
+                        'rules' => [$rule],
+                    ];
+                    $lastGroupLogic = $ruleGroupLogic;
+                } else {
+                    // Same logic, add to current group
+                    $currentGroup['rules'][] = $rule;
                 }
-                $currentGroup = [
-                    'logic' => $ruleGroupLogic,
-                    'rules' => [$rule],
-                ];
             } else {
-                // Add rule to current group
-                $currentGroup['rules'][] = $rule;
+                // No group logic - add to default AND group or current group
+                if ($currentGroup === null) {
+                    $currentGroup = [
+                        'logic' => 'AND',
+                        'rules' => [$rule],
+                    ];
+                    $lastGroupLogic = 'AND';
+                } else {
+                    $currentGroup['rules'][] = $rule;
+                }
             }
         }
 
         // Add the last group
-        if (! empty($currentGroup['rules'])) {
+        if ($currentGroup !== null && ! empty($currentGroup['rules'])) {
             $groups[] = $currentGroup;
         }
 

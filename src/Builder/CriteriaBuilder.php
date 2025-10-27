@@ -56,14 +56,22 @@ class CriteriaBuilder
     ): self {
         $this->validateRule($field, $operator, $value);
 
-        $this->pendingRules->push([
+        $ruleData = [
             'field' => $field,
             'operator' => $operator,
             'value' => $this->normalizeValue($value),
             'weight' => $weight ?? $this->config['rule_weights'][$priority->value],
             'order' => $this->pendingRules->count() + 1,
             'is_active' => true,
-        ]);
+            'meta' => [],
+        ];
+
+        // Add group logic if specified (persists for all subsequent rules until new group is started)
+        if (isset($this->pendingGroupLogic)) {
+            $ruleData['meta']['group_logic'] = $this->pendingGroupLogic;
+        }
+
+        $this->pendingRules->push($ruleData);
 
         return $this;
     }

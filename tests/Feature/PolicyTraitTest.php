@@ -80,6 +80,8 @@ class TestUser extends Model
         'certifications',
         'performance_rating',
         'debt_ratio',
+        'loyalty_points',
+        'purchase_amount',
     ];
 
     protected $casts = [
@@ -94,6 +96,8 @@ class TestUser extends Model
         'certifications' => 'integer',
         'performance_rating' => 'float',
         'debt_ratio' => 'float',
+        'loyalty_points' => 'integer',
+        'purchase_amount' => 'float',
     ];
 }
 
@@ -204,13 +208,23 @@ test('policy trait can check minimum score threshold', function () {
 
     $policy = new TestPolicy;
 
+    // Test with passing applicant (should get 100 score)
     $applicant = new TestUser([
         'credit_score' => 720,
         'debt_ratio' => 0.25,
     ]);
 
     expect($policy->publicHasMinimumScore($applicant, 'credit_check', 80))->toBeTrue();
-    expect($policy->publicHasMinimumScore($applicant, 'credit_check', 95))->toBeFalse();
+    expect($policy->publicHasMinimumScore($applicant, 'credit_check', 100))->toBeTrue();
+
+    // Test with partially failing applicant (should get 50 score - 1 of 2 rules pass)
+    $partialApplicant = new TestUser([
+        'credit_score' => 500, // Fails this rule
+        'debt_ratio' => 0.25,  // Passes this rule
+    ]);
+
+    expect($policy->publicHasMinimumScore($partialApplicant, 'credit_check', 40))->toBeTrue();
+    expect($policy->publicHasMinimumScore($partialApplicant, 'credit_check', 60))->toBeFalse();
 });
 
 test('policy trait can check batch eligibility', function () {
