@@ -155,16 +155,21 @@ $criteria = Eligify::criteria('rental_application_screening_2025')
 
         $concerns = [];
         if (! empty($result['failed_rules'])) {
-            foreach (array_slice($result['failed_rules'], 0, 4) as $rule) {
-                $messages = [
-                    'monthly_income' => 'Income below 3x rent requirement',
-                    'credit_score' => 'Credit score below minimum',
-                    'employment_verified' => 'Employment verification needed',
-                    'has_eviction_history' => 'Previous eviction on record',
-                    'criminal_background_clear' => 'Background check concerns',
-                    'years_rental_history' => 'Limited rental history',
-                ];
-                $concerns[] = $messages[$rule['field']] ?? $rule['field'];
+            foreach (array_slice($result['failed_rules'], 0, 4) as $ruleResult) {
+                if (isset($ruleResult['rule'])) {
+                    $rule = $ruleResult['rule'];
+                    $field = $rule->field ?? $rule->getAttribute('field');
+                    
+                    $messages = [
+                        'monthly_income' => 'Income below 3x rent requirement',
+                        'credit_score' => 'Credit score below minimum',
+                        'employment_verified' => 'Employment verification needed',
+                        'has_eviction_history' => 'Previous eviction on record',
+                        'criminal_background_clear' => 'Background check concerns',
+                        'years_rental_history' => 'Limited rental history',
+                    ];
+                    $concerns[] = $messages[$field] ?? $field;
+                }
             }
         }
 

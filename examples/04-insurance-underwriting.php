@@ -108,16 +108,21 @@ $criteria = Eligify::criteria('health_insurance_underwriting_2025')
         echo "   → Primary concerns:\n";
 
         if (! empty($result['failed_rules'])) {
-            foreach (array_slice($result['failed_rules'], 0, 3) as $rule) {
-                $concerns = [
-                    'age' => 'Age outside acceptable range',
-                    'has_heart_disease' => 'Pre-existing heart condition',
-                    'has_cancer_history' => 'Cancer history',
-                    'has_diabetes' => 'Diabetes diagnosis',
-                    'is_smoker' => 'Tobacco use',
-                    'bmi' => 'BMI outside healthy range',
-                ];
-                echo '      • '.($concerns[$rule['field']] ?? $rule['field'])."\n";
+            foreach (array_slice($result['failed_rules'], 0, 3) as $ruleResult) {
+                if (isset($ruleResult['rule'])) {
+                    $rule = $ruleResult['rule'];
+                    $field = $rule->field ?? $rule->getAttribute('field');
+                    
+                    $concerns = [
+                        'age' => 'Age outside acceptable range',
+                        'has_heart_disease' => 'Pre-existing heart condition',
+                        'has_cancer_history' => 'Cancer history',
+                        'has_diabetes' => 'Diabetes diagnosis',
+                        'is_smoker' => 'Tobacco use',
+                        'bmi' => 'BMI outside healthy range',
+                    ];
+                    echo '      • '.($concerns[$field] ?? $field)."\n";
+                }
             }
         }
     })

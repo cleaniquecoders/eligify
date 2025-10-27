@@ -39,9 +39,9 @@ class AuditLogger
             'auditable_type' => get_class($auditable),
             'auditable_id' => $auditable->getKey(),
             'context' => $this->sanitizeContext($context),
-            'user_id' => Auth::id(),
-            'ip_address' => request()?->ip(),
-            'user_agent' => request()?->userAgent(),
+            'user_id' => $this->getUserId(),
+            'ip_address' => $this->getIpAddress(),
+            'user_agent' => $this->getUserAgent(),
         ];
 
         // Add before/after state for change events
@@ -397,5 +397,53 @@ class AuditLogger
     protected function shouldIncludeSensitiveData(): bool
     {
         return $this->config['include_sensitive_data'] ?? false;
+    }
+
+    /**
+     * Get the authenticated user ID safely
+     */
+    protected function getUserId(): ?int
+    {
+        try {
+            if (app()->bound('auth') && Auth::check()) {
+                return Auth::id();
+            }
+        } catch (\Throwable $e) {
+            // Auth not available in standalone/CLI mode
+        }
+
+        return null;
+    }
+
+    /**
+     * Get the IP address safely
+     */
+    protected function getIpAddress(): ?string
+    {
+        try {
+            if (app()->bound('request')) {
+                return request()?->ip();
+            }
+        } catch (\Throwable $e) {
+            // Request not available in standalone/CLI mode
+        }
+
+        return null;
+    }
+
+    /**
+     * Get the user agent safely
+     */
+    protected function getUserAgent(): ?string
+    {
+        try {
+            if (app()->bound('request')) {
+                return request()?->userAgent();
+            }
+        } catch (\Throwable $e) {
+            // Request not available in standalone/CLI mode
+        }
+
+        return null;
     }
 }

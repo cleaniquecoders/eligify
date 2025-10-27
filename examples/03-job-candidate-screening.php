@@ -99,16 +99,21 @@ $criteria = Eligify::criteria('senior_software_engineer_2025')
         echo "   → Reasons:\n";
 
         if (! empty($result['failed_rules'])) {
-            foreach (array_slice($result['failed_rules'], 0, 3) as $rule) {
-                $messages = [
-                    'years_experience' => 'Insufficient work experience',
-                    'has_bachelor_degree' => 'Education requirement not met',
-                    'skill_backend' => 'Backend skills below threshold',
-                    'skill_frontend' => 'Frontend skills below threshold',
-                    'skill_database' => 'Database expertise insufficient',
-                    'salary_expectation' => 'Salary expectation exceeds budget',
-                ];
-                echo '      • '.($messages[$rule['field']] ?? $rule['field'])."\n";
+            foreach (array_slice($result['failed_rules'], 0, 3) as $ruleResult) {
+                if (isset($ruleResult['rule'])) {
+                    $rule = $ruleResult['rule'];
+                    $field = $rule->field ?? $rule->getAttribute('field');
+                    
+                    $messages = [
+                        'years_experience' => 'Insufficient work experience',
+                        'has_bachelor_degree' => 'Education requirement not met',
+                        'skill_backend' => 'Backend skills below threshold',
+                        'skill_frontend' => 'Frontend skills below threshold',
+                        'skill_database' => 'Database expertise insufficient',
+                        'salary_expectation' => 'Salary expectation exceeds budget',
+                    ];
+                    echo '      • '.($messages[$field] ?? $field)."\n";
+                }
             }
         }
     })

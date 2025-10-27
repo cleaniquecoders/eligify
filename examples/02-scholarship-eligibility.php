@@ -95,8 +95,12 @@ $criteria = Eligify::criteria('academic_scholarship_2025')
         echo "   → Consider applying next year after improving:\n";
 
         if (! empty($result['failed_rules'])) {
-            foreach ($result['failed_rules'] as $rule) {
-                echo "      • {$rule['field']}\n";
+            foreach ($result['failed_rules'] as $ruleResult) {
+                if (isset($ruleResult['rule'])) {
+                    $rule = $ruleResult['rule'];
+                    $field = $rule->field ?? $rule->getAttribute('field');
+                    echo "      • {$field}\n";
+                }
             }
         }
     })

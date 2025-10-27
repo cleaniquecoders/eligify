@@ -153,8 +153,12 @@ $criteria = Eligify::criteria('credit_card_approval_2025')
         ];
 
         if (! empty($result['failed_rules'])) {
-            foreach (array_slice($result['failed_rules'], 0, 3) as $rule) {
-                echo '      • '.($reasons[$rule['field']] ?? $rule['field'])."\n";
+            foreach (array_slice($result['failed_rules'], 0, 3) as $ruleResult) {
+                if (isset($ruleResult['rule'])) {
+                    $rule = $ruleResult['rule'];
+                    $field = $rule->field ?? $rule->getAttribute('field');
+                    echo '      • '.($reasons[$field] ?? $field)."\n";
+                }
             }
         }
 

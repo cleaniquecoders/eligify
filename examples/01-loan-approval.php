@@ -75,7 +75,19 @@ $criteria = Eligify::criteria('personal_loan_approval')
         if (! empty($result['failed_rules'])) {
             echo "   → Failed Requirements:\n";
             foreach ($result['failed_rules'] as $rule) {
-                echo "      • {$rule['field']}: Expected {$rule['operator']} {$rule['expected']}, got {$rule['actual']}\n";
+                $ruleObj = $rule['rule'] ?? null;
+                if ($ruleObj) {
+                    $field = $ruleObj->getAttribute('field');
+                    $operator = $ruleObj->getAttribute('operator');
+                    $expected = $ruleObj->getAttribute('value');
+                    $actual = $rule['field_value'] ?? 'N/A';
+
+                    // Format the expected value nicely
+                    $expectedStr = is_array($expected) ? implode(', ', $expected) : $expected;
+                    $actualStr = is_array($actual) ? implode(', ', $actual) : $actual;
+
+                    echo "      • {$field}: Expected {$operator} {$expectedStr}, got {$actualStr}\n";
+                }
             }
         }
     })
