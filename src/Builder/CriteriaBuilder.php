@@ -277,6 +277,7 @@ class CriteriaBuilder
         });
 
         $this->pendingRules = collect();
+        $this->pendingGroupLogic = null;
 
         return $this;
     }
@@ -460,10 +461,9 @@ class CriteriaBuilder
             'meta' => $metadata,
         ];
 
-        // Add group logic if specified
+        // Add group logic if specified (persists for all subsequent rules until new group is started)
         if (isset($this->pendingGroupLogic)) {
             $ruleData['meta']['group_logic'] = $this->pendingGroupLogic;
-            unset($this->pendingGroupLogic);
         }
 
         $this->pendingRules->push($ruleData);

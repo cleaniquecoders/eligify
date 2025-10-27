@@ -56,17 +56,19 @@ class AdvancedRuleEngine
         foreach ($rules as $rule) {
             // Check for group metadata
             $metadata = $rule->meta ?? [];
+            $ruleGroupLogic = $metadata['group_logic'] ?? null;
 
-            if (isset($metadata['group_logic'])) {
-                // Start new group
+            if ($ruleGroupLogic && $ruleGroupLogic !== $currentGroup['logic']) {
+                // Start new group only if logic is different
                 if (! empty($currentGroup['rules'])) {
                     $groups[] = $currentGroup;
                 }
                 $currentGroup = [
-                    'logic' => $metadata['group_logic'],
+                    'logic' => $ruleGroupLogic,
                     'rules' => [$rule],
                 ];
             } else {
+                // Add rule to current group
                 $currentGroup['rules'][] = $rule;
             }
         }

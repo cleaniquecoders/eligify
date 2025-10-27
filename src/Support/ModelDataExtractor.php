@@ -126,14 +126,14 @@ class ModelDataExtractor
         // Add timestamp-based computed fields
         if ($this->config['include_timestamps']) {
             if ($model->created_at) {
-                $computed['created_days_ago'] = now()->diffInDays($model->created_at);
-                $computed['created_months_ago'] = now()->diffInMonths($model->created_at);
-                $computed['created_years_ago'] = now()->diffInYears($model->created_at);
+                $computed['created_days_ago'] = abs((int) round($model->created_at->diffInDays(now())));
+                $computed['created_months_ago'] = abs((int) round($model->created_at->diffInMonths(now())));
+                $computed['created_years_ago'] = abs((int) round($model->created_at->diffInYears(now())));
                 $computed['account_age_days'] = $computed['created_days_ago']; // Alias
             }
 
             if ($model->updated_at) {
-                $computed['updated_days_ago'] = now()->diffInDays($model->updated_at);
+                $computed['updated_days_ago'] = abs((int) round($model->updated_at->diffInDays(now())));
                 $computed['last_activity_days'] = $computed['updated_days_ago']; // Alias
             }
         }
@@ -377,9 +377,9 @@ class ModelDataExtractor
                     'created_at' => 'registration_date',
                 ])
                     ->setComputedFields([
-                        'is_premium_user' => fn ($model) => method_exists($model, 'subscriptions') ? $model->subscriptions()->active()->exists() : false,
-                        'total_orders' => fn ($model) => method_exists($model, 'orders') ? $model->orders()->count() : 0,
-                        'lifetime_value' => fn ($model) => method_exists($model, 'orders') ? $model->orders()->sum('total') : 0,
+                        'is_premium_user' => fn ($model) => $this->safeRelationshipCheck($model, 'subscriptions', 'active'),
+                        'total_orders' => fn ($model) => $this->safeRelationshipCount($model, 'orders'),
+                        'lifetime_value' => fn ($model) => $this->safeRelationshipSum($model, 'orders', 'total'),
                     ]);
                 break;
 
@@ -396,5 +396,59 @@ class ModelDataExtractor
         }
 
         return $extractor;
+    }
+
+    /**
+     * Safely check relationship with scope
+     */
+    protected function safeRelationshipCheck($model, string $relationship, string $scope): bool
+    {
+        try {
+            if (! method_exists($model, $relationship)) {
+                return false;
+            }
+
+            $relation = $model->{$relationship}();
+
+            if (method_exists($relation, $scope)) {
+                return $relation->{$scope}()->exists();
+            }
+
+            return false;
+        } catch (\Exception $e) {
+            return false;
+        }
+    }
+
+    /**
+     * Safely count relationship
+     */
+    protected function safeRelationshipCount($model, string $relationship): int
+    {
+        try {
+            if (! method_exists($model, $relationship)) {
+                return 0;
+            }
+
+            return $model->{$relationship}()->count();
+        } catch (\Exception $e) {
+            return 0;
+        }
+    }
+
+    /**
+     * Safely sum relationship field
+     */
+    protected function safeRelationshipSum($model, string $relationship, string $field): float
+    {
+        try {
+            if (! method_exists($model, $relationship)) {
+                return 0.0;
+            }
+
+            return (float) $model->{$relationship}()->sum($field);
+        } catch (\Exception $e) {
+            return 0.0;
+        }
     }
 }
