@@ -52,17 +52,18 @@ class AdvancedRuleEngine
         $rules = $criteria->rules()->orderBy('order')->get();
         $groups = [];
         $currentGroup = null;
-        $lastGroupLogic = null;
+        $lastGroupId = null;
 
         foreach ($rules as $rule) {
             // Check for group metadata
             $metadata = $rule->meta ?? [];
             $ruleGroupLogic = $metadata['group_logic'] ?? null;
+            $ruleGroupId = $metadata['group_id'] ?? null;
 
-            // If this rule has group logic metadata, it indicates a new group or continuation
+            // If this rule has group metadata
             if ($ruleGroupLogic !== null) {
-                // Start new group if logic changed or no current group
-                if ($currentGroup === null || $ruleGroupLogic !== $lastGroupLogic) {
+                // Start new group if group ID changed or no current group
+                if ($currentGroup === null || ($ruleGroupId !== null && $ruleGroupId !== $lastGroupId)) {
                     // Save previous group if exists
                     if ($currentGroup !== null && ! empty($currentGroup['rules'])) {
                         $groups[] = $currentGroup;
@@ -72,9 +73,9 @@ class AdvancedRuleEngine
                         'logic' => $ruleGroupLogic,
                         'rules' => [$rule],
                     ];
-                    $lastGroupLogic = $ruleGroupLogic;
+                    $lastGroupId = $ruleGroupId;
                 } else {
-                    // Same logic, add to current group
+                    // Same group, add to current group
                     $currentGroup['rules'][] = $rule;
                 }
             } else {
@@ -84,7 +85,7 @@ class AdvancedRuleEngine
                         'logic' => 'AND',
                         'rules' => [$rule],
                     ];
-                    $lastGroupLogic = 'AND';
+                    $lastGroupId = null;
                 } else {
                     $currentGroup['rules'][] = $rule;
                 }

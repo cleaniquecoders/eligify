@@ -69,6 +69,7 @@ class CriteriaBuilder
         // Add group logic if specified (persists for all subsequent rules until new group is started)
         if (isset($this->pendingGroupLogic)) {
             $ruleData['meta']['group_logic'] = $this->pendingGroupLogic;
+            $ruleData['meta']['group_id'] = $this->groupId;
         }
 
         $this->pendingRules->push($ruleData);
@@ -412,8 +413,16 @@ class CriteriaBuilder
         // Set group logic in the next rule's metadata
         $this->pendingGroupLogic = $logic;
 
+        // Increment group ID to force a new group boundary
+        if (! isset($this->groupId)) {
+            $this->groupId = 0;
+        }
+        $this->groupId++;
+
         return $this;
     }
+
+    protected int $groupId = 0;
 
     /**
      * Add rule with dependency
@@ -472,6 +481,7 @@ class CriteriaBuilder
         // Add group logic if specified (persists for all subsequent rules until new group is started)
         if (isset($this->pendingGroupLogic)) {
             $ruleData['meta']['group_logic'] = $this->pendingGroupLogic;
+            $ruleData['meta']['group_id'] = $this->groupId;
         }
 
         $this->pendingRules->push($ruleData);
