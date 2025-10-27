@@ -21,6 +21,7 @@ class Criteria extends Model
     protected $table = 'eligify_criteria';
 
     protected $fillable = [
+        'uuid',
         'name',
         'slug',
         'description',

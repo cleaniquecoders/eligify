@@ -22,6 +22,7 @@ class Evaluation extends Model
     protected $table = 'eligify_evaluations';
 
     protected $fillable = [
+        'uuid',
         'criteria_id',
         'evaluable_type',
         'evaluable_id',

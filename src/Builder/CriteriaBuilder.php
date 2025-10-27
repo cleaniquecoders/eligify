@@ -35,7 +35,9 @@ class CriteriaBuilder
         $this->criteria = Criteria::firstOrCreate(
             ['slug' => str($criteriaName)->slug()],
             [
+                'uuid' => (string) str()->uuid(),
                 'name' => $criteriaName,
+                'slug' => str($criteriaName)->slug(),
                 'description' => "Auto-generated criteria for {$criteriaName}",
                 'is_active' => true,
             ]
@@ -269,6 +271,7 @@ class CriteriaBuilder
     {
         $this->pendingRules->each(function (array $ruleData) {
             Rule::create(array_merge($ruleData, [
+                'uuid' => (string) str()->uuid(),
                 'criteria_id' => $this->criteria->id,
             ]));
         });

@@ -21,6 +21,7 @@ class AuditLog extends Model
     protected $table = 'eligify_audit_logs';
 
     protected $fillable = [
+        'uuid',
         'event',
         'auditable_type',
         'auditable_id',

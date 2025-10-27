@@ -13,7 +13,12 @@ class WorkflowManager
 
     public function __construct()
     {
-        $this->config = config('eligify.workflow', []);
+        $this->config = config('eligify.workflow', [
+            'enabled' => true,
+            'dispatch_events' => true,
+            'log_callback_errors' => true,
+            'fail_on_callback_error' => false,
+        ]);
     }
 
     /**
@@ -138,8 +143,17 @@ class WorkflowManager
                     }
                     break;
 
-                default:
+                case 'custom':
                     // Support custom condition evaluation
+                    if (is_callable($expectedValue)) {
+                        if (! call_user_func($expectedValue, $context)) {
+                            return false;
+                        }
+                    }
+                    break;
+
+                default:
+                    // Support other custom condition evaluations
                     if (is_callable($expectedValue)) {
                         if (! call_user_func($expectedValue, $context)) {
                             return false;
@@ -235,6 +249,24 @@ class WorkflowManager
     public function getCallbacks(): array
     {
         return $this->callbacks;
+    }
+
+    /**
+     * Get the current configuration
+     */
+    public function getConfig(): array
+    {
+        return $this->config;
+    }
+
+    /**
+     * Set configuration (for testing)
+     */
+    public function setConfig(array $config): self
+    {
+        $this->config = array_merge($this->config, $config);
+
+        return $this;
     }
 
     /**

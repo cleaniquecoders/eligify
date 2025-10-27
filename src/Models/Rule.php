@@ -21,6 +21,7 @@ class Rule extends Model
     protected $table = 'eligify_rules';
 
     protected $fillable = [
+        'uuid',
         'criteria_id',
         'field',
         'operator',

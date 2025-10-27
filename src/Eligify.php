@@ -70,10 +70,25 @@ class Eligify
         $result = $this->evaluate($criteria, $data, false); // Don't save evaluation twice
 
         // Execute basic callbacks (backward compatibility)
-        if ($result['passed'] && $builder->getOnPassCallback()) {
-            call_user_func($builder->getOnPassCallback(), $data, $result);
-        } elseif (! $result['passed'] && $builder->getOnFailCallback()) {
-            call_user_func($builder->getOnFailCallback(), $data, $result);
+        try {
+            if ($result['passed'] && $builder->getOnPassCallback()) {
+                call_user_func($builder->getOnPassCallback(), $data, $result);
+            } elseif (! $result['passed'] && $builder->getOnFailCallback()) {
+                call_user_func($builder->getOnFailCallback(), $data, $result);
+            }
+        } catch (\Throwable $e) {
+            // Log callback execution errors
+            if (config('eligify.workflow.log_callback_errors', true)) {
+                logger()->error('Eligify basic callback execution failed', [
+                    'error' => $e->getMessage(),
+                    'criteria' => $criteria->name,
+                ]);
+            }
+
+            // Re-throw if configured to fail on callback errors
+            if (config('eligify.workflow.fail_on_callback_error', false)) {
+                throw $e;
+            }
         }
 
         // Execute workflow callbacks
@@ -316,6 +331,7 @@ class Eligify
     protected function saveEvaluation(Criteria $criteria, array $data, array $result): void
     {
         Evaluation::create([
+            'uuid' => (string) str()->uuid(),
             'criteria_id' => $criteria->id,
             'passed' => $result['passed'],
             'score' => $result['score'],
@@ -337,17 +353,18 @@ class Eligify
         }
 
         AuditLog::create([
+            'uuid' => (string) str()->uuid(),
             'event' => 'evaluation_completed',
             'auditable_type' => Criteria::class,
             'auditable_id' => $criteria->id,
-            'data' => [
+            'context' => [
                 'criteria' => $criteria->getAttribute('name'),
                 'input_data' => config('eligify.audit.include_sensitive_data', false) ? $data : [],
                 'result' => $result,
-                'user_id' => null, // Will be set by model observers if needed
-                'ip_address' => app('request')->ip(),
-                'user_agent' => app('request')->userAgent(),
             ],
+            'user_id' => null, // Will be set by model observers if needed
+            'ip_address' => app('request')->ip(),
+            'user_agent' => app('request')->userAgent(),
         ]);
     }
 

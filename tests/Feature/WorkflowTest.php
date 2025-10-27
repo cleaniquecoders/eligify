@@ -8,6 +8,9 @@ use Illuminate\Support\Facades\Event;
 it('can use enhanced workflow callbacks', function () {
     Event::fake();
 
+    // Ensure workflow is enabled
+    config(['eligify.workflow.enabled' => true]);
+
     $beforeExecuted = false;
     $afterExecuted = false;
     $excellentExecuted = false;
@@ -52,37 +55,48 @@ it('can use enhanced workflow callbacks', function () {
 it('can use score range callbacks', function () {
     $rangeExecuted = false;
 
+    // Create criteria with multiple rules to get a score that's not 100%
     $builder = Eligify::criteria('score_range_test')
-        ->addRule('score', '>=', 70)
-        ->onScoreRange(75, 85, function ($data, $result, $context) use (&$rangeExecuted) {
+        ->addRule('score', '>=', 70)  // This will pass
+        ->addRule('age', '>=', 25)    // This will fail, giving us ~50% score
+        ->onScoreRange(40, 60, function ($data, $result, $context) use (&$rangeExecuted) {
             $rangeExecuted = true;
         });
 
+    // Ensure workflow is enabled
+    $workflowManager = $builder->getWorkflowManager();
+    $workflowManager->setConfig(['enabled' => true, 'dispatch_events' => false]);
+
     $eligify = new Eligify;
 
-    // Test score within range
-    $result = $eligify->evaluateWithCallbacks($builder, ['score' => 80]);
-    expect($rangeExecuted)->toBeTrue();
-    expect($result['passed'])->toBeTrue();
+    // Test with data that will give us ~50% score (1 out of 2 rules pass)
+    $result = $eligify->evaluateWithCallbacks($builder, ['score' => 80, 'age' => 20]);
+    expect($result['score'])->toBe(50.0); // 1 out of 2 rules passed
+    expect($rangeExecuted)->toBeTrue(); // Should execute for score 50 (within range 40-60)
+    expect($result['passed'])->toBeFalse(); // Overall evaluation fails
 
-    // Reset and test score outside range
+    // Reset and test score outside range (all rules pass = 100% score)
     $rangeExecuted = false;
-    $eligify->evaluateWithCallbacks($builder, ['score' => 90]);
-    expect($rangeExecuted)->toBeFalse(); // Should not execute for score 90
+    $result = $eligify->evaluateWithCallbacks($builder, ['score' => 80, 'age' => 30]);
+    expect($result['score'])->toBe(100.0); // 2 out of 2 rules passed
+    expect($rangeExecuted)->toBeFalse(); // Should not execute for score 100 (outside range 40-60)
 });
-
 it('can handle conditional callbacks with complex conditions', function () {
+    // Ensure workflow is enabled
+    config(['eligify.workflow.enabled' => true]);
+
     $fieldEqualsExecuted = false;
     $scoreRangeExecuted = false;
     $customConditionExecuted = false;
 
     $builder = Eligify::criteria('complex_conditions_test')
-        ->addRule('score', '>=', 60)
-        ->addRule('status', '==', 'active')
+        ->addRule('score', '>=', 60)      // Will pass with score=75
+        ->addRule('status', '==', 'active') // Will pass with status='active'
+        ->addRule('age', '>=', 30)        // Will fail with age=25, giving us 66.67% score
         ->onCondition(['field_equals' => ['status', 'active']], function ($data, $result, $context) use (&$fieldEqualsExecuted) {
             $fieldEqualsExecuted = true;
         })
-        ->onCondition(['score_range' => [70, 80]], function ($data, $result, $context) use (&$scoreRangeExecuted) {
+        ->onCondition(['score_range' => [60, 70]], function ($data, $result, $context) use (&$scoreRangeExecuted) {
             $scoreRangeExecuted = true;
         })
         ->onCondition(['custom' => function ($context) {
@@ -94,24 +108,29 @@ it('can handle conditional callbacks with complex conditions', function () {
     $eligify = new Eligify;
 
     // Test data that meets field_equals and score_range conditions
-    $testData = ['score' => 75, 'status' => 'active'];
-    $eligify->evaluateWithCallbacks($builder, $testData);
+    // 2 out of 3 rules pass = 66.67% score (within 60-70 range)
+    $testData = ['score' => 75, 'status' => 'active', 'age' => 25];
+    $result = $eligify->evaluateWithCallbacks($builder, $testData);
 
     expect($fieldEqualsExecuted)->toBeTrue();
-    expect($scoreRangeExecuted)->toBeTrue();
-    expect($customConditionExecuted)->toBeFalse();
+    expect($scoreRangeExecuted)->toBeTrue(); // 66.67% is within 60-70 range
+    expect($customConditionExecuted)->toBeFalse(); // score=75 is not > 85
+    expect($result['score'])->toBeGreaterThan(66.0)->toBeLessThan(67.0); // Verify the calculated score is ~66.67%
 
     // Reset and test custom condition
     $fieldEqualsExecuted = false;
     $scoreRangeExecuted = false;
     $customConditionExecuted = false;
 
-    $testData = ['score' => 90, 'status' => 'active'];
-    $eligify->evaluateWithCallbacks($builder, $testData);
+    // Test with score=90 that triggers custom condition
+    // All 3 rules pass = 100% score (outside 60-70 range)
+    $testData = ['score' => 90, 'status' => 'active', 'age' => 35];
+    $result = $eligify->evaluateWithCallbacks($builder, $testData);
 
-    expect($fieldEqualsExecuted)->toBeTrue();
-    expect($scoreRangeExecuted)->toBeFalse(); // Score 90 is outside 70-80 range
-    expect($customConditionExecuted)->toBeTrue(); // Score 90 > 85
+    expect($fieldEqualsExecuted)->toBeTrue(); // status='active' matches
+    expect($scoreRangeExecuted)->toBeFalse(); // 100% score is outside 60-70 range
+    expect($customConditionExecuted)->toBeTrue(); // score=90 > 85
+    expect($result['score'])->toBe(100.0); // All rules pass
 });
 
 it('can perform batch evaluation', function () {
@@ -177,7 +196,11 @@ it('can perform batch evaluation with callbacks', function () {
 });
 
 it('handles callback errors gracefully', function () {
-    config(['eligify.workflow.fail_on_callback_error' => false]);
+    config([
+        'eligify.workflow.enabled' => true,
+        'eligify.workflow.fail_on_callback_error' => false,
+        'eligify.workflow.log_callback_errors' => false, // Disable logging for test
+    ]);
 
     $builder = Eligify::criteria('error_handling_test')
         ->addRule('score', '>=', 80)
