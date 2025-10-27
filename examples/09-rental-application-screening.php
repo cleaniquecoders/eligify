@@ -159,7 +159,7 @@ $criteria = Eligify::criteria('rental_application_screening_2025')
                 if (isset($ruleResult['rule'])) {
                     $rule = $ruleResult['rule'];
                     $field = $rule->field ?? $rule->getAttribute('field');
-                    
+
                     $messages = [
                         'monthly_income' => 'Income below 3x rent requirement',
                         'credit_score' => 'Credit score below minimum',
