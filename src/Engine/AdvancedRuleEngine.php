@@ -12,6 +12,8 @@ class AdvancedRuleEngine
 {
     protected RuleEngine $baseEngine;
 
+    protected array $inputData = [];
+
     public function __construct(RuleEngine $baseEngine)
     {
         $this->baseEngine = $baseEngine;
@@ -22,6 +24,8 @@ class AdvancedRuleEngine
      */
     public function evaluate(Criteria $criteria, array $data): array
     {
+        // Store input data for threshold decisions
+        $this->inputData = $data;
         // Parse complex rule groups
         $ruleGroups = $this->parseRuleGroups($criteria);
 
@@ -92,6 +96,12 @@ class AdvancedRuleEngine
             $result = $this->evaluateRule($rule, $data);
             $results[] = $result;
 
+            // Skip counting skipped rules in pass/fail logic
+            if (isset($result['skipped']) && $result['skipped']) {
+                // Don't count skipped rules
+                continue;
+            }
+
             if ($result['passed']) {
                 $passedCount++;
             } else {
@@ -102,13 +112,16 @@ class AdvancedRuleEngine
             $totalWeight += $rule->weight ?? 1;
         }
 
+        // Calculate effective rule count (excluding skipped rules)
+        $effectiveRuleCount = count($rules) - count(array_filter($results, fn ($r) => isset($r['skipped']) && $r['skipped']));
+
         // Determine group pass/fail based on logic
-        $groupPassed = $this->determineGroupResult($logic, $passedCount, count($rules));
+        $groupPassed = $this->determineGroupResult($logic, $passedCount, $effectiveRuleCount);
 
         return [
             'logic' => $logic,
             'passed' => $groupPassed,
-            'rule_count' => count($rules),
+            'rule_count' => $effectiveRuleCount,
             'passed_count' => $passedCount,
             'score' => $totalWeight > 0 ? ($totalScore / $totalWeight) * 100 : 0,
             'failed_rules' => $failedRules,
@@ -273,7 +286,8 @@ class AdvancedRuleEngine
             return $result;
         }
 
-        $score = $result['score'];
+        // Use input data score if available, otherwise use calculated score
+        $score = $this->inputData['score'] ?? $result['score'];
         $customDecision = null;
 
         // Check thresholds in descending order

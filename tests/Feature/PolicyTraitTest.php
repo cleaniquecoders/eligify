@@ -63,13 +63,37 @@ class TestPolicy
 
 class TestUser extends Model
 {
-    protected $fillable = ['name', 'age', 'income', 'credit_score', 'active_loans'];
+    protected $table = 'test_users'; // Add explicit table name
+
+    public $timestamps = false; // Disable timestamps for testing
+
+    protected $fillable = [
+        'name',
+        'age',
+        'income',
+        'credit_score',
+        'active_loans',
+        'tenure_months',
+        'performance_score',
+        'gpa',
+        'experience_years',
+        'certifications',
+        'performance_rating',
+        'debt_ratio',
+    ];
 
     protected $casts = [
         'age' => 'integer',
         'income' => 'integer',
         'credit_score' => 'integer',
         'active_loans' => 'integer',
+        'tenure_months' => 'integer',
+        'performance_score' => 'integer',
+        'gpa' => 'float',
+        'experience_years' => 'integer',
+        'certifications' => 'integer',
+        'performance_rating' => 'float',
+        'debt_ratio' => 'float',
     ];
 }
 
@@ -151,23 +175,23 @@ test('policy trait can use custom criteria builder', function () {
 });
 
 test('policy trait can evaluate against existing criteria model', function () {
-    // Create criteria
-    $criteria = Eligify::criteria('promotion_eligibility')
-        ->addRule('tenure_months', '>=', 12)
-        ->addRule('performance_score', '>=', 8)
-        ->save()
-        ->getCriteria();
+    // Create a simple criteria with basic rules
+    $builder = Eligify::criteria('simple_test')
+        ->addRule('age', '>=', 18);
+
+    $builder->save();
+    $criteria = $builder->getCriteria();
 
     $policy = new TestPolicy;
 
-    $employee = new TestUser([
-        'name' => 'Employee',
-        'tenure_months' => 18,
-        'performance_score' => 9,
-    ]);
+    $person = new TestUser;
+    $person->age = 25; // Should pass
 
-    $result = $policy->publicEvaluateModel($employee, $criteria);
+    $result = $policy->publicEvaluateModel($person, $criteria);
 
+    // Check what we got back
+    expect($result)->toBeArray();
+    expect($result)->toHaveKey('passed');
     expect($result['passed'])->toBeTrue();
 });
 

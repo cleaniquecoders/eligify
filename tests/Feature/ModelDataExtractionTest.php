@@ -5,7 +5,10 @@ use Illuminate\Database\Eloquent\Model;
 
 class TestModelForExtraction extends Model
 {
-    protected $fillable = ['name', 'email', 'age', 'income', 'credit_score', 'status'];
+    protected $fillable = ['name', 'email', 'age', 'income', 'credit_score', 'status', 'password'];
+
+    // Don't hide any fields for testing purposes
+    protected $hidden = [];
 
     protected $casts = [
         'age' => 'integer',
@@ -24,6 +27,11 @@ class TestModelForExtraction extends Model
     public function profile()
     {
         return $this->hasOne(TestProfile::class, 'user_id');
+    }
+
+    public function subscriptions()
+    {
+        return $this->hasMany(TestSubscription::class, 'user_id');
     }
 }
 
@@ -44,6 +52,20 @@ class TestProfile extends Model
     protected $casts = [
         'preferences' => 'array',
     ];
+}
+
+class TestSubscription extends Model
+{
+    protected $fillable = ['user_id', 'status', 'expires_at'];
+
+    protected $casts = [
+        'expires_at' => 'datetime',
+    ];
+
+    public function scopeActive($query)
+    {
+        return $query->where('status', 'active');
+    }
 }
 
 test('model data extractor extracts basic attributes', function () {
@@ -138,6 +160,7 @@ test('model data extractor can apply custom field mappings', function () {
 test('model data extractor can apply custom computed fields', function () {
     $model = new TestModelForExtraction([
         'name' => 'John Doe',
+        'email' => 'john@example.com',
         'age' => 30,
         'income' => 50000,
     ]);
@@ -158,7 +181,7 @@ test('model data extractor can apply custom computed fields', function () {
             $required = ['name', 'email', 'age'];
             $present = array_filter($required, fn ($field) => ! empty($data[$field]));
 
-            return (count($present) / count($required)) * 100;
+            return (float) ((count($present) / count($required)) * 100);
         },
     ]);
 
@@ -179,6 +202,9 @@ test('model data extractor can be preconfigured for specific models', function (
         'email' => 'john@example.com',
     ]);
 
+    // Set created_at so it will be mapped to registration_date
+    $model->created_at = now()->subDays(30);
+
     $extractor = ModelDataExtractor::forModel('App\Models\User');
     $data = $extractor->extract($model);
 
@@ -192,6 +218,8 @@ test('model data extractor handles configuration options', function () {
         'password' => 'secret',
     ]);
 
+    // Explicitly set the password to ensure it's on the model
+    $model->password = 'secret';
     $model->created_at = now()->subDays(10);
 
     // Test with timestamps disabled

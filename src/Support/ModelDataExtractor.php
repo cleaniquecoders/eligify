@@ -377,9 +377,9 @@ class ModelDataExtractor
                     'created_at' => 'registration_date',
                 ])
                     ->setComputedFields([
-                        'is_premium_user' => fn ($model) => $model->subscriptions()->active()->exists(),
-                        'total_orders' => fn ($model) => $model->orders()->count(),
-                        'lifetime_value' => fn ($model) => $model->orders()->sum('total'),
+                        'is_premium_user' => fn ($model) => method_exists($model, 'subscriptions') ? $model->subscriptions()->active()->exists() : false,
+                        'total_orders' => fn ($model) => method_exists($model, 'orders') ? $model->orders()->count() : 0,
+                        'lifetime_value' => fn ($model) => method_exists($model, 'orders') ? $model->orders()->sum('total') : 0,
                     ]);
                 break;
 
