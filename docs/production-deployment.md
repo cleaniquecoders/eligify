@@ -530,6 +530,7 @@ CREATE TABLE eligify_audit_logs_2025_10 PARTITION OF eligify_audit_logs
 **Symptoms:** Evaluations taking > 1 second
 
 **Solutions:**
+
 ```bash
 # Check indexes
 php artisan eligify:audit-query --stats
@@ -548,6 +549,7 @@ php artisan config:cache
 **Symptoms:** "Allowed memory size exhausted" errors
 
 **Solutions:**
+
 ```php
 // Use chunking for batch operations
 $criteria->evaluateBatch($largeDataset, chunkSize: 100);
@@ -561,6 +563,7 @@ ini_set('memory_limit', '1G');
 **Symptoms:** "Too many connections" errors
 
 **Solutions:**
+
 ```bash
 # Check active connections
 SHOW PROCESSLIST; # MySQL
@@ -579,6 +582,7 @@ SELECT * FROM pg_stat_activity; # PostgreSQL
 **Symptoms:** Audit logs table growing rapidly
 
 **Solutions:**
+
 ```bash
 # Run cleanup manually
 php artisan eligify:cleanup-audit --days=30
@@ -606,8 +610,8 @@ Enable debug logging:
 
 - **Documentation:** `/docs` directory
 - **Examples:** `/examples` directory
-- **GitHub Issues:** https://github.com/cleaniquecoders/eligify/issues
-- **Discussions:** https://github.com/cleaniquecoders/eligify/discussions
+- **GitHub Issues:** <https://github.com/cleaniquecoders/eligify/issues>
+- **Discussions:** <https://github.com/cleaniquecoders/eligify/discussions>
 
 ## Deployment Checklist
 

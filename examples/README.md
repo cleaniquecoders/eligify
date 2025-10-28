@@ -1,6 +1,31 @@
-# Eligify Package - Real-World Examples
+# Eligify Examples
 
-This directory contains comprehensive examples demonstrating how to use the Eligify package in real-world scenarios across various industries.
+This directory contains practical, real-world examples demonstrating Eligify's capabilities across various industries and use cases.
+
+## 🎮 Interactive Playground
+
+**Want to test these examples visually?**
+
+Enable the Eligify Dashboard and use the built-in Playground:
+
+```bash
+# .env
+ELIGIFY_UI_ENABLED=true
+```
+
+**Access:** `http://your-app.test/eligify/playground`
+
+![Playground Screenshot](../screenshots/05-playground.png)
+
+The Playground lets you:
+- Load any example criteria
+- Test with custom data
+- See real-time evaluation results
+- Debug rule-by-rule execution
+
+> 📖 [Complete UI Setup Guide](../docs/ui-setup-guide.md)
+
+---
 
 ## 📚 Examples Index
 

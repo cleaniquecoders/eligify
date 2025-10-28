@@ -9,18 +9,21 @@ The Rule Editor automatically adapts the value input field based on the selected
 ### Numeric Fields (Integer & Numeric)
 
 **Integer:**
+
 - Input type: `number`
 - Step: `1` (whole numbers only)
 - Placeholder: `e.g., 100`
 - Help text: "Enter a whole number (no decimals)"
 
 **Numeric:**
+
 - Input type: `number`
 - Step: `0.01` (allows decimals)
 - Placeholder: `e.g., 99.99`
 - Help text: "Enter a numeric value (decimals allowed)"
 
 **Example:**
+
 ```
 Field: age
 Field Type: Integer
@@ -34,6 +37,7 @@ Value Input: [___100___] (number input, step=1)
 - Help text: "Enter text value"
 
 **Example:**
+
 ```
 Field: status
 Field Type: String
@@ -47,6 +51,7 @@ Value Input: [_active_] (text input)
 - Help text: "Enter true/false or 1/0"
 
 **Example:**
+
 ```
 Field: is_verified
 Field Type: Boolean
@@ -61,6 +66,7 @@ Value Input: ○ True  ○ False (radio buttons)
 - Browser provides native date picker
 
 **Example:**
+
 ```
 Field: birth_date
 Field Type: Date
@@ -74,6 +80,7 @@ Value Input: [📅 2024-01-01] (date picker)
 - Help text: "Enter values as comma-separated or JSON array"
 
 **Example:**
+
 ```
 Field: tags
 Field Type: Array
@@ -91,6 +98,7 @@ When an operator that requires multiple values is selected (`in`, `not_in`, `bet
 ### Examples by Field Type
 
 **Integer with IN operator:**
+
 ```
 Field: age
 Field Type: Integer
@@ -103,6 +111,7 @@ Placeholder: "e.g., 100,200,300 or [100,200,300]"
 ```
 
 **String with IN operator:**
+
 ```
 Field: status
 Field Type: String
@@ -115,6 +124,7 @@ Placeholder: "e.g., active,pending,approved or ["active","pending"]"
 ```
 
 **Date with BETWEEN operator:**
+
 ```
 Field: created_at
 Field Type: Date
@@ -138,6 +148,7 @@ When a field type is selected, an informational blue box appears showing:
 - **Special Features**: Any special handling (e.g., "Using True/False selection" for Boolean)
 
 **Example:**
+
 ```
 ┌────────────────────────────────────────────────┐
 │ ℹ️ Field Type: Integer                        │

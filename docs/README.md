@@ -9,11 +9,15 @@ Eligify is a Laravel package that provides a flexible rule and criteria engine f
 - [Installation](#installation)
 - [Quick Start](#quick-start)
 - [Core Concepts](#core-concepts)
+- [UI Dashboard](ui-setup-guide.md) 🎨
 - [Model Data Extraction](#model-data-extraction)
   - [Quick Reference Guide](quick-reference-model-extraction.md) ⚡
-  - [Complete Extraction Guide](model-data-extraction.md) 📖
+  - [Complete Guide](model-data-extraction.md) 📖
+  - [Model Mappings](model-mappings.md) 🗺️
   - [Architecture & Data Flow](model-data-extractor-architecture.md) 🏗️
 - [Configuration](#configuration)
+  - [Configuration Guide](configuration.md) ⚙️
+  - [Environment Variables](environment-variables.md) 🔧
 - [Database Structure](#database-structure)
 - [Usage Guide](#usage-guide)
 - [Advanced Features](#advanced-features)
@@ -89,6 +93,28 @@ $result = Eligify::evaluate('loan_approval', [
     'evaluation_id' => 123,
 ]
 ```
+
+### Using the Web UI (Optional)
+
+Eligify includes an optional dashboard for visual management:
+
+```bash
+# Enable in .env
+ELIGIFY_UI_ENABLED=true
+
+# Access at
+http://your-app.test/eligify
+```
+
+![Dashboard Preview](../screenshots/01-dashboard-overview.png)
+
+**Features:**
+- 📊 Visual criteria builder
+- 🎮 Interactive testing playground
+- 🔍 Audit log explorer
+- ⚖️ Rule library management
+
+> 📖 **Complete setup guide:** [UI Setup Guide](ui-setup-guide.md)
 
 ## Core Concepts
 

@@ -14,6 +14,64 @@ You'll find it at `config/eligify.php`.
 
 ## Configuration Sections
 
+### UI / Dashboard Configuration
+
+**Complete setup guide:** [UI Setup Guide](ui-setup-guide.md)
+
+Control the optional web-based dashboard for managing Eligify:
+
+```php
+'ui' => [
+    // Enable/disable the dashboard
+    'enabled' => env('ELIGIFY_UI_ENABLED', false),
+
+    // Route prefix (e.g., /eligify)
+    'route_prefix' => env('ELIGIFY_UI_ROUTE_PREFIX', 'eligify'),
+
+    // Middleware stack
+    'middleware' => ['web'],
+
+    // Authorization gate name
+    'gate' => env('ELIGIFY_UI_GATE', 'viewEligify'),
+
+    // Custom authorization closure (optional)
+    'auth' => null,  // Example: fn ($request) => $request->user()?->isAdmin()
+
+    // Branding
+    'brand' => [
+        'name' => env('ELIGIFY_UI_BRAND_NAME', 'Eligify'),
+        'logo' => env('ELIGIFY_UI_BRAND_LOGO', null),
+    ],
+
+    // Asset loading strategy
+    'assets' => [
+        'use_cdn' => env('ELIGIFY_UI_ASSETS_USE_CDN', true),
+        'tailwind_cdn' => env('ELIGIFY_UI_TAILWIND_CDN', 'https://cdn.tailwindcss.com'),
+        'alpine_cdn' => env('ELIGIFY_UI_ALPINE_CDN', 'https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js'),
+    ],
+],
+```
+
+**Quick Enable:**
+
+```bash
+# .env
+ELIGIFY_UI_ENABLED=true
+```
+
+**Authorization Example:**
+
+```php
+// AppServiceProvider.php
+Gate::define('viewEligify', function ($user) {
+    return $user->hasRole('admin');
+});
+```
+
+> 📖 See the [UI Setup Guide](ui-setup-guide.md) for complete configuration, authorization strategies, and production deployment.
+
+---
+
 ### Scoring Configuration
 
 Controls how eligibility scores are calculated:
