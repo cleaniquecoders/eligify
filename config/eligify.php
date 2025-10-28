@@ -10,6 +10,46 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | UI / Dashboard Configuration
+    |--------------------------------------------------------------------------
+    |
+    | Telescope-style, opt-in dashboard for managing Eligify. Developers can
+    | enable it and control access via a Gate or a custom authorization closure.
+    |
+    */
+    'ui' => [
+        // Turn the Eligify Dashboard on/off
+        'enabled' => false,
+
+        // Route prefix for the dashboard (e.g., /eligify)
+        'route_prefix' => 'eligify',
+
+        // Middleware applied to all dashboard routes
+        'middleware' => ['web'],
+
+        // Gate name used to authorize dashboard access (if no auth closure is set)
+        'gate' => 'viewEligify',
+
+        // Optional authorization closure (like Telescope::auth)
+        // Example: fn ($request) => app()->environment('local') || Gate::check('viewEligify')
+        'auth' => null,
+
+        // Basic branding options for the dashboard layout
+        'brand' => [
+            'name' => 'Eligify',
+            'logo' => null, // path/URL or null to use text
+        ],
+
+        // Asset strategy defaults for the package UI
+        'assets' => [
+            'use_cdn' => true,
+            'tailwind_cdn' => 'https://cdn.tailwindcss.com',
+            'alpine_cdn' => 'https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js',
+        ],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | Default Scoring Configuration
     |--------------------------------------------------------------------------
     |
