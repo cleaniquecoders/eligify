@@ -361,13 +361,13 @@ test('multi-value operator switches to textarea', function () {
 
 ## Benefits
 
-✅ **Type Safety** - Browser-level validation prevents invalid input
-✅ **Better UX** - Users see appropriate inputs for data types
-✅ **Reduced Errors** - Validation happens before submission
-✅ **Visual Feedback** - Info box shows what's happening
-✅ **Smart Defaults** - System provides relevant examples
-✅ **Flexible** - Still accepts text input if no type selected
-✅ **Reactive** - Changes happen instantly via Livewire
+- ✅ **Type Safety** - Browser-level validation prevents invalid input
+- ✅ **Better UX** - Users see appropriate inputs for data types
+- ✅ **Reduced Errors** - Validation happens before submission
+- ✅ **Visual Feedback** - Info box shows what's happening
+- ✅ **Smart Defaults** - System provides relevant examples
+- ✅ **Flexible** - Still accepts text input if no type selected
+- ✅ **Reactive** - Changes happen instantly via Livewire
 
 ## Troubleshooting
 
