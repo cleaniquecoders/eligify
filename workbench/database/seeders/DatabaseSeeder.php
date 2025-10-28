@@ -8,6 +8,7 @@ use CleaniqueCoders\Eligify\Models\Criteria;
 use CleaniqueCoders\Eligify\Models\Evaluation;
 use CleaniqueCoders\Eligify\Models\Rule;
 use Illuminate\Database\Seeder;
+use Workbench\App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Workbench\Database\Factories\UserFactory;
 
@@ -20,10 +21,13 @@ class DatabaseSeeder extends Seeder
     {
         // UserFactory::new()->times(10)->create();
 
-        UserFactory::new()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
-        ]);
+        if (! User::where('email', 'test@example.com')->exists()) {
+            UserFactory::new()->create([
+                'name' => 'Test User',
+                'email' => 'test@example.com',
+            ]);
+
+        }
 
         // Seed minimal Eligify data for dashboard demo
         $criteria = Criteria::query()->create([
