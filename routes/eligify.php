@@ -9,7 +9,9 @@ Route::group([
 ], function () {
     // Dashboard route (renders Blade view; Livewire components can be added later)
     Route::get('/', function () {
-        return view('eligify::dashboard');
+        $metrics = \CleaniqueCoders\Eligify\Actions\GetDashboardMetrics::run();
+
+        return view('eligify::dashboard', compact('metrics'));
     })->name('dashboard');
 
     // Health check route (optional)
