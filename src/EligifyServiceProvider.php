@@ -24,6 +24,7 @@ use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Routing\Router;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
+use Livewire\Livewire;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
 
@@ -70,6 +71,13 @@ class EligifyServiceProvider extends PackageServiceProvider
         if (config('eligify.ui.enabled', false)) {
             $this->registerUiAuthorization();
             $this->registerUiRoutes();
+
+            // Register Livewire components when available
+            if (class_exists(Livewire::class)) {
+                Livewire::component('eligify.criteria-list', \CleaniqueCoders\Eligify\Http\Livewire\CriteriaList::class);
+                Livewire::component('eligify.rule-library-list', \CleaniqueCoders\Eligify\Http\Livewire\RuleLibraryList::class);
+                Livewire::component('eligify.audit-log-list', \CleaniqueCoders\Eligify\Http\Livewire\AuditLogList::class);
+            }
         } else {
             // Provide a safe default Gate if one is not defined, even when UI is disabled
             $this->ensureDefaultGate();

@@ -1,7 +1,11 @@
 <x-eligify::layout>
     <x-slot:title>Rule Library</x-slot:title>
-    <div class="bg-white border border-gray-200 rounded p-4">
-        <div class="font-semibold mb-2">Rule Library</div>
-        <p class="text-sm text-gray-600">This is a placeholder. Livewire list/filters will be added later.</p>
-    </div>
+    @if (class_exists(\Livewire\Livewire::class))
+        <livewire:eligify.rule-library-list />
+    @else
+        <div class="bg-white border border-gray-200 rounded p-4">
+            <div class="font-semibold mb-2">Rule Library</div>
+            <p class="text-sm text-gray-600">Livewire is not installed. Please install livewire/livewire to enable this listing.</p>
+        </div>
+    @endif
 </x-eligify::layout>
