@@ -1,11 +1,12 @@
 # Eligify
 
-[![Latest Version on Packagist](https://img.shields.io/packagist/v/cleaniquecoders/eligify.svg?style=flat-square)](https://packagist.org/packages/cleaniquecoders/eligify)
-[![GitHub Tests Action Status](https://img.shields.io/github/actions/workflow/status/cleaniquecoders/eligify/run-tests.yml?branch=main&label=tests&style=flat-square)](https://github.com/cleaniquecoders/eligify/actions?query=workflow%3Arun-tests+branch%3Amain)
-[![GitHub Code Style Action Status](https://img.shields.io/github/actions/workflow/status/cleaniquecoders/eligify/fix-php-code-style-issues.yml?branch=main&label=code%20style&style=flat-square)](https://github.com/cleaniquecoders/eligify/actions?query=workflow%3A"Fix+PHP+code+style+issues"+branch%3Amain)
-[![Total Downloads](https://img.shields.io/packagist/dt/cleaniquecoders/eligify.svg?style=flat-square)](https://packagist.org/packages/cleaniquecoders/eligify)
+[![Latest Version on Packagist](https://img.shields.io/packagist/v/cleaniquecoders/eligify.svg?style=flat-square)](https://packagist.org/packages/cleaniquecoders/eligify) [![GitHub Tests Action Status](https://img.shields.io/github/actions/workflow/status/cleaniquecoders/eligify/run-tests.yml?branch=main&label=tests&style=flat-square)](https://github.com/cleaniquecoders/eligify/actions?query=workflow%3Arun-tests+branch%3Amain) [![GitHub Code Style Action Status](https://img.shields.io/github/actions/workflow/status/cleaniquecoders/eligify/fix-php-code-style-issues.yml?branch=main&label=code%20style&style=flat-square)](https://github.com/cleaniquecoders/eligify/actions?query=workflow%3A"Fix+PHP+code+style+issues"+branch%3Amain) [![Total Downloads](https://img.shields.io/packagist/dt/cleaniquecoders/eligify.svg?style=flat-square)](https://packagist.org/packages/cleaniquecoders/eligify)
 
 Eligify is a flexible rule and criteria engine that determines whether an entity — such as a person, application, or transaction — meets the defined acceptance conditions. It powers decision-making systems by making eligibility data-driven, traceable, and automatable.
+
+## Preview
+
+![Evaluation Playground](screenshots/05-playground.png)
 
 ## Features
 
@@ -48,17 +49,18 @@ use CleaniqueCoders\Eligify\Facades\Eligify;
 
 // Define criteria
 $criteria = Eligify::criteria('loan_approval')
-    ->addRule('credit_score', '>=', 650, 30)
+->addRule('credit_score', '>=', 650, 30)
     ->addRule('annual_income', '>=', 30000, 25)
-    ->addRule('debt_ratio', '<=', 43, 20)
+    ->addRule('debt_ratio',
+'<=', 43, 20)
     ->passThreshold(70)
     ->save();
 
 // Evaluate
 $result = Eligify::evaluate('loan_approval', [
-    'credit_score' => 720,
-    'annual_income' => 55000,
-    'debt_ratio' => 35,
+'credit_score' => 720,
+'annual_income' => 55000,
+'debt_ratio' => 35,
 ]);
 
 // Result: ['passed' => true, 'score' => 85, 'decision' => 'Approved', ...]
@@ -82,7 +84,7 @@ ELIGIFY_UI_ENABLED=true
 ```php
 // AppServiceProvider.php
 Gate::define('viewEligify', function ($user) {
-    return $user->hasRole('admin');
+return $user->hasRole('admin');
 });
 ```
 
