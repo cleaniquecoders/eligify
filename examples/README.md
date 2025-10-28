@@ -68,6 +68,12 @@ This directory contains comprehensive examples demonstrating how to use the Elig
     - Feature adoption scoring
     - Automated upgrade recommendations
 
+11. **[User Account Verification](11-user-account-verification.php)** - User Management
+    - UserModelMapping automatic data extraction
+    - Account age and verification checks
+    - Model-based evaluation demonstration
+    - Batch user evaluation
+
 ## 🚀 Quick Start
 
 ### Running Examples
@@ -139,6 +145,7 @@ $result = Eligify::evaluate('your_criteria_name', $data);
 | 08. Credit Card | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ | ✅ | ✅ |
 | 09. Rental Screening | ✅ | ✅ | ✅ | ✅ | ❌ | ✅ | ✅ | ❌ |
 | 10. SaaS Upgrade | ✅ | ✅ | ✅ | ❌ | ✅ | ✅ | ❌ | ✅ |
+| 11. User Verification | ✅ | ✅ | ❌ | ❌ | ✅ | ✅ | ❌ | ❌ |
 
 ## 💡 Tips
 

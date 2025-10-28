@@ -508,25 +508,17 @@ return [
         // Enable automatic model-specific field extraction
         'auto_configure' => true,
 
-        // Custom field mappings for common model types
+        // Model mapping classes
+        // Map model class names to their mapping class implementations
         'model_mappings' => [
-            'User' => [
-                'field_mappings' => [
-                    'email_verified_at' => 'email_verified_timestamp',
-                    'created_at' => 'registration_date',
-                ],
-                'computed_fields' => [
-                    'is_verified' => 'email_verified_at !== null',
-                    'account_age_days' => 'created_at.diffInDays(now())',
-                ],
-            ],
-            'Order' => [
-                'computed_fields' => [
-                    'order_age_days' => 'created_at.diffInDays(now())',
-                    'is_recent' => 'created_at.isAfter(now().subDays(30))',
-                ],
-            ],
+            'App\Models\User' => \CleaniqueCoders\Eligify\Mappings\UserModelMapping::class,
+            // Add more mappings here:
+            // 'App\Models\Order' => \App\Eligify\Mappings\OrderModelMapping::class,
+            // 'App\Models\Customer' => \App\Eligify\Mappings\CustomerModelMapping::class,
         ],
+
+        // Default mapping class to use if no specific mapping is found
+        'default_mapping' => null,
     ],
 
 ];

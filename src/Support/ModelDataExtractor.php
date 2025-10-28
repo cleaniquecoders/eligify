@@ -364,91 +364,43 @@ class ModelDataExtractor
 
     /**
      * Create a preconfigured extractor for specific model types
+     *
+     * Looks up the model mapping class from config and applies it.
+     * Falls back to a default User mapping if configured.
      */
     public static function forModel(string $modelClass): self
     {
-        $extractor = new static;
+        $config = config('eligify.model_extraction', []);
+        $extractor = new static($config);
 
-        // Configure based on model type
-        switch ($modelClass) {
-            case 'App\Models\User':
-                $extractor->setFieldMappings([
-                    'email_verified_at' => 'email_verified_timestamp',
-                    'created_at' => 'registration_date',
-                ])
-                    ->setComputedFields([
-                        'is_premium_user' => fn ($model) => $extractor->safeRelationshipCheck($model, 'subscriptions', 'active'),
-                        'total_orders' => fn ($model) => $extractor->safeRelationshipCount($model, 'orders'),
-                        'lifetime_value' => fn ($model) => $extractor->safeRelationshipSum($model, 'orders', 'total'),
-                    ]);
-                break;
+        // Get model mappings from config
+        $modelMappings = $config['model_mappings'] ?? [];
 
-            case 'App\Models\Order':
-                $extractor->setComputedFields([
-                    'days_since_order' => fn ($model) => now()->diffInDays($model->created_at),
-                    'order_value_category' => fn ($model) => match (true) {
-                        $model->total >= 1000 => 'high',
-                        $model->total >= 500 => 'medium',
-                        default => 'low'
-                    },
-                ]);
-                break;
+        // Check if there's a mapping class for this model
+        if (isset($modelMappings[$modelClass])) {
+            $mappingClass = $modelMappings[$modelClass];
+
+            // Instantiate and apply the mapping
+            if (class_exists($mappingClass)) {
+                $mapping = new $mappingClass;
+
+                if ($mapping instanceof \CleaniqueCoders\Eligify\Contracts\ModelMapping) {
+                    return $mapping->configure($extractor);
+                }
+            }
         }
 
+        // Check for default mapping if configured
+        $defaultMapping = $config['default_mapping'] ?? null;
+        if ($defaultMapping && class_exists($defaultMapping)) {
+            $mapping = new $defaultMapping;
+
+            if ($mapping instanceof \CleaniqueCoders\Eligify\Contracts\ModelMapping) {
+                return $mapping->configure($extractor);
+            }
+        }
+
+        // Return unconfigured extractor if no mapping found
         return $extractor;
-    }
-
-    /**
-     * Safely check relationship with scope
-     */
-    protected function safeRelationshipCheck($model, string $relationship, string $scope): bool
-    {
-        try {
-            if (! method_exists($model, $relationship)) {
-                return false;
-            }
-
-            $relation = $model->{$relationship}();
-
-            if (method_exists($relation, $scope)) {
-                return $relation->{$scope}()->exists();
-            }
-
-            return false;
-        } catch (\Exception $e) {
-            return false;
-        }
-    }
-
-    /**
-     * Safely count relationship
-     */
-    protected function safeRelationshipCount($model, string $relationship): int
-    {
-        try {
-            if (! method_exists($model, $relationship)) {
-                return 0;
-            }
-
-            return $model->{$relationship}()->count();
-        } catch (\Exception $e) {
-            return 0;
-        }
-    }
-
-    /**
-     * Safely sum relationship field
-     */
-    protected function safeRelationshipSum($model, string $relationship, string $field): float
-    {
-        try {
-            if (! method_exists($model, $relationship)) {
-                return 0.0;
-            }
-
-            return (float) $model->{$relationship}()->sum($field);
-        } catch (\Exception $e) {
-            return 0.0;
-        }
     }
 }
