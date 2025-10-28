@@ -36,6 +36,17 @@ Route::group([
         return view('eligify::criteria.edit', ['id' => $id]);
     })->name('criteria.edit');
 
+    // Rules pages (Livewire-based)
+    Route::get('/rules/create', function () {
+        $criteriaId = request('criteria_id');
+
+        return view('eligify::rules.create', ['criteriaId' => $criteriaId]);
+    })->name('rules.create');
+
+    Route::get('/rules/{id}/edit', function (string $id) {
+        return view('eligify::rules.edit', ['id' => $id]);
+    })->name('rules.edit');
+
     // Rule Library
     Route::get('/rule-library', function () {
         return view('eligify::rule-library.index');
