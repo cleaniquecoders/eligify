@@ -4,9 +4,7 @@
 
 Eligify is a flexible rule and criteria engine that determines whether an entity — such as a person, application, or transaction — meets the defined acceptance conditions. It powers decision-making systems by making eligibility data-driven, traceable, and automatable.
 
-## Preview
-
-![Evaluation Playground](screenshots/05-playground.png)
+![Eligify](screenshots/eligify-banner.png)
 
 ## Features
 
@@ -84,7 +82,7 @@ ELIGIFY_UI_ENABLED=true
 ```php
 // AppServiceProvider.php
 Gate::define('viewEligify', function ($user) {
-return $user->hasRole('admin');
+    return $user->hasRole('admin');
 });
 ```
 
@@ -93,6 +91,7 @@ return $user->hasRole('admin');
 📖 **[Full Documentation](docs/README.md)**
 
 **Key Guides:**
+
 - [Quick Start Guide](docs/README.md#quick-start)
 - [UI Setup Guide](docs/ui-setup-guide.md) - Dashboard configuration & authorization
 - [Environment Variables](docs/environment-variables.md) - Complete `.env` reference
