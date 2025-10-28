@@ -77,6 +77,7 @@ class EligifyServiceProvider extends PackageServiceProvider
                 Livewire::component('eligify.criteria-list', \CleaniqueCoders\Eligify\Http\Livewire\CriteriaList::class);
                 Livewire::component('eligify.rule-library-list', \CleaniqueCoders\Eligify\Http\Livewire\RuleLibraryList::class);
                 Livewire::component('eligify.audit-log-list', \CleaniqueCoders\Eligify\Http\Livewire\AuditLogList::class);
+                Livewire::component('eligify.settings-manager', \CleaniqueCoders\Eligify\Http\Livewire\SettingsManager::class);
             }
         } else {
             // Provide a safe default Gate if one is not defined, even when UI is disabled

@@ -19,16 +19,16 @@ return [
     */
     'ui' => [
         // Turn the Eligify Dashboard on/off
-        'enabled' => false,
+        'enabled' => env('ELIGIFY_UI_ENABLED', false),
 
         // Route prefix for the dashboard (e.g., /eligify)
-        'route_prefix' => 'eligify',
+        'route_prefix' => env('ELIGIFY_UI_ROUTE_PREFIX', 'eligify'),
 
         // Middleware applied to all dashboard routes
         'middleware' => ['web'],
 
         // Gate name used to authorize dashboard access (if no auth closure is set)
-        'gate' => 'viewEligify',
+        'gate' => env('ELIGIFY_UI_GATE', 'viewEligify'),
 
         // Optional authorization closure (like Telescope::auth)
         // Example: fn ($request) => app()->environment('local') || Gate::check('viewEligify')
@@ -36,15 +36,15 @@ return [
 
         // Basic branding options for the dashboard layout
         'brand' => [
-            'name' => 'Eligify',
-            'logo' => null, // path/URL or null to use text
+            'name' => env('ELIGIFY_UI_BRAND_NAME', 'Eligify'),
+            'logo' => env('ELIGIFY_UI_BRAND_LOGO', null), // path/URL or null to use text
         ],
 
         // Asset strategy defaults for the package UI
         'assets' => [
-            'use_cdn' => true,
-            'tailwind_cdn' => 'https://cdn.tailwindcss.com',
-            'alpine_cdn' => 'https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js',
+            'use_cdn' => env('ELIGIFY_UI_ASSETS_USE_CDN', true),
+            'tailwind_cdn' => env('ELIGIFY_UI_TAILWIND_CDN', 'https://cdn.tailwindcss.com'),
+            'alpine_cdn' => env('ELIGIFY_UI_ALPINE_CDN', 'https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js'),
         ],
     ],
 
@@ -59,22 +59,22 @@ return [
     */
     'scoring' => [
         // Default passing score threshold (0-100)
-        'pass_threshold' => 65,
+        'pass_threshold' => env('ELIGIFY_SCORING_PASS_THRESHOLD', 65),
 
         // Maximum possible score
-        'max_score' => 100,
+        'max_score' => env('ELIGIFY_SCORING_MAX_SCORE', 100),
 
         // Minimum possible score
-        'min_score' => 0,
+        'min_score' => env('ELIGIFY_SCORING_MIN_SCORE', 0),
 
         // Default scoring method: use ScoringMethod enum
-        'method' => ScoringMethod::WEIGHTED->value,
+        'method' => env('ELIGIFY_SCORING_METHOD', ScoringMethod::WEIGHTED->value),
 
         // Penalty for failed rules (subtracted from total)
-        'failure_penalty' => 5,
+        'failure_penalty' => env('ELIGIFY_SCORING_FAILURE_PENALTY', 5),
 
         // Bonus for exceeding expectations
-        'excellence_bonus' => 10,
+        'excellence_bonus' => env('ELIGIFY_SCORING_EXCELLENCE_BONUS', 10),
     ],
 
     /*
@@ -323,22 +323,22 @@ return [
     */
     'evaluation' => [
         // Enable/disable evaluation caching
-        'cache_enabled' => true,
+        'cache_enabled' => env('ELIGIFY_EVALUATION_CACHE_ENABLED', true),
 
         // Cache TTL in minutes
-        'cache_ttl' => 60,
+        'cache_ttl' => env('ELIGIFY_EVALUATION_CACHE_TTL', 60),
 
         // Cache key prefix
-        'cache_prefix' => 'eligify_eval',
+        'cache_prefix' => env('ELIGIFY_EVALUATION_CACHE_PREFIX', 'eligify_eval'),
 
         // Stop on first failure (fail-fast)
-        'fail_fast' => false,
+        'fail_fast' => env('ELIGIFY_EVALUATION_FAIL_FAST', false),
 
         // Maximum evaluation time in seconds
-        'max_execution_time' => 30,
+        'max_execution_time' => env('ELIGIFY_EVALUATION_MAX_EXECUTION_TIME', 30),
 
         // Enable detailed logging
-        'detailed_logging' => true,
+        'detailed_logging' => env('ELIGIFY_EVALUATION_DETAILED_LOGGING', true),
 
         // Default decision labels
         'decisions' => [
@@ -357,7 +357,7 @@ return [
     */
     'audit' => [
         // Enable/disable audit logging
-        'enabled' => true,
+        'enabled' => env('ELIGIFY_AUDIT_ENABLED', true),
 
         // Events to audit
         'events' => [
@@ -373,16 +373,16 @@ return [
         ],
 
         // Automatically clean old audit logs
-        'auto_cleanup' => true,
+        'auto_cleanup' => env('ELIGIFY_AUDIT_AUTO_CLEANUP', true),
 
         // Keep audit logs for this many days
-        'retention_days' => 365,
+        'retention_days' => env('ELIGIFY_AUDIT_RETENTION_DAYS', 365),
 
         // Include sensitive data in audit logs
-        'include_sensitive_data' => false,
+        'include_sensitive_data' => env('ELIGIFY_AUDIT_INCLUDE_SENSITIVE', false),
 
         // Schedule automatic cleanup (cron expression or null to disable)
-        'cleanup_schedule' => 'daily', // daily, weekly, monthly, or cron expression like '0 2 * * *'
+        'cleanup_schedule' => env('ELIGIFY_AUDIT_CLEANUP_SCHEDULE', 'daily'), // daily, weekly, monthly, or cron
     ],
 
     /*
@@ -442,16 +442,16 @@ return [
     */
     'performance' => [
         // Enable query optimization
-        'optimize_queries' => true,
+        'optimize_queries' => env('ELIGIFY_PERF_OPTIMIZE_QUERIES', true),
 
         // Batch evaluation size
-        'batch_size' => 100,
+        'batch_size' => env('ELIGIFY_PERF_BATCH_SIZE', 100),
 
         // Enable rule compilation for better performance
-        'compile_rules' => true,
+        'compile_rules' => env('ELIGIFY_PERF_COMPILE_RULES', true),
 
         // Rule compilation cache TTL in minutes
-        'compilation_cache_ttl' => 1440, // 24 hours
+        'compilation_cache_ttl' => env('ELIGIFY_PERF_COMPILATION_CACHE_TTL', 1440), // 24 hours
     ],
 
     /*
@@ -464,31 +464,31 @@ return [
     */
     'workflow' => [
         // Enable workflow system
-        'enabled' => true,
+        'enabled' => env('ELIGIFY_WORKFLOW_ENABLED', true),
 
         // Callback execution timeout in seconds
-        'callback_timeout' => 30,
+        'callback_timeout' => env('ELIGIFY_WORKFLOW_CALLBACK_TIMEOUT', 30),
 
         // Log callback execution errors
-        'log_callback_errors' => true,
+        'log_callback_errors' => env('ELIGIFY_WORKFLOW_LOG_CALLBACK_ERRORS', true),
 
         // Fail evaluation if callback throws error
-        'fail_on_callback_error' => false,
+        'fail_on_callback_error' => env('ELIGIFY_WORKFLOW_FAIL_ON_CALLBACK_ERROR', false),
 
         // Dispatch Laravel events
-        'dispatch_events' => true,
+        'dispatch_events' => env('ELIGIFY_WORKFLOW_DISPATCH_EVENTS', true),
 
         // Enable async callbacks (requires queue)
-        'enable_async_callbacks' => false,
+        'enable_async_callbacks' => env('ELIGIFY_WORKFLOW_ASYNC', false),
 
         // Queue connection for async callbacks
-        'async_queue_connection' => 'default',
+        'async_queue_connection' => env('ELIGIFY_WORKFLOW_QUEUE_CONNECTION', 'default'),
 
         // Queue name for async callbacks
-        'async_queue_name' => 'eligify',
+        'async_queue_name' => env('ELIGIFY_WORKFLOW_QUEUE_NAME', 'eligify'),
 
         // Retry failed async callbacks
-        'async_retry_attempts' => 3,
+        'async_retry_attempts' => env('ELIGIFY_WORKFLOW_ASYNC_RETRY_ATTEMPTS', 3),
 
         // Score thresholds for automatic callbacks
         'score_thresholds' => [

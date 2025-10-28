@@ -17,6 +17,7 @@
     ],
     "require": {
         "php": "^8.4",
+        "cleaniquecoders/php-env-key-manager": "^1.1",
         "cleaniquecoders/traitify": "^1.2",
         "illuminate/contracts": "^11.0||^12.0",
         "livewire/livewire": "^3",
