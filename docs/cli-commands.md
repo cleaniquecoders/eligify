@@ -9,6 +9,15 @@ Eligify provides a comprehensive set of Artisan commands for managing eligibilit
 - [Evaluation Commands](#evaluation-commands)
 - [Audit Commands](#audit-commands)
 - [Maintenance Commands](#maintenance-commands)
+  - [eligify:benchmark](#eligifybenchmark) - Performance benchmarking
+  - [eligify:cleanup-evaluations](#eligifycleanup-evaluations) - Clean old evaluations
+  - [eligify:optimize](#eligifyoptimize) - Optimize database and cache
+  - [eligify:export](#eligifyexport) - Export data
+  - [eligify:import](#eligifyimport) - Import data
+  - [eligify:seed](#eligifyseed) - Seed sample data
+- [Scheduling Commands](#scheduling-commands)
+- [Command Aliases](#command-aliases)
+- [Tips and Tricks](#tips-and-tricks)
 
 ## Status Commands
 
@@ -441,6 +450,102 @@ php artisan eligify:cleanup-audit --event=evaluation_completed --days=180
 ```
 
 ## Maintenance Commands
+
+### eligify:benchmark
+
+Run performance benchmarks for Eligify.
+
+```bash
+php artisan eligify:benchmark [options]
+```
+
+**Options:**
+
+- `--iterations=` - Number of iterations to run (default: 100)
+- `--type=` - Benchmark type: `simple`, `complex`, `batch`, `cache`, `all` (default: all)
+- `--format=` - Output format: `table`, `json` (default: table)
+
+**Benchmark Types:**
+
+- `simple` - Basic evaluation with 3 rules
+- `complex` - Complex evaluation with 8+ rules
+- `batch` - Batch processing (100 and 1000 items)
+- `cache` - Cache performance comparison
+- `all` - Run all benchmarks
+
+**Examples:**
+
+```bash
+# Run all benchmarks (100 iterations)
+php artisan eligify:benchmark
+
+# Quick test with fewer iterations
+php artisan eligify:benchmark --iterations=10
+
+# Accurate test with more iterations
+php artisan eligify:benchmark --iterations=1000
+
+# Test specific benchmark type
+php artisan eligify:benchmark --type=simple
+php artisan eligify:benchmark --type=complex
+php artisan eligify:benchmark --type=batch
+php artisan eligify:benchmark --type=cache
+
+# Get JSON output for CI/CD
+php artisan eligify:benchmark --format=json --iterations=100
+
+# Combined options
+php artisan eligify:benchmark --type=batch --iterations=500
+```
+
+**Output Example:**
+
+```
+🚀 Eligify Performance Benchmarks
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📊 Iterations: 100
+⚡ Environment: production
+🐘 PHP Version: 8.4.0
+📦 Laravel Version: 11.9.0
+
+📈 Testing: Simple Evaluation - 3 basic rules
+
+Metric          Value
+────────────────────────
+Average Time    12.45 ms
+Min Time        8.23 ms
+Max Time        25.67 ms
+Median Time     11.89 ms
+Throughput      80.32 req/s
+Avg Memory      2.5 MB
+Peak Memory     3.1 MB
+Iterations      100
+
+   ⏱️  Average: 12.45 ms
+   ⚡ Throughput: 80.32 req/s
+   💾 Memory: 2.5 MB (peak: 3.1 MB)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+✅ Benchmark Summary
+
+   📊 Total tests run: 4
+   ⏱️  Overall average: 35.21 ms
+
+💡 Tip: Run with --iterations=1000 for more accurate results
+📖 Docs: See docs/performance-benchmarking.md for optimization tips
+```
+
+**Use Cases:**
+
+- Development testing
+- Pre-production validation
+- CI/CD performance regression testing
+- Production monitoring
+- Performance optimization verification
+
+**See Also:** [Performance Benchmarking Documentation](performance-benchmarking.md)
+
+---
 
 ### eligify:cleanup-evaluations
 

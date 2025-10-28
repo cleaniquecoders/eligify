@@ -4,6 +4,7 @@ namespace CleaniqueCoders\Eligify;
 
 use CleaniqueCoders\Eligify\Audit\AuditLogger;
 use CleaniqueCoders\Eligify\Commands\AuditQueryCommand;
+use CleaniqueCoders\Eligify\Commands\BenchmarkCommand;
 use CleaniqueCoders\Eligify\Commands\CleanupAuditLogsCommand;
 use CleaniqueCoders\Eligify\Commands\CriteriaCommand;
 use CleaniqueCoders\Eligify\Commands\EligifyCommand;
@@ -48,6 +49,7 @@ class EligifyServiceProvider extends PackageServiceProvider
                 EvaluateCommand::class,
                 AuditQueryCommand::class,
                 CleanupAuditLogsCommand::class,
+                BenchmarkCommand::class,
             ]);
     }
 
