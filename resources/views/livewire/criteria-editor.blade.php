@@ -6,18 +6,18 @@
 
         <div>
             <label class="block text-sm font-medium mb-1">Name</label>
-            <input type="text" class="w-full border rounded px-3 py-2" wire:model.defer="name" required>
+            <input type="text" class="w-full border rounded px-3 py-2" wire:model.blur="name" required>
             @error('name') <div class="text-sm text-red-600 mt-1">{{ $message }}</div> @enderror
         </div>
 
         <div>
             <label class="block text-sm font-medium mb-1">Description</label>
-            <textarea rows="4" class="w-full border rounded px-3 py-2" wire:model.defer="description"></textarea>
+            <textarea rows="4" class="w-full border rounded px-3 py-2" wire:model.blur="description"></textarea>
             @error('description') <div class="text-sm text-red-600 mt-1">{{ $message }}</div> @enderror
         </div>
 
         <div class="flex items-center gap-2">
-            <input type="checkbox" class="rounded" wire:model.defer="is_active">
+            <input type="checkbox" class="rounded" wire:model.blur="is_active">
             <label class="text-sm">Active</label>
             @error('is_active') <div class="text-sm text-red-600 mt-1">{{ $message }}</div> @enderror
         </div>
