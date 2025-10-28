@@ -6,6 +6,48 @@ use Illuminate\Database\Eloquent\Model;
 
 /**
  * Advanced model data extractor for eligibility evaluations
+ *
+ * This class transforms Laravel Eloquent models into flat arrays suitable for
+ * eligibility rule evaluation. It handles attribute extraction, relationship
+ * data, computed fields, and custom field mappings.
+ *
+ * ## Usage Patterns
+ *
+ * ### Pattern 1: Quick extraction with defaults
+ * ```php
+ * $extractor = new ModelDataExtractor();
+ * $data = $extractor->extract($user);
+ * ```
+ * Best for: Simple cases where you don't need custom mappings
+ *
+ * ### Pattern 2: Custom configuration per instance
+ * ```php
+ * $extractor = new ModelDataExtractor([
+ *     'include_relationships' => true,
+ *     'max_relationship_depth' => 3,
+ * ]);
+ * $extractor->setFieldMappings(['annual_income' => 'income'])
+ *           ->setComputedFields(['risk_score' => fn($model) => $model->calculateRisk()]);
+ * $data = $extractor->extract($user);
+ * ```
+ * Best for: One-off extractions with specific requirements
+ *
+ * ### Pattern 3: Model-specific extractors (RECOMMENDED)
+ * ```php
+ * // Uses pre-configured mappings from config/eligify.php
+ * $data = ModelDataExtractor::forModel(User::class)->extract($user);
+ * ```
+ * Best for: Production use with multiple model types that need consistent mappings
+ *
+ * ## Method Guide
+ *
+ * - `extract()` - Performs the actual data extraction from a model instance
+ * - `forModel()` - Factory method that creates a pre-configured extractor for a specific model class
+ * - `setFieldMappings()` - Defines custom field name transformations
+ * - `setRelationshipMappings()` - Defines custom relationship data mappings
+ * - `setComputedFields()` - Adds custom computed fields via closures
+ *
+ * @see \CleaniqueCoders\Eligify\Contracts\ModelMapping For creating custom model mappings
  */
 class ModelDataExtractor
 {
@@ -32,6 +74,26 @@ class ModelDataExtractor
 
     /**
      * Extract data from a model for eligibility evaluation
+     *
+     * This is the main worker method that performs the actual data extraction.
+     * It processes the model through several stages:
+     *
+     * 1. Extracts basic attributes (columns from database)
+     * 2. Computes derived fields (age calculations, time-based metrics)
+     * 3. Processes relationships (counts, aggregations, summaries)
+     * 4. Applies custom field mappings (rename fields)
+     * 5. Applies relationship mappings (flatten nested data)
+     * 6. Applies custom computed fields (user-defined calculations)
+     *
+     * @param  Model  $model  The Eloquent model instance to extract data from
+     * @return array Flat array of key-value pairs suitable for rule evaluation
+     *
+     * @example
+     * ```php
+     * $extractor = new ModelDataExtractor();
+     * $data = $extractor->extract($user);
+     * // Returns: ['id' => 1, 'email' => 'user@example.com', 'created_days_ago' => 365, ...]
+     * ```
      */
     public function extract(Model $model): array
     {
@@ -63,7 +125,23 @@ class ModelDataExtractor
     }
 
     /**
-     * Set custom field mappings
+     * Set custom field mappings to rename fields during extraction
+     *
+     * Use this to transform field names from your model structure to the names
+     * expected by your eligibility rules. This is useful when rules are defined
+     * with generic field names but different models use different column names.
+     *
+     * @param  array  $mappings  Array of ['original_field' => 'mapped_field'] pairs
+     * @return self Fluent interface
+     *
+     * @example
+     * ```php
+     * $extractor->setFieldMappings([
+     *     'annual_income' => 'income',
+     *     'credit_rating' => 'credit_score',
+     * ]);
+     * // Model has 'annual_income', but rules expect 'income'
+     * ```
      */
     public function setFieldMappings(array $mappings): self
     {
@@ -73,7 +151,25 @@ class ModelDataExtractor
     }
 
     /**
-     * Set custom relationship mappings
+     * Set custom relationship mappings to flatten nested relationship data
+     *
+     * Use this to extract specific fields from relationships and map them to
+     * top-level fields in the extracted data. This makes relationship data
+     * accessible to rules without nested array access.
+     *
+     * @param  array  $mappings  Array of ['relationship_name' => ['original_key' => 'mapped_key']] pairs
+     * @return self Fluent interface
+     *
+     * @example
+     * ```php
+     * $extractor->setRelationshipMappings([
+     *     'profile' => [
+     *         'employment_status' => 'is_employed',
+     *         'employer_name' => 'employer',
+     *     ],
+     * ]);
+     * // Extracts $user->profile->employment_status as 'is_employed' in the flat array
+     * ```
      */
     public function setRelationshipMappings(array $mappings): self
     {
@@ -83,7 +179,24 @@ class ModelDataExtractor
     }
 
     /**
-     * Set custom computed fields
+     * Set custom computed fields to add dynamic calculations
+     *
+     * Use this to define fields that are calculated on-the-fly during extraction.
+     * Each computed field is a closure that receives the model and already-extracted
+     * data, allowing you to perform complex calculations or business logic.
+     *
+     * @param  array  $fields  Array of ['field_name' => callable] pairs
+     * @return self Fluent interface
+     *
+     * @example
+     * ```php
+     * $extractor->setComputedFields([
+     *     'risk_score' => function($model, $data) {
+     *         return ($data['income'] / $data['debt']) * 100;
+     *     },
+     *     'approval_probability' => fn($model) => $model->calculateApprovalChance(),
+     * ]);
+     * ```
      */
     public function setComputedFields(array $fields): self
     {
@@ -363,10 +476,36 @@ class ModelDataExtractor
     }
 
     /**
-     * Create a preconfigured extractor for specific model types
+     * Create a preconfigured extractor for specific model types (RECOMMENDED)
      *
-     * Looks up the model mapping class from config and applies it.
-     * Falls back to a default User mapping if configured.
+     * This factory method creates an extractor instance that's already configured
+     * with model-specific mappings defined in config/eligify.php. This is the
+     * recommended approach for production use as it centralizes your extraction
+     * logic and ensures consistency across your application.
+     *
+     * The method looks up the model class in config('eligify.model_extraction.model_mappings')
+     * and applies the corresponding mapping class if found. Falls back to a default
+     * mapping if configured.
+     *
+     * @param  string  $modelClass  Fully qualified model class name (e.g., App\Models\User::class)
+     * @return self Configured ModelDataExtractor instance ready to use
+     *
+     * @example
+     * ```php
+     * // Configure in config/eligify.php:
+     * 'model_extraction' => [
+     *     'model_mappings' => [
+     *         \App\Models\User::class => \App\Eligify\Mappings\UserMapping::class,
+     *         \App\Models\LoanApplication::class => \App\Eligify\Mappings\LoanMapping::class,
+     *     ],
+     * ],
+     *
+     * // Then use in your code:
+     * $userData = ModelDataExtractor::forModel(User::class)->extract($user);
+     * $loanData = ModelDataExtractor::forModel(LoanApplication::class)->extract($loan);
+     * ```
+     *
+     * @see \CleaniqueCoders\Eligify\Contracts\ModelMapping For creating custom mapping classes
      */
     public static function forModel(string $modelClass): self
     {

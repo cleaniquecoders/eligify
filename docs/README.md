@@ -10,6 +10,9 @@ Eligify is a Laravel package that provides a flexible rule and criteria engine f
 - [Quick Start](#quick-start)
 - [Core Concepts](#core-concepts)
 - [Model Data Extraction](#model-data-extraction)
+  - [Quick Reference Guide](quick-reference-model-extraction.md) ⚡
+  - [Complete Extraction Guide](model-data-extraction.md) 📖
+  - [Architecture & Data Flow](model-data-extractor-architecture.md) 🏗️
 - [Configuration](#configuration)
 - [Database Structure](#database-structure)
 - [Usage Guide](#usage-guide)
