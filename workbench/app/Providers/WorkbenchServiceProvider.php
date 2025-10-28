@@ -3,6 +3,7 @@
 namespace Workbench\App\Providers;
 
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Facades\Gate;
 
 class WorkbenchServiceProvider extends ServiceProvider
 {
@@ -11,7 +12,15 @@ class WorkbenchServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        // Configure Eligify UI early so the package provider sees it during boot
+        config([
+            'eligify.ui.enabled' => true,
+            'eligify.ui.route_prefix' => 'eligify',
+            'eligify.ui.middleware' => ['web'],
+            'eligify.ui.auth' => function ($request) {
+                return app()->environment('local');
+            },
+        ]);
     }
 
     /**
@@ -19,6 +28,9 @@ class WorkbenchServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        // Optionally define the Gate for completeness (not strictly needed due to closure)
+        Gate::define('viewEligify', function ($user = null) {
+            return app()->environment('local');
+        });
     }
 }

@@ -3,5 +3,6 @@
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    return view('welcome');
+    // Redirect to the Eligify dashboard when workbench root is visited
+    return redirect()->route('eligify.dashboard');
 });
