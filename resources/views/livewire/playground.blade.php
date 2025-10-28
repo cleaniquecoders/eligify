@@ -54,7 +54,7 @@
                     Select Criteria
                 </label>
                 <select
-                    wire:model="selectedCriteriaId"
+                    wire:model.live="selectedCriteriaId"
                     class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
                     <option value="">-- Choose a criteria to test --</option>
@@ -90,23 +90,39 @@
                     <label class="block text-sm font-medium text-gray-700">
                         Test Data (JSON)
                     </label>
-                    <button
-                        wire:click="formatJson"
-                        class="text-xs text-blue-600 hover:text-blue-800"
-                        title="Format JSON"
-                    >
-                        Format
-                    </button>
+                    <div class="flex items-center gap-2">
+                        @if($selectedCriteria && $selectedCriteria->rules->isNotEmpty())
+                            <button
+                                wire:click="generateFromRules"
+                                class="text-xs px-2 py-1 bg-green-100 text-green-700 hover:bg-green-200 rounded border border-green-300"
+                                title="Generate sample data based on your rules"
+                            >
+                                ✨ Generate from Rules
+                            </button>
+                        @endif
+                        <button
+                            wire:click="formatJson"
+                            class="text-xs text-blue-600 hover:text-blue-800"
+                            title="Format JSON"
+                        >
+                            Format
+                        </button>
+                    </div>
                 </div>
                 <textarea
-                    wire:model="testDataJson"
+                    wire:model.live="testDataJson"
                     rows="12"
                     class="w-full border border-gray-300 rounded px-3 py-2 font-mono text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder='{"field": "value", ...}'
+                    placeholder='{"field": "value", "nested": {"field": "value"}}'
                 ></textarea>
-                <p class="text-xs text-gray-500 mt-2">
-                    Enter JSON data to test against the selected criteria
-                </p>
+                <div class="text-xs text-gray-500 mt-2">
+                    @if($selectedCriteria && $selectedCriteria->rules->isNotEmpty())
+                        <p class="mb-1">💡 <strong>Tip:</strong> Click "✨ Generate from Rules" to auto-create sample data based on your {{ $selectedCriteria->rules->count() }} rule(s)</p>
+                    @elseif($selectedCriteria && $selectedCriteria->rules->isEmpty())
+                        <p class="mb-1 text-amber-600">⚠️ This criteria has no active rules. Add some rules first.</p>
+                    @endif
+                    <p>Enter JSON data to test. Supports nested objects using dot notation (e.g., <code class="px-1 py-0.5 bg-gray-100 rounded">applicant.income</code>)</p>
+                </div>
             </div>
 
             <!-- Evaluate Button -->

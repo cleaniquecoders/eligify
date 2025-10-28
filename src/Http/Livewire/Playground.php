@@ -26,9 +26,15 @@ class Playground extends Component
 
     public function mount(?int $criteriaId = null): void
     {
+        // Only load criteria if explicitly provided via URL
         if ($criteriaId) {
             $this->selectedCriteriaId = $criteriaId;
             $this->loadCriteria();
+        } else {
+            // Start with nothing selected
+            $this->selectedCriteriaId = null;
+            $this->selectedCriteria = null;
+            $this->testDataJson = '';
         }
 
         $this->initializeQuickExamples();
@@ -132,7 +138,31 @@ class Playground extends Component
         }
     }
 
-    protected function generateSampleData(): string
+    public function generateFromRules(): void
+    {
+        if (! $this->selectedCriteria) {
+            $this->error = 'Please select a criteria first.';
+            return;
+        }
+
+        if ($this->selectedCriteria->rules->isEmpty()) {
+            $this->error = 'No rules found for this criteria.';
+            return;
+        }
+
+        try {
+            $generated = $this->generateSampleData();
+            $this->testDataJson = $generated;
+            $this->error = null;
+
+            // Force Livewire to detect the change
+            $this->dispatch('sample-data-generated');
+        } catch (\Exception $e) {
+            $this->error = 'Failed to generate sample data: ' . $e->getMessage();
+        }
+    }
+
+    public function generateSampleData(): string
     {
         if (! $this->selectedCriteria || $this->selectedCriteria->rules->isEmpty()) {
             return json_encode([
@@ -145,10 +175,36 @@ class Playground extends Component
         foreach ($this->selectedCriteria->rules as $rule) {
             $field = $rule->field;
             $value = $this->generateSampleValue($rule);
-            $sampleData[$field] = $value;
+
+            // Handle dot notation for nested objects
+            if (str_contains($field, '.')) {
+                $this->setNestedValue($sampleData, $field, $value);
+            } else {
+                $sampleData[$field] = $value;
+            }
         }
 
         return json_encode($sampleData, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+    }
+
+    /**
+     * Set a value in a nested array using dot notation
+     */
+    protected function setNestedValue(array &$array, string $key, mixed $value): void
+    {
+        $keys = explode('.', $key);
+
+        while (count($keys) > 1) {
+            $key = array_shift($keys);
+
+            if (! isset($array[$key]) || ! is_array($array[$key])) {
+                $array[$key] = [];
+            }
+
+            $array = &$array[$key];
+        }
+
+        $array[array_shift($keys)] = $value;
     }
 
     protected function generateSampleValue($rule)
