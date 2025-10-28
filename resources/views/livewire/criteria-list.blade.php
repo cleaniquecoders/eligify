@@ -41,6 +41,7 @@
                                     <td class="px-4 py-2">
                                         <a class="text-blue-600 hover:underline" href="{{ route('eligify.criteria.show', $criteria->id) }}">{{ $criteria->name }}</a>
                                         <div class="text-xs text-gray-500">{{ $criteria->description }}</div>
+                                        <div class="mt-1 text-xs"><a class="text-blue-600 hover:underline" href="{{ route('eligify.criteria.edit', $criteria->id) }}">Edit</a></div>
                                     </td>
                                     <td class="px-4 py-2">
                                         <span class="inline-flex items-center px-2 py-0.5 text-xs rounded {{ $criteria->is_active ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-700' }}">
@@ -68,6 +69,7 @@
                                     {{ $criteria->is_active ? 'Active' : 'Inactive' }}
                                 </span>
                             </div>
+                            <div class="mt-2 text-xs"><a class="text-blue-600 hover:underline" href="{{ route('eligify.criteria.edit', $criteria->id) }}">Edit</a></div>
                             <div class="mt-3 flex gap-4 text-xs text-gray-600">
                                 <div>Rules: <span class="font-semibold">{{ $criteria->rules_count }}</span></div>
                                 <div>Evals: <span class="font-semibold">{{ $criteria->evaluations_count }}</span></div>

@@ -1,5 +1,9 @@
 <x-eligify::layout>
     <x-slot:title>Criteria</x-slot:title>
+    <div class="flex items-center justify-between mb-3">
+        <div></div>
+        <a href="{{ route('eligify.criteria.create') }}" class="px-4 py-2 bg-gray-900 text-white rounded">New Criteria</a>
+    </div>
     @if (class_exists(\Livewire\Livewire::class))
         <livewire:eligify.criteria-list />
     @else

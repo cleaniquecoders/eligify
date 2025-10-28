@@ -19,14 +19,22 @@ Route::group([
         return response()->json(['status' => 'ok']);
     })->name('health');
 
-    // Criteria pages (placeholders)
+    // Criteria pages (Livewire-based)
     Route::get('/criteria', function () {
         return view('eligify::criteria.index');
     })->name('criteria.index');
 
+    Route::get('/criteria/create', function () {
+        return view('eligify::criteria.create');
+    })->name('criteria.create');
+
     Route::get('/criteria/{id}', function (string $id) {
         return view('eligify::criteria.show', ['id' => $id]);
     })->name('criteria.show');
+
+    Route::get('/criteria/{id}/edit', function (string $id) {
+        return view('eligify::criteria.edit', ['id' => $id]);
+    })->name('criteria.edit');
 
     // Rule Library
     Route::get('/rule-library', function () {

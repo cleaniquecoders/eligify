@@ -75,6 +75,8 @@ class EligifyServiceProvider extends PackageServiceProvider
             // Register Livewire components when available
             if (class_exists(Livewire::class)) {
                 Livewire::component('eligify.criteria-list', \CleaniqueCoders\Eligify\Http\Livewire\CriteriaList::class);
+                Livewire::component('eligify.criteria-editor', \CleaniqueCoders\Eligify\Http\Livewire\CriteriaEditor::class);
+                Livewire::component('eligify.criteria-show', \CleaniqueCoders\Eligify\Http\Livewire\CriteriaShow::class);
                 Livewire::component('eligify.rule-library-list', \CleaniqueCoders\Eligify\Http\Livewire\RuleLibraryList::class);
                 Livewire::component('eligify.audit-log-list', \CleaniqueCoders\Eligify\Http\Livewire\AuditLogList::class);
                 Livewire::component('eligify.settings-manager', \CleaniqueCoders\Eligify\Http\Livewire\SettingsManager::class);
