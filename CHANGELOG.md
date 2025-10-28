@@ -2,6 +2,178 @@
 
 All notable changes to `eligify` will be documented in this file.
 
+## Eligitfy UI - 2025-10-28
+
+### Release Notes - Eligify v1.2.0
+
+**Released:** October 28, 2025
+**Type:** Feature Enhancement Release
+
+#### What's New
+
+Version 1.2.0 brings powerful UI, developer tools, and performance optimization capabilities that make Eligify easier to use, test, and optimize for production workloads.
+
+##### UI to Manage Your Criteria *& Rules
+
+See [UI Setup Guide](https://github.com/cleaniquecoders/eligify/blob/main/docs/ui-setup-guide.md) for more details.
+
+##### 🎮 Interactive Testing Playground
+
+<img width="1235" height="949" alt="05-playground" src="https://github.com/user-attachments/assets/e3a62b12-918d-4de2-8d01-025c87b6a4a5" />
+Test your eligibility criteria in real-time with sample data generation:
+
+- **Smart Sample Generation** - Auto-generate test data from your rules with one click
+- **Flexible Input** - Support for both flat (dot notation) and nested JSON structures
+- **Visual Results** - See detailed pass/fail breakdown with execution times per rule
+- **Quick Examples** - Pre-filled templates for common data types
+
+```php
+// The playground can auto-generate data like this:
+{
+  "applicant": {
+    "income": 3010,
+    "age": 28,
+    "not_bankrupt": true
+  }
+}
+
+```
+##### 🎯 Dynamic Field Type Input
+
+The rule editor now adapts intelligently based on field types:
+
+- **Smart Input Types** - Number fields, date pickers, boolean toggles, text areas
+- **Type-Aware Validation** - Automatic validation based on selected field type
+- **Filtered Operators** - Only show relevant operators for each data type
+- **Better UX** - Context-aware placeholders and help text
+
+##### ⚡ Performance Benchmarking System
+
+New built-in performance testing and optimization toolkit:
+
+###### Benchmark Command
+
+```bash
+# Run all benchmarks with default settings (100 iterations)
+php artisan eligify:benchmark
+
+# Quick test with fewer iterations  
+php artisan eligify:benchmark --iterations=10
+
+# Test specific scenarios
+php artisan eligify:benchmark --type=simple    # Basic rules
+php artisan eligify:benchmark --type=complex   # Complex evaluations
+php artisan eligify:benchmark --type=batch     # Batch processing
+php artisan eligify:benchmark --type=cache     # Cache performance
+
+# JSON output for CI/CD pipelines
+php artisan eligify:benchmark --format=json
+
+```
+###### Key Features
+
+- **Multiple Test Scenarios** - Simple, complex, batch (100/1000 items), and cache performance tests
+- **Comprehensive Metrics** - Average/min/max/median time, throughput (req/s), memory usage
+- **Cache Analysis** - Compare performance with/without caching, shows improvement percentage
+- **Production Safety** - Automatically prevents running in production environment
+- **Color-Coded Output** - Visual performance indicators (green/yellow/red)
+- **Automatic Cleanup** - Removes test data after benchmarking
+
+###### Real-World Performance Metrics
+
+Based on benchmark results:
+
+| Scenario | Average Time | Throughput | Memory |
+|----------|--------------|------------|--------|
+| Simple (3 rules) | ~15-30 ms | 50-100 req/s | 2-4 MB |
+| Complex (8 rules) | ~30-60 ms | 20-50 req/s | 4-8 MB |
+| Batch (100 items) | ~500-1000 ms | 100-200 items/s | 10-20 MB |
+| Batch (1000 items) | ~5-10 sec | 100-200 items/s | 30-50 MB |
+
+**Cache Improvement:** 2-5x faster with caching enabled
+
+###### New Classes
+
+- **`BenchmarkCommand`** - Artisan command for running performance tests
+- **`EligifyBenchmark`** - Core benchmarking class with measurement utilities
+
+##### 📊 Performance Benchmarking Guide
+
+Comprehensive documentation for optimizing your eligibility checks:
+
+- **Benchmark Results** - Real-world performance metrics and throughput data
+- **Testing Methodology** - Scripts and tools for measuring your system
+- **Optimization Strategies** - Cache, batch processing, and database tips
+- **Load Testing** - Guidelines for production performance monitoring
+- **Profiling Tools** - Integration with Laravel Telescope, Blackfire, and XDebug
+
+#### What This Means For You
+
+##### For Development
+
+- **Test faster** - Interactive playground reduces testing time from minutes to seconds
+- **Catch issues earlier** - Type-aware validation prevents configuration errors
+- **Optimize confidently** - Benchmark real performance before production deployment
+
+##### For Production
+
+- **Measure performance** - Understand your system's capacity and bottlenecks
+- **Plan scaling** - Know your throughput limits for infrastructure planning
+- **Monitor degradation** - Regular benchmarks detect performance regressions
+
+#### Upgrade Guide
+
+```bash
+composer update cleaniquecoders/eligify
+php artisan migrate
+
+```
+No breaking changes - fully backward compatible with v1.1.x
+
+#### Documentation
+
+📖 **Complete Documentation:** [https://github.com/cleaniquecoders/eligify/tree/main/docs](https://github.com/cleaniquecoders/eligify/tree/main/docs)
+
+**New Guides:**
+
+- [Playground Guide](https://github.com/cleaniquecoders/eligify/blob/main/docs/playground-guide.md) - Interactive testing tutorial
+- [Dynamic Value Input](https://github.com/cleaniquecoders/eligify/blob/main/docs/dynamic-value-input.md) - Field type system reference
+- [Performance Benchmarking](https://github.com/cleaniquecoders/eligify/blob/main/docs/performance-benchmarking.md) - Optimization strategies and benchmarking guide
+
+#### Best Practices
+
+##### Benchmarking in CI/CD
+
+```bash
+# Add to your CI pipeline
+php artisan eligify:benchmark --iterations=1000 --format=json > benchmark-results.json
+
+```
+##### Before Production Deployment
+
+```bash
+# Run comprehensive benchmarks
+php artisan eligify:benchmark --iterations=1000 --type=all
+
+# Test expected production load
+php artisan eligify:benchmark --type=batch --iterations=1000
+
+```
+##### Performance Optimization Tips
+
+1. **Enable Caching** - 2-5x performance improvement for repeated evaluations
+2. **Batch Processing** - Use `evaluateBatch()` for multiple entities
+3. **Database Indexing** - Add indexes on frequently queried criteria slugs
+4. **Rule Optimization** - Place high-priority rules first for early termination
+5. **Monitor Memory** - Watch peak memory usage for large batch operations
+
+
+---
+
+**Previous Release:** [v1.1.0 - Model Data Extraction System](https://github.com/cleaniquecoders/eligify/blob/main/CHANGELOG.md#model-data-extraction-system---2025-10-28)
+
+**Full Changelog:** [CHANGELOG.md](https://github.com/cleaniquecoders/eligify/blob/main/CHANGELOG.md)
+
 ## Model Data Extraction System - 2025-10-28
 
 ### Release Notes - Eligify v1.1.0
@@ -29,6 +201,7 @@ $data = [
 
 Eligify::criteria('loan_approval')->evaluate($data);
 
+
 ```
 ##### The Solution: ModelDataExtractor
 
@@ -39,6 +212,7 @@ Now, with v1.1.0:
 $data = ModelDataExtractor::forModel(User::class)->extract($user);
 
 Eligify::criteria('loan_approval')->evaluate($data);
+
 
 ```
 #### ✨ What's New in v1.1.0
@@ -54,6 +228,7 @@ Transform any Eloquent model into evaluation-ready data automatically.
 ```php
 $data = (new ModelDataExtractor())->extract($user);
 
+
 ```
 **Pattern 2: Custom Configuration (One-off)**
 
@@ -63,12 +238,14 @@ $data = (new ModelDataExtractor())
     ->setComputedFields(['risk_score' => fn($m) => $m->calculateRisk()])
     ->extract($user);
 
+
 ```
 **Pattern 3: Production-Ready (Recommended)**
 
 ```php
 // Configure once in config/eligify.php
 $data = ModelDataExtractor::forModel(User::class)->extract($user);
+
 
 ```
 ###### Key Features
@@ -113,6 +290,7 @@ $data = $extractor
     ])
     ->extract($user);
 
+
 ```
 ###### AbstractModelMapping Class
 
@@ -152,6 +330,7 @@ class CustomerModelMapping extends AbstractModelMapping
     }
 }
 
+
 ```
 ###### ModelMapping Contract
 
@@ -166,6 +345,7 @@ interface ModelMapping
     public function getComputedFields(): array;
 }
 
+
 ```
 ###### Built-in Model Mappings
 
@@ -176,6 +356,7 @@ interface ModelMapping
 // - email_verified_at → email_verified_timestamp
 // - created_at → registration_date
 // - is_verified → computed field (true/false)
+
 
 ```
 ##### 📚 New Documentation
@@ -258,6 +439,7 @@ $result = Eligify::criteria('loan_approval')
     ->addRule('debt_to_income_ratio', '<=', 0.4)
     ->evaluate($data);
 
+
 ```
 ##### Example 2: Scholarship Eligibility
 
@@ -291,6 +473,7 @@ $result = Eligify::criteria('scholarship_eligibility')
     ->addRule('extracurricular_count', '>=', 2)
     ->addRule('has_financial_need', '==', true)
     ->evaluate($data);
+
 
 ```
 ##### Example 3: E-commerce VIP Tier
@@ -329,6 +512,7 @@ $result = Eligify::criteria('vip_tier')
     ->addRule('return_rate', '<=', 0.05)
     ->setScoringMethod(ScoringMethod::WEIGHTED_AVERAGE)
     ->evaluate($data);
+
 
 ```
 #### 🔧 Configuration Updates
@@ -373,6 +557,7 @@ return [
     ],
 ];
 
+
 ```
 #### 🔄 Migration Guide
 
@@ -387,11 +572,13 @@ This is a **minor version release** with **100% backward compatibility**. All ex
 ```bash
 php artisan vendor:publish --tag="eligify-config" --force
 
+
 ```
 2. **Create your first model mapping:**
 
 ```php
 php artisan make:eligify-mapping CustomerMapping
+
 
 ```
 3. **Register in config:**
@@ -402,12 +589,14 @@ php artisan make:eligify-mapping CustomerMapping
     'App\Models\Customer' => \App\Eligify\Mappings\CustomerMapping::class,
 ],
 
+
 ```
 4. **Start using it:**
 
 ```php
 $data = ModelDataExtractor::forModel(Customer::class)->extract($customer);
 Eligify::criteria('vip_program')->evaluate($data);
+
 
 ```
 #### 📦 Installation & Upgrade
@@ -417,6 +606,7 @@ Eligify::criteria('vip_program')->evaluate($data);
 ```bash
 composer require cleaniquecoders/eligify:^1.1
 
+
 ```
 **Upgrade from v1.0.x:**
 
@@ -424,6 +614,7 @@ composer require cleaniquecoders/eligify:^1.1
 composer update cleaniquecoders/eligify
 php artisan vendor:publish --tag="eligify-config" --force
 php artisan optimize:clear
+
 
 ```
 #### 🧪 Testing
@@ -447,6 +638,7 @@ use CleaniqueCoders\Eligify\Support\ModelDataExtractor;
 $data = ModelDataExtractor::forModel(User::class)->extract($user);
 $this->assertArrayHasKey('is_verified', $data);
 $this->assertTrue($data['is_verified']);
+
 
 ```
 #### 🎯 Use Cases Enhanced by v1.1.0
@@ -553,6 +745,7 @@ Eligify::criteria('loan_approval')
     ->evaluate($applicant);
 
 
+
 ```
 #### 🧠 Advanced Rule Engine
 
@@ -641,6 +834,7 @@ Eligify::criteria('complex_approval')
     ->evaluate($applicant);
 
 
+
 ```
 #### Policy Integration
 
@@ -664,6 +858,7 @@ class LoanPolicy
 
 
 
+
 ```
 #### Artisan Commands
 
@@ -680,6 +875,7 @@ php artisan eligify:evaluate loan_approval --model="App\Models\Loan:1"
 # Audit management
 php artisan eligify:audit-query --event=evaluation_completed
 php artisan eligify:cleanup-audit --days=90
+
 
 
 
@@ -702,11 +898,13 @@ php artisan eligify:cleanup-audit --days=90
 composer require cleaniquecoders/eligify
 
 
+
 ```
 ```bash
 php artisan vendor:publish --tag="eligify-migrations"
 php artisan vendor:publish --tag="eligify-config"
 php artisan migrate
+
 
 
 
