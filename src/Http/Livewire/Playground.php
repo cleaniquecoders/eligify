@@ -59,6 +59,8 @@ class Playground extends Component
             // Auto-generate sample data based on rules
             $this->testDataJson = $this->generateSampleData();
             $this->error = null;
+
+            $this->js('$wire.$refresh()');
         } catch (\Exception $e) {
             $this->error = 'Criteria not found: '.$e->getMessage();
             $this->selectedCriteria = null;
@@ -153,12 +155,10 @@ class Playground extends Component
         }
 
         try {
-            $generated = $this->generateSampleData();
-            $this->testDataJson = $generated;
+            $this->testDataJson = $this->generateSampleData();
             $this->error = null;
 
-            // Force Livewire to detect the change
-            $this->dispatch('sample-data-generated');
+            $this->js('$wire.$refresh()');
         } catch (\Exception $e) {
             $this->error = 'Failed to generate sample data: '.$e->getMessage();
         }

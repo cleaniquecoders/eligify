@@ -92,13 +92,13 @@
                     </label>
                     <div class="flex items-center gap-2">
                         @if($selectedCriteria && $selectedCriteria->rules->isNotEmpty())
-                            <button
+                            <div
                                 wire:click="generateFromRules"
-                                class="text-xs px-2 py-1 bg-green-100 text-green-700 hover:bg-green-200 rounded border border-green-300"
+                                class="cursor-pointer text-xs px-2 py-1 bg-green-100 text-green-700 hover:bg-green-200 rounded border border-green-300"
                                 title="Generate sample data based on your rules"
                             >
                                 ✨ Generate from Rules
-                            </button>
+                            </div>
                         @endif
                         <button
                             wire:click="formatJson"
@@ -114,7 +114,8 @@
                     rows="12"
                     class="w-full border border-gray-300 rounded px-3 py-2 font-mono text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                     placeholder='{"field": "value", "nested": {"field": "value"}}'
-                ></textarea>
+                >{{ !empty($testDataJson) ? $testDataJson : '' }}</textarea>
+
                 <div class="text-xs text-gray-500 mt-2">
                     @if($selectedCriteria && $selectedCriteria->rules->isNotEmpty())
                         <p class="mb-1">💡 <strong>Tip:</strong> Click "✨ Generate from Rules" to auto-create sample data based on your {{ $selectedCriteria->rules->count() }} rule(s)</p>
