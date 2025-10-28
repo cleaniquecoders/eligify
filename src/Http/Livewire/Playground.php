@@ -142,11 +142,13 @@ class Playground extends Component
     {
         if (! $this->selectedCriteria) {
             $this->error = 'Please select a criteria first.';
+
             return;
         }
 
         if ($this->selectedCriteria->rules->isEmpty()) {
             $this->error = 'No rules found for this criteria.';
+
             return;
         }
 
@@ -158,7 +160,7 @@ class Playground extends Component
             // Force Livewire to detect the change
             $this->dispatch('sample-data-generated');
         } catch (\Exception $e) {
-            $this->error = 'Failed to generate sample data: ' . $e->getMessage();
+            $this->error = 'Failed to generate sample data: '.$e->getMessage();
         }
     }
 

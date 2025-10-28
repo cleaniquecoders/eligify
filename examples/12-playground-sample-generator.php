@@ -42,7 +42,7 @@ foreach ($rules as $rule) {
     $value = $rule->value;
 
     // Generate appropriate sample value
-    $sampleValue = match($operator) {
+    $sampleValue = match ($operator) {
         '>=', '>' => is_numeric($value) ? $value + 10 : $value,
         '<=', '<' => is_numeric($value) ? $value - 10 : $value,
         '==' => $value,
@@ -57,7 +57,7 @@ foreach ($rules as $rule) {
 
         while (count($keys) > 1) {
             $key = array_shift($keys);
-            if (!isset($nested[$key])) {
+            if (! isset($nested[$key])) {
                 $nested[$key] = [];
             }
             $nested = &$nested[$key];
@@ -77,17 +77,17 @@ echo "🧪 Testing with generated data...\n\n";
 
 $result = Eligify::evaluate('loan-approval-playground-test', $sampleData);
 
-echo "Result: " . ($result['passed'] ? '✅ PASSED' : '❌ FAILED') . "\n";
+echo 'Result: '.($result['passed'] ? '✅ PASSED' : '❌ FAILED')."\n";
 echo "Score: {$result['score']}/100\n";
 echo "Decision: {$result['decision']}\n\n";
 
 // Show execution log
-if (!empty($result['execution_log'])) {
+if (! empty($result['execution_log'])) {
     echo "📊 Rules Breakdown:\n";
     foreach ($result['execution_log'] as $log) {
         $status = $log['passed'] ? '✓' : '✗';
         echo "  {$status} {$log['field']} {$log['operator']} ";
-        echo json_encode($log['expected']) . " (actual: " . json_encode($log['actual']) . ")\n";
+        echo json_encode($log['expected']).' (actual: '.json_encode($log['actual']).")\n";
     }
 }
 
