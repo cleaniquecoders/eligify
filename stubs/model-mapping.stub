@@ -1,0 +1,52 @@
+<?php
+
+namespace {{ namespace }};
+
+use CleaniqueCoders\Eligify\Mappings\AbstractModelMapping;
+
+/**
+ * Model mapping for {{ modelClass }}
+ *
+ * Generated on {{ date }}
+ */
+class {{ class }} extends AbstractModelMapping
+{
+    /**
+     * Get the model class this mapping is for
+     */
+    public function getModelClass(): string
+    {
+        return '{{ modelClass }}';
+    }
+
+    /**
+     * Field mappings for {{ modelClass }}
+     *
+     * Maps original field names to their mapped equivalents
+     */
+    protected array $fieldMappings = [{{ fieldMappings }}
+    ];
+
+    /**
+     * Relationship mappings for {{ modelClass }}
+     *
+     * Maps relationship data to flat fields
+     */
+    protected array $relationshipMappings = [{{ relationshipMappings }}
+    ];
+
+    /**
+     * Computed fields for {{ modelClass }}
+     */
+    protected array $computedFields = [{{ computedFieldsPlaceholder }}
+    ];
+
+    /**
+     * Initialize computed fields with closures
+     */
+    public function __construct()
+    {
+        $this->computedFields = [{{ computedFields }}
+        ];
+    }
+}

@@ -8,6 +8,8 @@ Eligify provides a comprehensive set of Artisan commands for managing eligibilit
 - [Criteria Management](#criteria-management)
 - [Evaluation Commands](#evaluation-commands)
 - [Audit Commands](#audit-commands)
+- [Code Generation](#code-generation)
+  - [eligify:make-mapping](#eligifymake-mapping) - Generate model mapping class
 - [Maintenance Commands](#maintenance-commands)
   - [eligify:benchmark](#eligifybenchmark) - Performance benchmarking
   - [eligify:cleanup-evaluations](#eligifycleanup-evaluations) - Clean old evaluations
@@ -448,6 +450,95 @@ Total: 840 logs
 ```bash
 php artisan eligify:cleanup-audit --event=evaluation_completed --days=180
 ```
+
+## Code Generation
+
+### eligify:make-mapping
+
+Generate a model mapping class for Eligify data extraction.
+
+```bash
+php artisan eligify:make-mapping {model} [options]
+```
+
+**Arguments:**
+
+- `model` - Fully qualified model class name (e.g., `App\Models\User`)
+
+**Options:**
+
+- `--name=` - Custom name for the mapping class (in kebab-case)
+- `--force` - Overwrite existing mapping class
+- `--namespace=` - Custom namespace (default: `App\Eligify\Mappings`)
+
+**Examples:**
+
+```bash
+# Generate mapping for User model
+php artisan eligify:make-mapping "App\Models\User"
+
+# Custom name
+php artisan eligify:make-mapping "App\Models\User" --name=premium-user
+
+# Custom namespace
+php artisan eligify:make-mapping "App\Models\Order" --namespace="App\CustomMappings"
+
+# Force overwrite
+php artisan eligify:make-mapping "App\Models\User" --force
+```
+
+**Generated Output:**
+
+The command automatically:
+
+- Analyzes model database schema and attributes
+- Detects and maps timestamp fields (created_at, updated_at, etc.)
+- Discovers model relationships
+- Creates common computed fields (is_verified, is_active, etc.)
+- Generates field mappings for business-friendly names
+
+**Example Generated Class:**
+
+```php
+namespace App\Eligify\Mappings;
+
+use CleaniqueCoders\Eligify\Mappings\AbstractModelMapping;
+
+class UserMapping extends AbstractModelMapping
+{
+    public function getModelClass(): string
+    {
+        return 'App\Models\User';
+    }
+
+    protected array $fieldMappings = [
+        'created_at' => 'registration_date',
+        'email_verified_at' => 'email_verified_timestamp',
+    ];
+
+    protected array $relationshipMappings = [
+        'orders.count' => 'orders_count',
+        'orders.sum:total' => 'total_order_value',
+    ];
+
+    protected array $computedFields = [
+        'is_verified' => null,
+    ];
+
+    public function __construct()
+    {
+        $this->computedFields = [
+            'is_verified' => fn ($model) => !is_null($model->email_verified_at),
+        ];
+    }
+}
+```
+
+**See Also:**
+
+- [Model Mapping Generator Guide](make-mapping-command.md) - Detailed documentation
+- [Model Mappings Overview](model-mappings.md) - Mapping concepts
+- [Model Data Extraction](model-data-extraction.md) - Usage guide
 
 ## Maintenance Commands
 
