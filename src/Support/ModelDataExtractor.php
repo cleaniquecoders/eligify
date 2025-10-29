@@ -121,6 +121,8 @@ class ModelDataExtractor
         // Apply custom computed fields
         $data = $this->applyComputedFields($model, $data);
 
+        ksort($data);
+
         return $data;
     }
 
