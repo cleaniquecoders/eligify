@@ -40,6 +40,9 @@ return [
             'logo' => env('ELIGIFY_UI_BRAND_LOGO', null), // path/URL or null to use text
         ],
 
+        // Using Gate
+        'gate' => 'viewEligify',
+
         // Asset strategy defaults for the package UI
         'assets' => [
             'use_cdn' => env('ELIGIFY_UI_ASSETS_USE_CDN', true),
