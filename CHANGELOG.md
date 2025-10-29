@@ -2,6 +2,91 @@
 
 All notable changes to `eligify` will be documented in this file.
 
+## Fix Github Action - 2025-10-29
+
+### v1.2.2 - CI/CD Optimization - 2025-10-29
+
+#### What's Changed
+
+Version 1.2.2 focuses on streamlining the continuous integration pipeline for faster, more targeted testing.
+
+##### 🚀 CI/CD Improvements
+
+###### Optimized Test Matrix
+
+The GitHub Actions workflow has been simplified to focus on the primary production environment:
+
+- **Single OS**: Ubuntu Linux only (removed Windows testing)
+- **Single PHP Version**: PHP 8.4 only (removed PHP 8.3)
+- **Single Laravel Version**: Laravel 12.x only (removed Laravel 11.x)
+- **Single Stability**: `prefer-stable` only (removed `prefer-lowest`)
+
+**Before**: 16 test jobs (2 OS × 2 PHP × 2 Laravel × 2 stability)
+**After**: 1 test job (Ubuntu × PHP 8.4 × Laravel 12.x × stable)
+
+###### Benefits
+
+✅ **Faster CI/CD** - Reduced from 16 parallel jobs to 1 focused job
+✅ **Lower Resource Usage** - Significant reduction in GitHub Actions minutes
+✅ **Simplified Maintenance** - Single environment to monitor and debug
+✅ **Production-Focused** - Tests the exact stack used in production
+
+##### 📋 Changes
+
+- Updated run-tests.yml:
+  - Removed Windows OS from test matrix
+  - Removed PHP 8.3 support from CI (package still supports it)
+  - Removed Laravel 11.x from CI (package still compatible)
+  - Removed `prefer-lowest` stability testing
+  - Simplified matrix configuration
+  
+
+##### 🔧 Technical Details
+
+**Workflow Configuration**:
+
+```yaml
+matrix:
+  os: [ubuntu-latest]
+  php: [8.4]
+  laravel: [12.*]
+  stability: [prefer-stable]
+
+```
+**Timeout**: 5 minutes
+**Testbench**: 10.* (for Laravel 12)
+
+##### ⚠️ Important Notes
+
+- This change **only affects CI/CD testing**, not package compatibility
+- The package remains compatible with:
+  - PHP 8.3 and 8.4
+  - Laravel 11.x and 12.x
+  - Both Ubuntu and Windows environments
+  
+- Users can still use the package on any supported configuration
+- Consider this a strategic focus on primary deployment targets
+
+##### 🔄 Compatibility
+
+- ✅ Fully backward compatible with v1.2.1
+- ✅ No breaking changes
+- ✅ No changes to package code or features
+- ✅ Infrastructure-only update
+
+##### 📦 Upgrade Instructions
+
+No action required. This is a CI/CD-only update with no impact on package functionality.
+
+```bash
+composer update cleaniquecoders/eligify
+
+```
+
+---
+
+**Full Changelog**: https://github.com/cleaniquecoders/eligify/compare/v1.2.1...v1.2.2
+
 ## Added eligify:make-mapping Command - 2025-10-29
 
 ### v1.2.1 - Model Mapping Generator - 2025-10-29
@@ -26,6 +111,7 @@ php artisan eligify:make-mapping "App\Models\Post" --namespace="App\CustomMappin
 
 # Force overwrite existing mapping
 php artisan eligify:make-mapping "App\Models\User" --force
+
 
 ```
 ##### Key Features
@@ -53,6 +139,7 @@ Automatically generates mappings for common patterns:
 'orders.count' => 'orders_count',
 'orders.sum:amount' => 'total_order_amount',
 'posts.avg:rating' => 'avg_post_rating',
+
 
 ```
 ###### ⚡ Computed Fields Generation
@@ -106,6 +193,7 @@ class UserMapping extends AbstractModelMapping
     }
 }
 
+
 ```
 ##### Command Options
 
@@ -123,6 +211,7 @@ class UserMapping extends AbstractModelMapping
    ```bash
    php artisan eligify:make-mapping "App\Models\User"
    
+   
    ```
 2. **Review and Customize**
    
@@ -139,11 +228,13 @@ class UserMapping extends AbstractModelMapping
        ],
    ],
    
+   
    ```
 4. **Use in Evaluations**
    
    ```php
    $data = ModelDataExtractor::forModel(User::class)->extract($user);
+   
    
    ```
 
@@ -206,6 +297,7 @@ composer update cleaniquecoders/eligify
 # Start generating mappings
 php artisan eligify:make-mapping "App\Models\User"
 
+
 ```
 ##### Testing
 
@@ -256,7 +348,6 @@ Test your eligibility criteria in real-time with sample data generation:
 - **Flexible Input** - Support for both flat (dot notation) and nested JSON structures
 - **Visual Results** - See detailed pass/fail breakdown with execution times per rule
 - **Quick Examples** - Pre-filled templates for common data types
-
 ```php
 // The playground can auto-generate data like this:
 {
@@ -266,6 +357,7 @@ Test your eligibility criteria in real-time with sample data generation:
     "not_bankrupt": true
   }
 }
+
 
 
 ```
@@ -299,6 +391,7 @@ php artisan eligify:benchmark --type=cache     # Cache performance
 
 # JSON output for CI/CD pipelines
 php artisan eligify:benchmark --format=json
+
 
 
 ```
@@ -360,6 +453,7 @@ composer update cleaniquecoders/eligify
 php artisan migrate
 
 
+
 ```
 No breaking changes - fully backward compatible with v1.1.x
 
@@ -382,6 +476,7 @@ No breaking changes - fully backward compatible with v1.1.x
 php artisan eligify:benchmark --iterations=1000 --format=json > benchmark-results.json
 
 
+
 ```
 ##### Before Production Deployment
 
@@ -391,6 +486,7 @@ php artisan eligify:benchmark --iterations=1000 --type=all
 
 # Test expected production load
 php artisan eligify:benchmark --type=batch --iterations=1000
+
 
 
 ```
@@ -438,6 +534,7 @@ Eligify::criteria('loan_approval')->evaluate($data);
 
 
 
+
 ```
 ##### The Solution: ModelDataExtractor
 
@@ -448,6 +545,7 @@ Now, with v1.1.0:
 $data = ModelDataExtractor::forModel(User::class)->extract($user);
 
 Eligify::criteria('loan_approval')->evaluate($data);
+
 
 
 
@@ -467,6 +565,7 @@ $data = (new ModelDataExtractor())->extract($user);
 
 
 
+
 ```
 **Pattern 2: Custom Configuration (One-off)**
 
@@ -478,12 +577,14 @@ $data = (new ModelDataExtractor())
 
 
 
+
 ```
 **Pattern 3: Production-Ready (Recommended)**
 
 ```php
 // Configure once in config/eligify.php
 $data = ModelDataExtractor::forModel(User::class)->extract($user);
+
 
 
 
@@ -532,6 +633,7 @@ $data = $extractor
 
 
 
+
 ```
 ###### AbstractModelMapping Class
 
@@ -573,6 +675,7 @@ class CustomerModelMapping extends AbstractModelMapping
 
 
 
+
 ```
 ###### ModelMapping Contract
 
@@ -589,6 +692,7 @@ interface ModelMapping
 
 
 
+
 ```
 ###### Built-in Model Mappings
 
@@ -599,6 +703,7 @@ interface ModelMapping
 // - email_verified_at → email_verified_timestamp
 // - created_at → registration_date
 // - is_verified → computed field (true/false)
+
 
 
 
@@ -685,6 +790,7 @@ $result = Eligify::criteria('loan_approval')
 
 
 
+
 ```
 ##### Example 2: Scholarship Eligibility
 
@@ -718,6 +824,7 @@ $result = Eligify::criteria('scholarship_eligibility')
     ->addRule('extracurricular_count', '>=', 2)
     ->addRule('has_financial_need', '==', true)
     ->evaluate($data);
+
 
 
 
@@ -758,6 +865,7 @@ $result = Eligify::criteria('vip_tier')
     ->addRule('return_rate', '<=', 0.05)
     ->setScoringMethod(ScoringMethod::WEIGHTED_AVERAGE)
     ->evaluate($data);
+
 
 
 
@@ -806,6 +914,7 @@ return [
 
 
 
+
 ```
 #### 🔄 Migration Guide
 
@@ -822,11 +931,13 @@ php artisan vendor:publish --tag="eligify-config" --force
 
 
 
+
 ```
 2. **Create your first model mapping:**
 
 ```php
 php artisan make:eligify-mapping CustomerMapping
+
 
 
 
@@ -841,12 +952,14 @@ php artisan make:eligify-mapping CustomerMapping
 
 
 
+
 ```
 4. **Start using it:**
 
 ```php
 $data = ModelDataExtractor::forModel(Customer::class)->extract($customer);
 Eligify::criteria('vip_program')->evaluate($data);
+
 
 
 
@@ -860,6 +973,7 @@ composer require cleaniquecoders/eligify:^1.1
 
 
 
+
 ```
 **Upgrade from v1.0.x:**
 
@@ -867,6 +981,7 @@ composer require cleaniquecoders/eligify:^1.1
 composer update cleaniquecoders/eligify
 php artisan vendor:publish --tag="eligify-config" --force
 php artisan optimize:clear
+
 
 
 
@@ -892,6 +1007,7 @@ use CleaniqueCoders\Eligify\Support\ModelDataExtractor;
 $data = ModelDataExtractor::forModel(User::class)->extract($user);
 $this->assertArrayHasKey('is_verified', $data);
 $this->assertTrue($data['is_verified']);
+
 
 
 
@@ -1002,6 +1118,7 @@ Eligify::criteria('loan_approval')
 
 
 
+
 ```
 #### 🧠 Advanced Rule Engine
 
@@ -1092,6 +1209,7 @@ Eligify::criteria('complex_approval')
 
 
 
+
 ```
 #### Policy Integration
 
@@ -1112,6 +1230,7 @@ class LoanPolicy
         );
     }
 }
+
 
 
 
@@ -1138,6 +1257,7 @@ php artisan eligify:cleanup-audit --days=90
 
 
 
+
 ```
 
 ---
@@ -1159,11 +1279,13 @@ composer require cleaniquecoders/eligify
 
 
 
+
 ```
 ```bash
 php artisan vendor:publish --tag="eligify-migrations"
 php artisan vendor:publish --tag="eligify-config"
 php artisan migrate
+
 
 
 
