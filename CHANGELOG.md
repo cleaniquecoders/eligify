@@ -2,6 +2,237 @@
 
 All notable changes to `eligify` will be documented in this file.
 
+## Added eligify:make-mapping Command - 2025-10-29
+
+### v1.2.1 - Model Mapping Generator - 2025-10-29
+
+#### What's New
+
+Version 1.2.1 introduces an intelligent code generation tool that simplifies the process of creating model mapping classes for data extraction in eligibility evaluations.
+
+##### 🎨 Model Mapping Generator Command
+
+A powerful new Artisan command that automatically generates mapping classes by analyzing your Eloquent models:
+
+```bash
+# Generate mapping for a model
+php artisan eligify:make-mapping "App\Models\User"
+
+# With custom name (kebab-case)
+php artisan eligify:make-mapping "App\Models\Order" --name=premium-order
+
+# With custom namespace
+php artisan eligify:make-mapping "App\Models\Post" --namespace="App\CustomMappings"
+
+# Force overwrite existing mapping
+php artisan eligify:make-mapping "App\Models\User" --force
+
+```
+##### Key Features
+
+###### 🔍 Intelligent Model Analysis
+
+The command automatically analyzes your model to extract:
+
+- **Database Fields** - Reads table schema to detect all available columns
+- **Relationships** - Discovers model relationships via reflection
+- **Computed Fields** - Identifies patterns for common computed fields
+- **Timestamp Fields** - Maps timestamp columns to readable names
+
+###### 🎯 Smart Field Mapping
+
+Automatically generates mappings for common patterns:
+
+```php
+// Timestamp fields mapped to readable names
+'created_at' => 'created_date',
+'email_verified_at' => 'email_verified_timestamp',
+'published_at' => 'published_timestamp',
+
+// Relationship aggregations
+'orders.count' => 'orders_count',
+'orders.sum:amount' => 'total_order_amount',
+'posts.avg:rating' => 'avg_post_rating',
+
+```
+###### ⚡ Computed Fields Generation
+
+Automatically creates computed fields for:
+
+- **Verification Status** - `is_verified` from `email_verified_at`
+- **Approval Status** - `is_approved` from `approved_at`
+- **Publication Status** - `is_published` from `published_at`
+- **Count Checks** - `has_orders` from `orders_count`
+
+###### 📝 Professional Code Output
+
+Generates clean, well-documented mapping classes:
+
+```php
+<?php
+
+namespace App\Eligify\Mappings;
+
+use CleaniqueCoders\Eligify\Mappings\AbstractModelMapping;
+
+/**
+ * User Model Mapping
+ * 
+ * Generated: 2025-10-29 10:30:00
+ * Model: App\Models\User
+ */
+class UserMapping extends AbstractModelMapping
+{
+    public function getModelClass(): string
+    {
+        return 'App\Models\User';
+    }
+
+    protected array $fieldMappings = [
+        'email_verified_at' => 'email_verified_timestamp',
+        'created_at' => 'created_date',
+    ];
+
+    protected array $computedFields = [
+        'is_verified' => null,
+    ];
+
+    public function __construct()
+    {
+        $this->computedFields = [
+            // Check if email_verified_at is set
+            'is_verified' => fn ($model) => !is_null($model->email_verified_at ?? null),
+        ];
+    }
+}
+
+```
+##### Command Options
+
+| Option | Description |
+|--------|-------------|
+| `model` | The fully qualified model class name (required) |
+| `--name` | Custom name for the mapping class in kebab-case |
+| `--namespace` | Custom namespace for the mapping class |
+| `--force` | Overwrite existing mapping class without confirmation |
+
+##### Usage Workflow
+
+1. **Generate the Mapping**
+   
+   ```bash
+   php artisan eligify:make-mapping "App\Models\User"
+   
+   ```
+2. **Review and Customize**
+   
+   - Open the generated file in `app/Eligify/Mappings/UserMapping.php`
+   - Customize field mappings, relationships, and computed fields as needed
+   
+3. **Register in Configuration**
+   
+   ```php
+   // config/eligify.php
+   'model_extraction' => [
+       'model_mappings' => [
+           'App\Models\User' => \App\Eligify\Mappings\UserMapping::class,
+       ],
+   ],
+   
+   ```
+4. **Use in Evaluations**
+   
+   ```php
+   $data = ModelDataExtractor::forModel(User::class)->extract($user);
+   
+   ```
+
+##### What Gets Analyzed
+
+###### Model Fields
+
+- Reads database schema using Laravel's Schema facade
+- Falls back to `$fillable` and `$guarded` if table doesn't exist
+- Excludes sensitive fields (`password`, `remember_token`, etc.)
+
+###### Relationships
+
+- Scans public methods for relationship return types
+- Detects: `hasMany`, `belongsTo`, `belongsToMany`, `hasOne`, etc.
+- Generates common aggregations: `count`, `sum`, `avg`
+
+###### Computed Fields
+
+- Detects timestamp fields for verification status
+- Creates boolean helpers for common patterns
+- Generates count-based existence checks
+
+##### Benefits
+
+✅ **Saves Time** - Generates mapping classes in seconds instead of manual writing
+✅ **Reduces Errors** - Automatically detects available fields and relationships
+✅ **Standardizes** - Consistent structure across all mapping classes
+✅ **Type-Safe** - Uses reflection and schema inspection for accuracy
+✅ **Customizable** - Generated code is fully editable and extensible
+
+##### New Files
+
+- **Command**: `src/Commands/MakeMappingCommand.php` - Generator command
+- **Stub**: `stubs/model-mapping.stub` - Template for generated classes
+- **Tests**: `tests/Feature/Commands/MakeMappingCommandTest.php` - Comprehensive test coverage
+
+##### Documentation
+
+📖 New documentation added:
+
+- Model mapping generation guide
+- Example use cases and workflows
+- Customization patterns
+- Best practices for mapping classes
+
+##### Compatibility
+
+- ✅ Fully backward compatible with v1.2.0
+- ✅ No breaking changes
+- ✅ Works with existing mapping classes
+- ✅ PHP 8.3+ and Laravel 11-12 support
+
+##### Upgrade Instructions
+
+```bash
+# Update the package
+composer update cleaniquecoders/eligify
+
+# Start generating mappings
+php artisan eligify:make-mapping "App\Models\User"
+
+```
+##### Testing
+
+All new functionality is fully tested:
+
+- ✅ Command execution and file generation
+- ✅ Field and relationship detection
+- ✅ Custom name and namespace options
+- ✅ Force overwrite functionality
+- ✅ Error handling for invalid models
+- ✅ Computed field generation patterns
+
+##### Next Steps
+
+After generating your mapping class:
+
+1. Review the generated field mappings
+2. Add custom computed fields if needed
+3. Configure relationship aggregations
+4. Register in `config/eligify.php`
+5. Use with `ModelDataExtractor::forModel()`
+
+
+---
+
+**Full Changelog**: [v1.2.0...v1.2.1](https://github.com/cleaniquecoders/eligify/compare/v1.2.0...v1.2.1)
+
 ## Eligitfy UI - 2025-10-28
 
 ### Release Notes - Eligify v1.2.0
@@ -21,7 +252,6 @@ See [UI Setup Guide](https://github.com/cleaniquecoders/eligify/blob/main/docs/u
 
 <img width="1235" height="949" alt="05-playground" src="https://github.com/user-attachments/assets/e3a62b12-918d-4de2-8d01-025c87b6a4a5" />
 Test your eligibility criteria in real-time with sample data generation:
-
 - **Smart Sample Generation** - Auto-generate test data from your rules with one click
 - **Flexible Input** - Support for both flat (dot notation) and nested JSON structures
 - **Visual Results** - See detailed pass/fail breakdown with execution times per rule
@@ -36,6 +266,7 @@ Test your eligibility criteria in real-time with sample data generation:
     "not_bankrupt": true
   }
 }
+
 
 ```
 ##### 🎯 Dynamic Field Type Input
@@ -68,6 +299,7 @@ php artisan eligify:benchmark --type=cache     # Cache performance
 
 # JSON output for CI/CD pipelines
 php artisan eligify:benchmark --format=json
+
 
 ```
 ###### Key Features
@@ -127,6 +359,7 @@ Comprehensive documentation for optimizing your eligibility checks:
 composer update cleaniquecoders/eligify
 php artisan migrate
 
+
 ```
 No breaking changes - fully backward compatible with v1.1.x
 
@@ -148,6 +381,7 @@ No breaking changes - fully backward compatible with v1.1.x
 # Add to your CI pipeline
 php artisan eligify:benchmark --iterations=1000 --format=json > benchmark-results.json
 
+
 ```
 ##### Before Production Deployment
 
@@ -157,6 +391,7 @@ php artisan eligify:benchmark --iterations=1000 --type=all
 
 # Test expected production load
 php artisan eligify:benchmark --type=batch --iterations=1000
+
 
 ```
 ##### Performance Optimization Tips
@@ -202,6 +437,7 @@ $data = [
 Eligify::criteria('loan_approval')->evaluate($data);
 
 
+
 ```
 ##### The Solution: ModelDataExtractor
 
@@ -212,6 +448,7 @@ Now, with v1.1.0:
 $data = ModelDataExtractor::forModel(User::class)->extract($user);
 
 Eligify::criteria('loan_approval')->evaluate($data);
+
 
 
 ```
@@ -229,6 +466,7 @@ Transform any Eloquent model into evaluation-ready data automatically.
 $data = (new ModelDataExtractor())->extract($user);
 
 
+
 ```
 **Pattern 2: Custom Configuration (One-off)**
 
@@ -239,12 +477,14 @@ $data = (new ModelDataExtractor())
     ->extract($user);
 
 
+
 ```
 **Pattern 3: Production-Ready (Recommended)**
 
 ```php
 // Configure once in config/eligify.php
 $data = ModelDataExtractor::forModel(User::class)->extract($user);
+
 
 
 ```
@@ -291,6 +531,7 @@ $data = $extractor
     ->extract($user);
 
 
+
 ```
 ###### AbstractModelMapping Class
 
@@ -331,6 +572,7 @@ class CustomerModelMapping extends AbstractModelMapping
 }
 
 
+
 ```
 ###### ModelMapping Contract
 
@@ -346,6 +588,7 @@ interface ModelMapping
 }
 
 
+
 ```
 ###### Built-in Model Mappings
 
@@ -356,6 +599,7 @@ interface ModelMapping
 // - email_verified_at → email_verified_timestamp
 // - created_at → registration_date
 // - is_verified → computed field (true/false)
+
 
 
 ```
@@ -440,6 +684,7 @@ $result = Eligify::criteria('loan_approval')
     ->evaluate($data);
 
 
+
 ```
 ##### Example 2: Scholarship Eligibility
 
@@ -473,6 +718,7 @@ $result = Eligify::criteria('scholarship_eligibility')
     ->addRule('extracurricular_count', '>=', 2)
     ->addRule('has_financial_need', '==', true)
     ->evaluate($data);
+
 
 
 ```
@@ -512,6 +758,7 @@ $result = Eligify::criteria('vip_tier')
     ->addRule('return_rate', '<=', 0.05)
     ->setScoringMethod(ScoringMethod::WEIGHTED_AVERAGE)
     ->evaluate($data);
+
 
 
 ```
@@ -558,6 +805,7 @@ return [
 ];
 
 
+
 ```
 #### 🔄 Migration Guide
 
@@ -573,11 +821,13 @@ This is a **minor version release** with **100% backward compatibility**. All ex
 php artisan vendor:publish --tag="eligify-config" --force
 
 
+
 ```
 2. **Create your first model mapping:**
 
 ```php
 php artisan make:eligify-mapping CustomerMapping
+
 
 
 ```
@@ -590,12 +840,14 @@ php artisan make:eligify-mapping CustomerMapping
 ],
 
 
+
 ```
 4. **Start using it:**
 
 ```php
 $data = ModelDataExtractor::forModel(Customer::class)->extract($customer);
 Eligify::criteria('vip_program')->evaluate($data);
+
 
 
 ```
@@ -607,6 +859,7 @@ Eligify::criteria('vip_program')->evaluate($data);
 composer require cleaniquecoders/eligify:^1.1
 
 
+
 ```
 **Upgrade from v1.0.x:**
 
@@ -614,6 +867,7 @@ composer require cleaniquecoders/eligify:^1.1
 composer update cleaniquecoders/eligify
 php artisan vendor:publish --tag="eligify-config" --force
 php artisan optimize:clear
+
 
 
 ```
@@ -638,6 +892,7 @@ use CleaniqueCoders\Eligify\Support\ModelDataExtractor;
 $data = ModelDataExtractor::forModel(User::class)->extract($user);
 $this->assertArrayHasKey('is_verified', $data);
 $this->assertTrue($data['is_verified']);
+
 
 
 ```
@@ -746,6 +1001,7 @@ Eligify::criteria('loan_approval')
 
 
 
+
 ```
 #### 🧠 Advanced Rule Engine
 
@@ -835,6 +1091,7 @@ Eligify::criteria('complex_approval')
 
 
 
+
 ```
 #### Policy Integration
 
@@ -859,6 +1116,7 @@ class LoanPolicy
 
 
 
+
 ```
 #### Artisan Commands
 
@@ -875,6 +1133,7 @@ php artisan eligify:evaluate loan_approval --model="App\Models\Loan:1"
 # Audit management
 php artisan eligify:audit-query --event=evaluation_completed
 php artisan eligify:cleanup-audit --days=90
+
 
 
 
@@ -899,11 +1158,13 @@ composer require cleaniquecoders/eligify
 
 
 
+
 ```
 ```bash
 php artisan vendor:publish --tag="eligify-migrations"
 php artisan vendor:publish --tag="eligify-config"
 php artisan migrate
+
 
 
 
