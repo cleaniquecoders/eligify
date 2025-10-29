@@ -137,7 +137,7 @@ class MakeMappingCommand extends Command
             return 'App\\Eligify\\Mappings';
         }
 
-        return $modelNamespace.'\\Eligify\\Mappings';
+        return ltrim($modelNamespace.'\\Eligify\\Mappings', '\\');
     }
 
     protected function getPath(string $namespace, string $className): string
