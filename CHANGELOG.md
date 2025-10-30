@@ -2,6 +2,10 @@
 
 All notable changes to `eligify` will be documented in this file.
 
+## Refactor and Update Documentation - 2025-10-30
+
+**Full Changelog**: https://github.com/cleaniquecoders/eligify/compare/1.3.0...1.3.1
+
 ## Model Mapping Namespace Migration - 2025-10-30
 
 ### Breaking Changes
@@ -21,8 +25,8 @@ use CleaniqueCoders\Eligify\Contracts\ModelMapping;
 // After
 use CleaniqueCoders\Eligify\Data\Mappings\AbstractModelMapping;
 use CleaniqueCoders\Eligify\Data\Contracts\ModelMapping;
-```
 
+```
 This change better organizes the package structure by grouping all data-related functionality under the `Data` namespace alongside `Extractor` and `Snapshot` classes.
 
 ## Model Mapping Generation & Relationship Patterns - 2025-10-30
@@ -48,6 +52,7 @@ php artisan eligify:make-mapping "App\Models\User"
 php artisan eligify:make-all-mappings
 php artisan eligify:make-all-mappings --dry-run
 php artisan eligify:make-all-mappings --path=modules/User/Models --namespace=Modules\\User\\Models
+
 
 ```
 **Features:**
@@ -89,6 +94,7 @@ $extractor->setRelationshipMappings([
     ],
 ]);
 
+
 ```
 **Pattern 2: Spread Operator (Include All Fields)**
 
@@ -97,6 +103,7 @@ $profileMapping = app(ProfileModelMapping::class);
 $extractor->setRelationshipMappings([
     'profile' => $profileMapping->getFieldMappings(),
 ]);
+
 
 ```
 **Pattern 3: Merge with Prefix Remapping**
@@ -107,6 +114,7 @@ foreach ($addressFields as $original => $mapped) {
     $remappedFields[$mapped] = 'applicant_'.$original;
 }
 
+
 ```
 **Pattern 4: Multi-Level Nested Relationships**
 
@@ -115,6 +123,7 @@ $extractor->setRelationshipMappings([
     'customer' => ['email_address' => 'customer_email'],
     'customer.address' => ['street_address' => 'shipping_street'],
 ]);
+
 
 ```
 #### 4. **Enhanced UI: Dynamic Field Selection**
@@ -133,7 +142,6 @@ New dynamic field selection in Rule Editor based on model mappings:
 <img width="1240" height="691" alt="Screenshot 2025-10-30 at 12 43 39 PM" src="https://github.com/user-attachments/assets/f7969e2d-6527-4263-86c4-93fb0de525c7" />
 <img width="1205" height="504" alt="Screenshot 2025-10-30 at 9 24 26 AM" src="https://github.com/user-attachments/assets/b1013ef8-ccc5-4056-82b7-7d9e6abaa610" />
 **Improvements:**
-
 - Sort results alphabetically by category
 - Fixed extra backslash in namespace display
 - Dynamic operator suggestions based on field type
@@ -146,6 +154,7 @@ New dynamic field selection in Rule Editor based on model mappings:
 // Early implementation (deprecated)
 $data = ExtractedModelData::from($model);
 
+
 ```
 **Current Approach:** Snapshot + Extractor pattern
 
@@ -153,6 +162,7 @@ $data = ExtractedModelData::from($model);
 // Modern implementation
 $extractor = new Extractor(['include_relationships' => true]);
 $snapshot = $extractor->extract($model);
+
 
 ```
 **Benefits:**
@@ -181,6 +191,7 @@ $result = Eligify::evaluate($criteria, $data, false, false); // Bypass cache
 Eligify::flushCache();
 Eligify::warmupCache($criteria, $sampleDataSets);
 Eligify::invalidateCache($criteria);
+
 
 ```
 **Features:**
@@ -237,24 +248,24 @@ Eligify::invalidateCache($criteria);
 ### 🔧 Technical Improvements
 
 1. **AbstractModelMapping Enhancements:**
-
+   
    - Added `getFieldMappings()` public method
    - Added `getRelationshipMappings()` public method
    - Added `getComputedFields()` public method
    - Added `getPrefix()` with auto-generation
    - Enhanced helper methods for relationship data
-
+   
 2. **Service Provider Updates:**
-
+   
    - Registered new mapping generation commands
    - Auto-discovery of mapping classes
-
+   
 3. **Namespace Handling:**
-
+   
    - Fixed extra backslash display in UI
    - Better namespace resolution for modules
    - Support for Workbench models
-
+   
 
 
 ---
@@ -272,6 +283,7 @@ php artisan eligify:make-all-mappings
 # - ApplicantMapping (prefix: 'applicant')
 # - LoanApplicationMapping (prefix: 'loan.application')
 
+
 ```
 #### Use in Eligibility Rules
 
@@ -288,6 +300,7 @@ Eligify::criteria('Loan Approval')
     ->addRule('applicant.credit_report.score', '>=', 650)
 
     ->evaluate($applicant);
+
 
 ```
 
@@ -323,6 +336,7 @@ class UserMapping extends AbstractModelMapping
     // Manual field definitions...
 }
 
+
 ```
 **After:**
 
@@ -331,6 +345,7 @@ class UserMapping extends AbstractModelMapping
 php artisan eligify:make-mapping "App\Models\User"
 
 # Review and customize generated mapping
+
 
 ```
 #### Adopting Relationship Patterns
@@ -344,6 +359,7 @@ protected array $relationshipMappings = [
     'profile.employment_status' => 'is_employed',
 ];
 
+
 ```
 **After (Reuse Existing Mapping):**
 
@@ -356,6 +372,7 @@ public function configure(Extractor $extractor): Extractor
     ]);
     return $extractor;
 }
+
 
 ```
 
@@ -406,6 +423,7 @@ php artisan eligify:make-all-mappings --dry-run  # Preview first
 php artisan eligify:make-all-mappings            # Generate
 
 # 4. Review and customize generated mappings
+
 
 ```
 
@@ -479,7 +497,7 @@ The GitHub Actions workflow has been simplified to focus on the primary producti
   - Removed Laravel 11.x from CI (package still compatible)
   - Removed `prefer-lowest` stability testing
   - Simplified matrix configuration
-
+  
 
 ##### 🔧 Technical Details
 
@@ -493,6 +511,7 @@ matrix:
   stability: [prefer-stable]
 
 
+
 ```
 **Timeout**: 5 minutes
 **Testbench**: 10.* (for Laravel 12)
@@ -500,17 +519,17 @@ matrix:
 ##### ⚠️ Important Notes
 
 - This change **only affects CI/CD testing**, not package compatibility
-
+  
 - The package remains compatible with:
-
+  
   - PHP 8.3 and 8.4
   - Laravel 11.x and 12.x
   - Both Ubuntu and Windows environments
-
+  
 - Users can still use the package on any supported configuration
-
+  
 - Consider this a strategic focus on primary deployment targets
-
+  
 
 ##### 🔄 Compatibility
 
@@ -525,6 +544,7 @@ No action required. This is a CI/CD-only update with no impact on package functi
 
 ```bash
 composer update cleaniquecoders/eligify
+
 
 
 ```
@@ -560,6 +580,7 @@ php artisan eligify:make-mapping "App\Models\User" --force
 
 
 
+
 ```
 ##### Key Features
 
@@ -586,6 +607,7 @@ Automatically generates mappings for common patterns:
 'orders.count' => 'orders_count',
 'orders.sum:amount' => 'total_order_amount',
 'posts.avg:rating' => 'avg_post_rating',
+
 
 
 
@@ -643,6 +665,7 @@ class UserMapping extends AbstractModelMapping
 
 
 
+
 ```
 ##### Command Options
 
@@ -656,20 +679,21 @@ class UserMapping extends AbstractModelMapping
 ##### Usage Workflow
 
 1. **Generate the Mapping**
-
+   
    ```bash
    php artisan eligify:make-mapping "App\Models\User"
-
-
-
+   
+   
+   
+   
    ```
 2. **Review and Customize**
-
+   
    - Open the generated file in `app/Eligify/Mappings/UserMapping.php`
    - Customize field mappings, relationships, and computed fields as needed
-
+   
 3. **Register in Configuration**
-
+   
    ```php
    // config/eligify.php
    'model_extraction' => [
@@ -677,17 +701,19 @@ class UserMapping extends AbstractModelMapping
            'App\Models\User' => \App\Eligify\Mappings\UserMapping::class,
        ],
    ],
-
-
-
+   
+   
+   
+   
    ```
 4. **Use in Evaluations**
-
+   
    ```php
    $data = ModelDataExtractor::forModel(User::class)->extract($user);
-
-
-
+   
+   
+   
+   
    ```
 
 ##### What Gets Analyzed
@@ -748,6 +774,7 @@ composer update cleaniquecoders/eligify
 
 # Start generating mappings
 php artisan eligify:make-mapping "App\Models\User"
+
 
 
 
@@ -812,7 +839,6 @@ Test your eligibility criteria in real-time with sample data generation:
 }
 ```
 ##### 🎯 Dynamic Field Type Input
-
 The rule editor now adapts intelligently based on field types:
 
 - **Smart Input Types** - Number fields, date pickers, boolean toggles, text areas
@@ -841,6 +867,7 @@ php artisan eligify:benchmark --type=cache     # Cache performance
 
 # JSON output for CI/CD pipelines
 php artisan eligify:benchmark --format=json
+
 
 
 
@@ -906,6 +933,7 @@ php artisan migrate
 
 
 
+
 ```
 No breaking changes - fully backward compatible with v1.1.x
 
@@ -930,6 +958,7 @@ php artisan eligify:benchmark --iterations=1000 --format=json > benchmark-result
 
 
 
+
 ```
 ##### Before Production Deployment
 
@@ -939,6 +968,7 @@ php artisan eligify:benchmark --iterations=1000 --type=all
 
 # Test expected production load
 php artisan eligify:benchmark --type=batch --iterations=1000
+
 
 
 
@@ -990,6 +1020,7 @@ Eligify::criteria('Loan Approval')->evaluate($data);
 
 
 
+
 ```
 ##### The Solution: ModelDataExtractor
 
@@ -1000,6 +1031,7 @@ Now, with v1.1.0:
 $data = ModelDataExtractor::forModel(User::class)->extract($user);
 
 Eligify::criteria('Loan Approval')->evaluate($data);
+
 
 
 
@@ -1023,6 +1055,7 @@ $data = (new ModelDataExtractor())->extract($user);
 
 
 
+
 ```
 **Pattern 2: Custom Configuration (One-off)**
 
@@ -1036,12 +1069,14 @@ $data = (new ModelDataExtractor())
 
 
 
+
 ```
 **Pattern 3: Production-Ready (Recommended)**
 
 ```php
 // Configure once in config/eligify.php
 $data = ModelDataExtractor::forModel(User::class)->extract($user);
+
 
 
 
@@ -1094,6 +1129,7 @@ $data = $extractor
 
 
 
+
 ```
 ###### AbstractModelMapping Class
 
@@ -1137,6 +1173,7 @@ class CustomerModelMapping extends AbstractModelMapping
 
 
 
+
 ```
 ###### ModelMapping Contract
 
@@ -1150,6 +1187,7 @@ interface ModelMapping
     public function getRelationshipMappings(): array;
     public function getComputedFields(): array;
 }
+
 
 
 
@@ -1170,40 +1208,41 @@ interface ModelMapping
 
 
 
+
 ```
 ##### 📚 New Documentation
 
 Five comprehensive guides added (1,500+ lines total):
 
 1. **[model-data-extraction.md](https://github.com/cleaniquecoders/eligify/blob/main/docs/model-data-extraction.md)** (367 lines)
-
+   
    - Complete usage guide with decision flowcharts
    - Method comparison and best practices
    - Real-world examples and patterns
-
+   
 2. **[model-mappings.md](https://github.com/cleaniquecoders/eligify/blob/main/docs/model-mappings.md)** (313 lines)
-
+   
    - Creating custom model mappings
    - Helper methods reference
    - Advanced techniques and patterns
-
+   
 3. **[quick-reference-model-extraction.md](https://github.com/cleaniquecoders/eligify/blob/main/docs/quick-reference-model-extraction.md)** (144 lines)
-
+   
    - TL;DR quick reference guide
    - Method comparison card
    - Common use cases
-
+   
 4. **[model-data-extractor-architecture.md](https://github.com/cleaniquecoders/eligify/blob/main/docs/model-data-extractor-architecture.md)** (303 lines)
-
+   
    - System architecture overview
    - Data flow diagrams
    - Integration patterns
-
+   
 5. **Updated [usage-guide.md](https://github.com/cleaniquecoders/eligify/blob/main/docs/usage-guide.md)**
-
+   
    - Integrated model extraction examples
    - End-to-end evaluation workflows
-
+   
 
 #### 🚀 Real-World Examples
 
@@ -1255,6 +1294,7 @@ $result = Eligify::criteria('Loan Approval')
 
 
 
+
 ```
 ##### Example 2: Scholarship Eligibility
 
@@ -1288,6 +1328,7 @@ $result = Eligify::criteria('Scholarship Eligibility')
     ->addRule('extracurricular_count', '>=', 2)
     ->addRule('has_financial_need', '==', true)
     ->evaluate($data);
+
 
 
 
@@ -1330,6 +1371,7 @@ $result = Eligify::criteria('Vip Tier')
     ->addRule('return_rate', '<=', 0.05)
     ->setScoringMethod(ScoringMethod::WEIGHTED_AVERAGE)
     ->evaluate($data);
+
 
 
 
@@ -1382,6 +1424,7 @@ return [
 
 
 
+
 ```
 #### 🔄 Migration Guide
 
@@ -1400,11 +1443,13 @@ php artisan vendor:publish --tag="eligify-config" --force
 
 
 
+
 ```
 2. **Create your first model mapping:**
 
 ```php
 php artisan make:eligify-mapping CustomerMapping
+
 
 
 
@@ -1423,12 +1468,14 @@ php artisan make:eligify-mapping CustomerMapping
 
 
 
+
 ```
 4. **Start using it:**
 
 ```php
 $data = ModelDataExtractor::forModel(Customer::class)->extract($customer);
 Eligify::criteria('vip_program')->evaluate($data);
+
 
 
 
@@ -1446,6 +1493,7 @@ composer require cleaniquecoders/eligify:^1.1
 
 
 
+
 ```
 **Upgrade from v1.0.x:**
 
@@ -1453,6 +1501,7 @@ composer require cleaniquecoders/eligify:^1.1
 composer update cleaniquecoders/eligify
 php artisan vendor:publish --tag="eligify-config" --force
 php artisan optimize:clear
+
 
 
 
@@ -1480,6 +1529,7 @@ use CleaniqueCoders\Eligify\Support\ModelDataExtractor;
 $data = ModelDataExtractor::forModel(User::class)->extract($user);
 $this->assertArrayHasKey('is_verified', $data);
 $this->assertTrue($data['is_verified']);
+
 
 
 
@@ -1594,6 +1644,7 @@ Eligify::criteria('Loan Approval')
 
 
 
+
 ```
 #### 🧠 Advanced Rule Engine
 
@@ -1686,6 +1737,7 @@ Eligify::criteria('complex_approval')
 
 
 
+
 ```
 #### Policy Integration
 
@@ -1706,6 +1758,7 @@ class LoanPolicy
         );
     }
 }
+
 
 
 
@@ -1736,6 +1789,7 @@ php artisan eligify:cleanup-audit --days=90
 
 
 
+
 ```
 
 ---
@@ -1759,11 +1813,13 @@ composer require cleaniquecoders/eligify
 
 
 
+
 ```
 ```bash
 php artisan vendor:publish --tag="eligify-migrations"
 php artisan vendor:publish --tag="eligify-config"
 php artisan migrate
+
 
 
 
