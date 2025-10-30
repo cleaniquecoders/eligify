@@ -451,9 +451,10 @@ php examples/17-relationship-mapping-usage.php
 
 ## Related Documentation
 
-- [Relationship Mapping Cheatsheet](relationship-mapping-cheatsheet.md) - Quick reference
-- [Mapper Generation Guide](mapper-generation-guide.md) - Auto-generate mappings
-- [Configuration Guide](configuration.md) - Setup and config
+- [Relationship Mapping](relationship-mapping.md) - Quick reference cheatsheet
+- [Generator](generator.md) - Auto-generate mappings
+- [Patterns](patterns.md) - Documentation structure overview
+- [Main Data Management](../README.md) - Back to data management overview
 
 ---
 

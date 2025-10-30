@@ -9,37 +9,42 @@ The model mapping system provides a flexible way to:
 - Extract data from complex models
 - Transform nested relationships
 - Compute derived values
-- Cache mapped data for performance
+- Create reusable data transformation logic
 
 ## Documentation
 
-- **[Getting Started](getting-started.md)** - Quick start guide
-- **[Patterns](patterns.md)** - All 4 mapping patterns with examples
-- **[Relationship Mapping](relationship-mapping.md)** - Deep dive into relationship patterns
+- **[Getting Started](getting-started.md)** - Complete guide with all 4 patterns
+- **[Patterns](patterns.md)** - Documentation structure overview
+- **[Relationship Mapping](relationship-mapping.md)** - Quick reference cheatsheet
 - **[Generator](generator.md)** - Automated mapper generation
 
 ## Quick Example
 
 ```php
-use CleaniqueCoders\Eligify\Support\Mapper;
+use CleaniqueCoders\Eligify\Data\Mappings\AbstractModelMapping;
+use CleaniqueCoders\Eligify\Data\Extractor;
 
-class UserMapper extends Mapper
+class UserMapping extends AbstractModelMapping
 {
-    protected function map(): array
+    protected ?string $prefix = 'user';
+
+    protected array $fieldMappings = [
+        'email' => 'email_address',
+        'annual_income' => 'income',
+    ];
+
+    protected array $computedFields = [
+        'account_age_days' => fn($model) => $model->created_at->diffInDays(now()),
+    ];
+
+    public function getModelClass(): string
     {
-        return [
-            'user_id' => $this->model->id,
-            'email' => $this->model->email,
-            'credit_score' => $this->model->profile->credit_score,
-            'active_loans' => $this->model->loans()->active()->count(),
-            'total_income' => $this->model->calculateTotalIncome(),
-        ];
+        return User::class;
     }
 }
 
 // Usage
-$mapper = new UserMapper($user);
-$data = $mapper->toArray();
+$data = Extractor::forModel(User::class)->extract($user);
 ```
 
 ## The Four Patterns

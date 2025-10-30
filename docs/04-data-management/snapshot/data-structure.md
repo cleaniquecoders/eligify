@@ -364,9 +364,3 @@ $snapshot = Snapshot::create($application, metadata: [
     'data_classification' => 'sensitive',
 ]);
 ```
-
-## Related Documentation
-
-- [Snapshot Usage Guide](usage.md) - How to use snapshots
-- [Data Management](../) - Overview
-- [Audit System](../../07-advanced-features/) - Audit logging

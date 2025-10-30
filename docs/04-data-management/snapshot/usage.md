@@ -379,11 +379,3 @@ $results = $users->map(function ($user) {
     return app('eligify')->evaluate('loan_approval', $extracted);
 });
 ```
-
-## See Also
-
-- [Extractor Documentation](model-data-extraction.md)
-- [Extractor Architecture](extractor-architecture.md)
-- [Usage Guide](usage-guide.md)
-- [Example 14: Snapshot Usage](../examples/14-snapshot-usage.php)
-- [Quick Reference](quick-reference-model-extraction.md)

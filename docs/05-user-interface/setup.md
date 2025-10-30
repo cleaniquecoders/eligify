@@ -2,7 +2,7 @@
 
 **Eligify Dashboard** provides a Telescope-style, opt-in web interface for managing criteria, rules, evaluations, and monitoring your eligibility system. This guide will help you configure and secure the UI for your application.
 
-![Dashboard Overview](../screenshots/01-dashboard-overview.png)
+![Dashboard Overview](../../screenshots/01-dashboard-overview.png)
 
 ## Table of Contents
 
@@ -558,7 +558,7 @@ Restrict access by IP address.
 
 ### Dashboard Overview
 
-![Dashboard](../screenshots/01-dashboard-overview.png)
+![Dashboard](../../screenshots/01-dashboard-overview.png)
 
 **Key Metrics Displayed:**
 
@@ -572,7 +572,7 @@ Restrict access by IP address.
 
 ### Criteria Management
 
-![Criteria List](../screenshots/02-criteria-list.png)
+![Criteria List](../../screenshots/02-criteria-list.png)
 
 **Features:**
 
@@ -585,7 +585,7 @@ Restrict access by IP address.
 
 ### Criteria Editor
 
-![Criteria Editor](../screenshots/03-criteria-editor.png)
+![Criteria Editor](../../screenshots/03-criteria-editor.png)
 
 **Visual Rule Builder:**
 
@@ -599,7 +599,7 @@ Restrict access by IP address.
 
 ### Rule Editor
 
-![Rule Editor](../screenshots/04-rule-editor.png)
+![Rule Editor](../../screenshots/04-rule-editor.png)
 
 **Rule Configuration:**
 
@@ -613,7 +613,7 @@ Restrict access by IP address.
 
 ### Playground
 
-![Playground](../screenshots/05-playground.png)
+![Playground](../../screenshots/05-playground.png)
 
 **Test Your Criteria:**
 
@@ -634,7 +634,7 @@ Restrict access by IP address.
 
 ### Audit Logs
 
-![Audit Logs](../screenshots/06-audit-logs.png)
+![Audit Logs](../../screenshots/06-audit-logs.png)
 
 **Comprehensive Tracking:**
 
@@ -648,7 +648,7 @@ Restrict access by IP address.
 
 ### Settings
 
-![Settings](../screenshots/07-settings.png)
+![Settings](../../screenshots/07-settings.png)
 
 **Configuration Management:**
 

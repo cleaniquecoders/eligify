@@ -12,18 +12,18 @@ Eligify provides powerful data management features including model mapping, data
 
 - **[Getting Started](model-mapping/getting-started.md)** - Quick start with model mapping
 - **[Patterns](model-mapping/patterns.md)** - All 4 mapping patterns explained
-- **[Relationship Mapping](model-mapping/relationship-mapping.md)** - Deep dive into relationships
+- **[Relationship Mapping](model-mapping/relationship-mapping.md)** - Quick reference cheatsheet
 - **[Generator](model-mapping/generator.md)** - Automated mapper generation
+
+### Data Extraction
+
+- **[Extraction Guide](extraction/guide.md)** - Complete guide to data extraction
+- **[Extractor Reference](extraction/extractor.md)** - Extractor class documentation
 
 ### Snapshot System
 
 - **[Usage Guide](snapshot/usage.md)** - Using the snapshot system
 - **[Data Structure](snapshot/data-structure.md)** - Snapshot object structure
-
-### Other Features
-
-- **[Data Extractor](extractor.md)** - Extracting data from models
-- **[Dynamic Values](dynamic-values.md)** - Dynamic value input during evaluation
 
 ## Key Features
 

@@ -5,6 +5,7 @@ The snapshot system captures and preserves entity state at a specific point in t
 ## Overview
 
 Snapshots are useful for:
+
 - **Audit Trails**: Preserve exact state during evaluation
 - **Historical Analysis**: Re-evaluate past decisions
 - **Compliance**: Maintain records for regulatory requirements
@@ -46,12 +47,14 @@ $result = $historical->evaluate(); // Uses preserved state
 ## When to Use Snapshots
 
 ✅ **Use snapshots when:**
+
 - You need audit trails
 - Decisions must be reproducible
 - State changes frequently
 - Compliance requires historical records
 
 ❌ **Don't use snapshots when:**
+
 - Real-time data is required
 - Storage is a concern
 - Evaluation is non-critical

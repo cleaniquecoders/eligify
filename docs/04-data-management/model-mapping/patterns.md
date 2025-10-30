@@ -1,28 +1,29 @@
 # Model Mapping Documentation Structure
 
-## 📁 New Simplified Structure
+## 📁 Documentation Organization
 
-### Core Documentation (Keep)
+### Core Documentation Files
 
-1. **[model-mapping-guide.md](model-mapping-guide.md)** ⭐ **MAIN GUIDE**
+1. **[getting-started.md](getting-started.md)** ⭐ **MAIN GUIDE**
    - Complete guide covering all 4 patterns
    - Step-by-step examples
    - Best practices
    - Based directly on `examples/17-relationship-mapping-usage.php`
 
-2. **[relationship-mapping-cheatsheet.md](relationship-mapping-cheatsheet.md)** 🔴 **QUICK REFERENCE**
+2. **[relationship-mapping.md](relationship-mapping.md)** 🔴 **QUICK REFERENCE**
    - One-page visual reference
    - Key rules and common mistakes
    - Quick pattern lookup
 
-3. **[mapper-generation-guide.md](mapper-generation-guide.md)** 🔨 **AUTOMATION**
+3. **[generator.md](generator.md)** 🔨 **AUTOMATION**
    - CLI commands for auto-generation
    - Bulk operations
    - Customization options
 
-4. **[snapshot.md](snapshot.md)** 📦 **DATA SNAPSHOTS**
-   - Snapshot functionality
-   - Use cases
+4. **[README.md](README.md)** � **OVERVIEW**
+   - Quick introduction
+   - Navigation guide
+   - Basic example
 
 ---
 
@@ -83,17 +84,17 @@ Access deep relationships
 
 ## 🎯 Documentation Flow
 
-1. **Start**: [model-mapping-guide.md](model-mapping-guide.md)
+1. **Start**: [getting-started.md](getting-started.md)
    - Learn all 4 patterns
    - See complete examples
    - Understand concepts
 
-2. **Quick Reference**: [relationship-mapping-cheatsheet.md](relationship-mapping-cheatsheet.md)
+2. **Quick Reference**: [relationship-mapping.md](relationship-mapping.md)
    - Visual guide
    - Quick lookup
    - Common mistakes
 
-3. **Generate**: [mapper-generation-guide.md](mapper-generation-guide.md)
+3. **Generate**: [generator.md](generator.md)
    - Auto-generate mappings
    - Save time
    - Consistent structure
@@ -121,45 +122,34 @@ Access deep relationships
 ]
 ```
 
-This rule is now clearly explained in:
+This rule is clearly explained in:
 
-- Main guide intro
+- Main guide intro ([getting-started.md](getting-started.md))
 - Each pattern example
-- Cheatsheet (red alert box)
+- Cheatsheet ([relationship-mapping.md](relationship-mapping.md))
 - Best practices section
-- Troubleshooting section
+- Troubleshooting guides
 
 ---
 
-## 📖 README.md Integration
+## ✅ Benefits of This Structure
 
-Updated sections in `docs/README.md`:
-
-- Table of Contents: Simplified to 4 core docs
-- Model Mapping section: Streamlined with pattern preview
-- Links: All point to new structure
-- Examples: Point to Example 17
-
----
-
-## ✅ Benefits of New Structure
-
-1. **Clarity**: One main guide, one cheatsheet, one automation guide
+1. **Clarity**: Focused documentation with clear purposes
 2. **Consistency**: All based on Example 17's proven patterns
-3. **Maintainability**: Less duplication, easier to update
-4. **Discoverability**: Clear hierarchy and flow
-5. **Accuracy**: No more conflicting information
+3. **Maintainability**: Minimal duplication, easier to update
+4. **Discoverability**: Clear hierarchy and navigation
+5. **Accuracy**: Single source of truth for each topic
 
 ---
 
 ## 🚀 Next Steps for Developers
 
-1. Read [model-mapping-guide.md](model-mapping-guide.md)
-2. Keep [relationship-mapping-cheatsheet.md](relationship-mapping-cheatsheet.md) open while coding
+1. Read [getting-started.md](getting-started.md) for complete patterns
+2. Keep [relationship-mapping.md](relationship-mapping.md) open while coding
 3. Use `php artisan eligify:make-mapping` to generate mappings
-4. Reference [Example 17](../examples/17-relationship-mapping-usage.php) for working code
+4. Reference Example 17 for working code examples
 5. Test and validate your mappings
 
 ---
 
-Generated: 30 October 2025
+Last updated: 30 October 2025

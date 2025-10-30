@@ -183,6 +183,6 @@ This shows all relationship patterns with clear explanations.
 
 ## See Also
 
-- [Model Mapping Guide](model-mapping-guide.md) - Complete guide with all patterns
-- [Mapper Generation Guide](mapper-generation-guide.md) - Auto-generate mappings
-- [Example 17](../examples/17-relationship-mapping-usage.php) - Working code examples
+- [Getting Started](getting-started.md) - Complete guide with all patterns
+- [Generator](generator.md) - Auto-generate mappings
+- Example 17 (`examples/17-relationship-mapping-usage.php`) - Working code examples
