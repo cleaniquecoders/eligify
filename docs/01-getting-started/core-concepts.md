@@ -6,7 +6,7 @@ Understanding the fundamental concepts of Eligify will help you build powerful e
 
 Eligify follows a simple but powerful model:
 
-```
+```plaintext
 Criteria → Rules → Evaluation → Result → Action
 ```
 
@@ -15,10 +15,11 @@ Criteria → Rules → Evaluation → Result → Action
 A **criterion** (plural: criteria) is a named collection of rules that define what makes something eligible.
 
 ```php
-$criteria = Eligify::criteria('loan_approval');
+$criteria = Eligify::criteria('Loan Approval');
 ```
 
 **Key characteristics:**
+
 - Has a unique name/identifier
 - Contains one or more rules
 - Defines a scoring method
@@ -33,6 +34,7 @@ A **rule** is a single condition that must be checked during evaluation.
 ```
 
 **Components of a rule:**
+
 - **Field**: The data field to check (`'income'`)
 - **Operator**: The comparison operator (`'>='`)
 - **Value**: The expected value (`3000`)
@@ -47,6 +49,7 @@ $result = $criteria->evaluate($applicant);
 ```
 
 **What happens during evaluation:**
+
 1. Data is extracted from the subject
 2. Each rule is checked against the data
 3. Scores are calculated based on the method
@@ -82,18 +85,21 @@ $result->details();         // detailed breakdown
 Eligify accepts multiple data formats:
 
 #### Array Data
+
 ```php
 $data = ['income' => 5000, 'credit_score' => 750];
 $result = $criteria->evaluate($data);
 ```
 
 #### Eloquent Models
+
 ```php
 $user = User::find(1);
 $result = $criteria->evaluate($user);
 ```
 
 #### Custom Objects
+
 ```php
 $applicant = new LoanApplicant();
 $result = $criteria->evaluate($applicant);
@@ -206,7 +212,7 @@ Score is the average of passed rules:
 ### Saving Criteria
 
 ```php
-$criteria = Eligify::criteria('loan_approval')
+$criteria = Eligify::criteria('Loan Approval')
     ->addRule('income', '>=', 3000)
     ->save();
 ```
@@ -240,6 +246,7 @@ Every evaluation creates an audit record (if enabled):
 ```
 
 **Audit records include:**
+
 - Criteria used
 - Subject identifier
 - Input data snapshot
@@ -271,6 +278,7 @@ $result = $criteria->evaluate($snapshot);
 ```
 
 **Benefits:**
+
 - Preserve data state for compliance
 - Re-evaluate with historical data
 - Audit trail with original values
@@ -298,10 +306,10 @@ Event::listen(EvaluationCompleted::class, function ($event) {
 
 ```php
 // Good
-Eligify::criteria('premium_membership_upgrade')
+Eligify::criteria('Premium Membership Upgrade')
 
 // Bad
-Eligify::criteria('check1')
+Eligify::criteria('Check1')
 ```
 
 ### 2. Use Weights Strategically
@@ -336,7 +344,7 @@ Don't access model attributes directly in rules. Use mappers for complex logic:
 
 ```php
 test('loan approval criteria', function () {
-    $criteria = Eligify::criteria('loan_approval')
+    $criteria = Eligify::criteria('Loan Approval')
         ->addRule('income', '>=', 3000)
         ->addRule('credit_score', '>=', 650);
 

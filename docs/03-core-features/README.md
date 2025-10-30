@@ -21,7 +21,7 @@ Eligify provides a complete system for defining, evaluating, and acting upon eli
 A named set of rules that define eligibility requirements:
 
 ```php
-Eligify::criteria('loan_approval')
+Eligify::criteria('Loan Approval')
     ->addRule('income', '>=', 3000)
     ->addRule('credit_score', '>=', 650);
 ```

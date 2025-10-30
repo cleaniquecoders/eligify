@@ -530,7 +530,7 @@ trait EligifyHelpers
 
     protected function evaluateLoan(User $applicant): EvaluationResult
     {
-        return Eligify::criteria('loan_approval')
+        return Eligify::criteria('Loan Approval')
             ->addRule('income', '>=', 3000)
             ->addRule('credit_score', '>=', 650)
             ->evaluate($applicant);

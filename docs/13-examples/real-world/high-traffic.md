@@ -9,7 +9,7 @@ use CleaniqueCoders\Eligify\Facades\Eligify;
 use Illuminate\Support\Facades\Cache;
 
 // Strategy 1: Aggressive caching
-$result = Eligify::criteria('loan_approval')
+$result = Eligify::criteria('Loan Approval')
     ->addRule('income', '>=', 3000)
     ->addRule('credit_score', '>=', 650)
     ->cacheFor(3600) // Cache for 1 hour
@@ -22,16 +22,16 @@ $result = Eligify::criteria('heavy_computation')
 
 // Strategy 3: Batch evaluations
 $applicants = User::where('status', 'pending')->get();
-$results = Eligify::criteria('loan_approval')
+$results = Eligify::criteria('Loan Approval')
     ->evaluateBatch($applicants);
 
 // Strategy 4: Pre-warm cache
 Artisan::command('eligify:warm-cache', function () {
-    $criteria = Eligify::criteria('loan_approval')->getRules();
+    $criteria = Eligify::criteria('Loan Approval')->getRules();
     $users = User::limit(1000)->get();
 
     foreach ($users as $user) {
-        Eligify::criteria('loan_approval')
+        Eligify::criteria('Loan Approval')
             ->loadRules($criteria)
             ->cacheFor(7200)
             ->evaluate($user);

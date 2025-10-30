@@ -47,7 +47,7 @@ php artisan vendor:publish --tag="eligify-config"
 use CleaniqueCoders\Eligify\Facades\Eligify;
 
 // Define criteria
-$criteria = Eligify::criteria('loan_approval')
+$criteria = Eligify::criteria('Loan Approval')
 ->addRule('credit_score', '>=', 650, 30)
     ->addRule('annual_income', '>=', 30000, 25)
     ->addRule('debt_ratio',

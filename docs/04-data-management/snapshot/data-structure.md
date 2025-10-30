@@ -214,7 +214,7 @@ $snapshot = Snapshot::forSubject($user)->latest()->first();
 ```php
 $snapshot = Snapshot::create($user);
 
-$result = Eligify::criteria('loan_approval')
+$result = Eligify::criteria('Loan Approval')
     ->evaluate($snapshot);
 ```
 
@@ -308,7 +308,7 @@ $snapshot = Snapshot::create($user, metadata: [
 $snapshot->save();
 
 // 3. Evaluate
-$result = Eligify::criteria('loan_approval')
+$result = Eligify::criteria('Loan Approval')
     ->evaluate($snapshot);
 
 // 4. Store result with snapshot reference

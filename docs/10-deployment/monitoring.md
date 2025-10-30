@@ -29,7 +29,7 @@ use CleaniqueCoders\Eligify\Facades\Eligify;
 use Illuminate\Support\Facades\Log;
 
 // Log evaluation attempts
-Eligify::criteria('loan_approval')
+Eligify::criteria('Loan Approval')
     ->addRule('income', '>=', 3000)
     ->onEvaluate(function ($entity, $result) {
         Log::info('Eligibility evaluated', [
@@ -114,7 +114,7 @@ use Illuminate\Support\Facades\Cache;
 // Track timing
 $start = microtime(true);
 
-$result = Eligify::criteria('loan_approval')
+$result = Eligify::criteria('Loan Approval')
     ->addRule('income', '>=', 3000)
     ->evaluate($applicant);
 

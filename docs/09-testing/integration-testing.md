@@ -26,7 +26,7 @@ test('complete loan approval workflow', function () {
     $snapshot = Eligify::snapshot($applicant, 'loan_application');
 
     // Evaluate eligibility
-    $result = Eligify::criteria('loan_approval')
+    $result = Eligify::criteria('Loan Approval')
         ->addRule('income', '>=', 3000, 0.4)
         ->addRule('credit_score', '>=', 650, 0.6)
         ->scoringMethod('weighted')

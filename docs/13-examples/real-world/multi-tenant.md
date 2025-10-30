@@ -17,7 +17,7 @@ $tenantCriteria = Criteria::where('tenant_id', $tenant->id)
     ->where('is_active', true)
     ->firstOrFail();
 
-$result = Eligify::criteria('loan_approval')
+$result = Eligify::criteria('Loan Approval')
     ->loadFromDatabase($tenantCriteria)
     ->evaluate($applicant);
 

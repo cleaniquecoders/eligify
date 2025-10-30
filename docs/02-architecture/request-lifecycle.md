@@ -39,7 +39,7 @@ The entry point is typically the Eligify facade:
 ```php
 use CleaniqueCoders\Eligify\Facades\Eligify;
 
-$result = Eligify::criteria('loan_approval')->evaluate($applicant);
+$result = Eligify::criteria('Loan Approval')->evaluate($applicant);
 ```
 
 **What happens:**
@@ -461,7 +461,7 @@ Exceptions can be thrown at various stages:
 
 ```php
 try {
-    $result = Eligify::criteria('loan_approval')->evaluate($applicant);
+    $result = Eligify::criteria('Loan Approval')->evaluate($applicant);
 } catch (CriteriaNotFoundException $e) {
     // Criteria doesn't exist
 } catch (InvalidOperatorException $e) {

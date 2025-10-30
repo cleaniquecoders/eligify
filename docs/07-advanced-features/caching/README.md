@@ -23,12 +23,12 @@ Eligify's caching system can significantly improve performance by:
 use CleaniqueCoders\Eligify\Facades\Eligify;
 
 // Cache evaluation result for 1 hour
-$result = Eligify::criteria('loan_approval')
+$result = Eligify::criteria('Loan Approval')
     ->cache(3600)
     ->evaluate($applicant);
 
 // Cache with custom key
-$result = Eligify::criteria('loan_approval')
+$result = Eligify::criteria('Loan Approval')
     ->cacheAs('loan:'.$applicant->id, 3600)
     ->evaluate($applicant);
 ```
@@ -60,7 +60,7 @@ Cache compiled criteria definitions:
 
 ```php
 // Cache the criteria itself
-$criteria = Eligify::criteria('loan_approval')->remember(3600);
+$criteria = Eligify::criteria('Loan Approval')->remember(3600);
 ```
 
 ### 3. Model Mapping Cache

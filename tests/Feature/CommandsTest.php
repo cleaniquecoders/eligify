@@ -64,7 +64,7 @@ test('eligify command defaults to status', function () {
 
 test('eligify criteria list command shows all criteria', function () {
     // Create test criteria
-    Eligify::criteria('loan_approval')
+    Eligify::criteria('Loan Approval')
         ->description('Loan approval criteria')
         ->addRule('income', '>=', 3000)
         ->save();
@@ -120,7 +120,7 @@ test('eligify criteria list command outputs json format', function () {
 });
 
 test('eligify criteria show command displays criteria details', function () {
-    $criteria = Eligify::criteria('loan_approval')
+    $criteria = Eligify::criteria('Loan Approval')
         ->description('Loan approval criteria')
         ->addRule('income', '>=', 3000)
         ->addRule('credit_score', '>=', 650)

@@ -17,7 +17,7 @@ Workflows enable you to:
 Execute when evaluation passes:
 
 ```php
-Eligify::criteria('loan_approval')
+Eligify::criteria('Loan Approval')
     ->addRule('income', '>=', 3000)
     ->addRule('credit_score', '>=', 650)
     ->onPass(function ($subject) {
@@ -46,7 +46,7 @@ Eligify::criteria('loan_approval')
 Execute when evaluation fails:
 
 ```php
-Eligify::criteria('loan_approval')
+Eligify::criteria('Loan Approval')
     ->addRule('income', '>=', 3000)
     ->addRule('credit_score', '>=', 650)
     ->onFail(function ($subject) {

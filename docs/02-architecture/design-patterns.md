@@ -9,7 +9,7 @@ The **Builder Pattern** provides a fluent interface for constructing complex cri
 ### Implementation
 
 ```php
-$criteria = Eligify::criteria('loan_approval')
+$criteria = Eligify::criteria('Loan Approval')
     ->addRule('income', '>=', 3000)
     ->addRule('credit_score', '>=', 650)
     ->setScoring('weighted')

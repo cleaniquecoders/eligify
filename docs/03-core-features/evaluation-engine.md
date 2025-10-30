@@ -5,6 +5,7 @@ The Evaluation Engine orchestrates the complete evaluation process, from data ex
 ## Overview
 
 The Evaluation Engine coordinates:
+
 1. Data extraction from subjects
 2. Rule evaluation via the Rule Engine
 3. Score calculation via Scorers
@@ -17,7 +18,7 @@ The Evaluation Engine coordinates:
 ```php
 use CleaniqueCoders\Eligify\Facades\Eligify;
 
-$criteria = Eligify::criteria('loan_approval')
+$criteria = Eligify::criteria('Loan Approval')
     ->addRule('income', '>=', 3000)
     ->addRule('credit_score', '>=', 650);
 
@@ -151,7 +152,7 @@ Evaluate multiple subjects at once:
 ```php
 $subjects = User::where('status', 'pending')->get();
 
-$results = Eligify::criteria('approval')
+$results = Eligify::criteria('Approval')
     ->evaluateMany($subjects);
 
 foreach ($results as $subject => $result) {
@@ -166,7 +167,7 @@ foreach ($results as $subject => $result) {
 ### Evaluate Only If
 
 ```php
-$criteria = Eligify::criteria('premium_check');
+$criteria = Eligify::criteria('Premium Check');
 
 if ($user->isActive()) {
     $result = $criteria->evaluate($user);
@@ -283,7 +284,7 @@ test('user passes eligibility check', function () {
         'credit_score' => 750,
     ]);
 
-    $criteria = Eligify::criteria('loan_approval')
+    $criteria = Eligify::criteria('Loan Approval')
         ->addRule('income', '>=', 3000)
         ->addRule('credit_score', '>=', 650);
 
@@ -299,7 +300,7 @@ test('user fails eligibility check', function () {
         'credit_score' => 600,
     ]);
 
-    $criteria = Eligify::criteria('loan_approval')
+    $criteria = Eligify::criteria('Loan Approval')
         ->addRule('income', '>=', 3000)
         ->addRule('credit_score', '>=', 650);
 

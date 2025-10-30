@@ -103,7 +103,7 @@ class TestUser extends Model
 
 test('policy trait can check basic eligibility', function () {
     // Create a test criteria
-    Eligify::criteria('loan_approval')
+    Eligify::criteria('Loan Approval')
         ->addRule('income', '>=', 3000)
         ->addRule('credit_score', '>=', 650)
         ->addRule('active_loans', '<=', 2)

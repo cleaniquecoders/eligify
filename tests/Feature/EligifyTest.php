@@ -5,7 +5,7 @@ use CleaniqueCoders\Eligify\Enums\RulePriority;
 
 it('can create criteria with fluent api and evaluate', function () {
     // Create criteria using the fluent API
-    $builder = Eligify::criteria('loan_approval')
+    $builder = Eligify::criteria('Loan Approval')
         ->description('Basic loan approval criteria')
         ->addRule('credit_score', '>=', 650, null, RulePriority::HIGH)
         ->addRule('income', '>=', 30000, null, RulePriority::HIGH)

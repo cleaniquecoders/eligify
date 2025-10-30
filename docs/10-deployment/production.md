@@ -223,7 +223,7 @@ REDIS_PORT=6379
 // For large batch evaluations
 use CleaniqueCoders\Eligify\Facades\Eligify;
 
-$criteria = Eligify::criteria('loan_approval');
+$criteria = Eligify::criteria('Loan Approval');
 
 // Queue the evaluation
 dispatch(function () use ($criteria, $applicants) {

@@ -21,7 +21,7 @@ use App\Notifications\LoanApprovedNotification;
 use App\Notifications\LoanRejectedNotification;
 
 // Define eligibility criteria
-$result = Eligify::criteria('loan_approval')
+$result = Eligify::criteria('Loan Approval')
     ->addRule('income', '>=', 3000)
     ->addRule('credit_score', '>=', 650)
     ->scoringMethod('pass_fail')
@@ -78,7 +78,7 @@ test('qualified applicant gets loan approval', function () {
         'credit_score' => 750,
     ]);
 
-    $result = Eligify::criteria('loan_approval')
+    $result = Eligify::criteria('Loan Approval')
         ->addRule('income', '>=', 3000)
         ->addRule('credit_score', '>=', 650)
         ->evaluate($applicant);
@@ -93,7 +93,7 @@ test('unqualified applicant gets rejected', function () {
         'credit_score' => 550, // Too low
     ]);
 
-    $result = Eligify::criteria('loan_approval')
+    $result = Eligify::criteria('Loan Approval')
         ->addRule('income', '>=', 3000)
         ->addRule('credit_score', '>=', 650)
         ->evaluate($applicant);
@@ -163,7 +163,7 @@ $criteria = Criteria::create([
 ]);
 
 // Load and evaluate
-$result = Eligify::criteria('loan_approval')
+$result = Eligify::criteria('Loan Approval')
     ->loadFromDatabase($criteria)
     ->evaluate($applicant);
 ```

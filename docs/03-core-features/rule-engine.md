@@ -5,6 +5,7 @@ The Rule Engine is the core component that evaluates individual rules and determ
 ## Overview
 
 The Rule Engine processes rules by:
+
 1. Extracting field values from subject data
 2. Applying the appropriate operator
 3. Comparing actual vs expected values
@@ -357,7 +358,7 @@ Use in criteria:
 Default behavior - all rules must pass:
 
 ```php
-Eligify::criteria('strict_approval')
+Eligify::criteria('Strict Approval')
     ->setScoring('pass_fail')
     ->addRule('age', '>=', 18)
     ->addRule('income', '>=', 3000)
@@ -370,7 +371,7 @@ Eligify::criteria('strict_approval')
 Some rules can fail with weighted scoring:
 
 ```php
-Eligify::criteria('flexible_approval')
+Eligify::criteria('Flexible Approval')
     ->setScoring('weighted')
     ->setThreshold(70)
     ->addRule('age', '>=', 18, weight: 20)
@@ -385,7 +386,7 @@ Group rules with OR logic:
 
 ```php
 // Pass if EITHER verification method succeeds
-Eligify::criteria('verification')
+Eligify::criteria('Verification')
     ->addRuleGroup('email_or_phone', [
         ['field' => 'email_verified', 'operator' => '==', 'value' => true],
         ['field' => 'phone_verified', 'operator' => '==', 'value' => true],
@@ -409,7 +410,7 @@ try {
 
 ```php
 try {
-    Eligify::criteria('test')
+    Eligify::criteria('Test')
         ->addRule('age', 'invalid_operator', 18);
 } catch (InvalidOperatorException $e) {
     // Unknown operator
@@ -452,7 +453,7 @@ $operator = OperatorFactory::make('>=');  // Cached
 Rules are only evaluated when needed:
 
 ```php
-$criteria = Eligify::criteria('test')
+$criteria = Eligify::criteria('Test')
     ->addRule('expensive_calculation', '>=', 100);
 
 // Rule not evaluated until evaluate() is called

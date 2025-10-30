@@ -4,7 +4,7 @@ This document explains how the Eligify package source code is organized.
 
 ## Directory Overview
 
-```
+```plaintext
 src/
 ├── Actions/            # Single-purpose action classes
 ├── Audit/              # Audit logging system
@@ -32,12 +32,9 @@ src/
 
 Single-purpose action classes following the Single Responsibility Principle:
 
-```
+```plaintext
 Actions/
-├── CreateCriteria.php
-├── EvaluateCriteria.php
-├── DeleteCriteria.php
-└── GenerateMapper.php
+└── GetDashboardMetrics.php
 ```
 
 **Example:**
@@ -45,11 +42,11 @@ Actions/
 ```php
 namespace CleaniqueCoders\Eligify\Actions;
 
-class EvaluateCriteria
+class GetDashboardMetrics
 {
-    public function execute(Criteria $criteria, mixed $subject): EvaluationResult
+    public function execute(): array
     {
-        // Evaluation logic
+        // Dashboard metrics logic
     }
 }
 ```
@@ -58,56 +55,61 @@ class EvaluateCriteria
 
 Handles evaluation audit logging:
 
-```
+```plaintext
 Audit/
-├── AuditLogger.php
-├── AuditManager.php
-└── Contracts/
-    └── AuditLoggerInterface.php
+└── AuditLogger.php
 ```
 
 ### Builder (src/Builder/)
 
 Fluent interfaces for building criteria and rules:
 
-```
+```plaintext
 Builder/
-├── CriteriaBuilder.php
-├── RuleBuilder.php
-└── Contracts/
-    └── BuilderInterface.php
+└── CriteriaBuilder.php
 ```
 
 ### Commands (src/Commands/)
 
 Artisan console commands:
 
-```
+```plaintext
 Commands/
+├── AuditQueryCommand.php
+├── BenchmarkCommand.php
+├── CacheClearCommand.php
+├── CacheStatsCommand.php
+├── CacheWarmupCommand.php
+├── CleanupAuditLogsCommand.php
+├── CriteriaCommand.php
 ├── EligifyCommand.php
-├── InstallCommand.php
-├── GenerateMapperCommand.php
-└── ClearCacheCommand.php
+├── EvaluateCommand.php
+├── MakeAllMappingsCommand.php
+└── MakeMappingCommand.php
 ```
 
 **Usage:**
 
 ```bash
-php artisan eligify:install
-php artisan eligify:generate-mapper User
-php artisan eligify:clear-cache
+php artisan eligify:cache-clear
+php artisan eligify:cache-stats
+php artisan eligify:cache-warmup
+php artisan eligify:audit-query
+php artisan eligify:benchmark
+php artisan eligify:cleanup-audit-logs
+php artisan eligify:criteria
+php artisan eligify:evaluate
+php artisan eligify:make-mapping User
+php artisan eligify:make-all-mappings
 ```
 
 ### Concerns (src/Concerns/)
 
 Reusable traits for models and classes:
 
-```
+```plaintext
 Concerns/
-├── HasCriteria.php
-├── HasEvaluations.php
-├── Mappable.php
-└── Cacheable.php
+└── HasEligibility.php
 ```
 
 **Example:**
@@ -115,56 +117,106 @@ Concerns/
 ```php
 namespace CleaniqueCoders\Eligify\Concerns;
 
-trait HasCriteria
+trait HasEligibility
 {
-    public function criteria()
+    public function evaluateAgainst(string $criteriaName): mixed
     {
-        return $this->belongsToMany(Criteria::class);
-    }
-
-    public function evaluateAgainst(string $criteriaName): EvaluationResult
-    {
-        $criteria = Criteria::findByName($criteriaName);
-        return $criteria->evaluate($this);
+        // Eligibility evaluation logic
     }
 }
 ```
 
 ### Data Objects (src/Data/)
 
-Immutable DTOs for passing data:
+Data extraction and snapshot management for eligibility evaluations:
 
-```
+```plaintext
 Data/
-├── Snapshot.php
-├── EvaluationResult.php
-├── RuleData.php
-└── CriteriaData.php
+├── Extractor.php               # Model data extractor
+├── Snapshot.php                # Immutable data snapshot
+├── Contracts/
+│   └── ModelMapping.php        # Model mapping interface
+└── Mappings/
+    ├── AbstractModelMapping.php    # Base mapping class
+    └── UserModelMapping.php        # User model mapping
 ```
 
-**Example:**
+**Extractor Example:**
 
 ```php
 namespace CleaniqueCoders\Eligify\Data;
 
-readonly class EvaluationResult
-{
-    public function __construct(
-        public bool $passed,
-        public float $score,
-        public array $passedRules,
-        public array $failedRules,
-        public array $details
-    ) {}
+use CleaniqueCoders\Eligify\Data\Extractor;
 
-    public function passed(): bool
+// Quick extraction with defaults
+$extractor = new Extractor();
+$snapshot = $extractor->extract($user);
+
+// Custom configuration per instance
+$extractor = new Extractor([
+    'include_relationships' => true,
+    'max_relationship_depth' => 3,
+]);
+$extractor->setFieldMappings(['annual_income' => 'income'])
+          ->setComputedFields(['risk_score' => fn($model) => $model->calculateRisk()]);
+$snapshot = $extractor->extract($user);
+
+// Model-specific extractors (RECOMMENDED)
+$snapshot = Extractor::forModel(User::class)->extract($user);
+```
+
+**Snapshot Example:**
+
+```php
+namespace CleaniqueCoders\Eligify\Data;
+
+// Direct property access
+$income = $snapshot->income;
+
+// Safe access with defaults
+$score = $snapshot->get('credit_score', 650);
+
+// Check if field exists
+if ($snapshot->has('employment_verified')) {
+    // ...
+}
+
+// Convert to array for rule engine
+$data = $snapshot->toArray();
+
+// Get only specific fields
+$subset = $snapshot->only(['income', 'credit_score', 'age']);
+
+// Exclude sensitive fields
+$safe = $snapshot->except(['ssn', 'account_number']);
+```
+
+**Custom Model Mapping Example:**
+
+```php
+namespace CleaniqueCoders\Eligify\Data\Mappings;
+
+class UserModelMapping extends AbstractModelMapping
+{
+    public function getModelClass(): string
     {
-        return $this->passed;
+        return 'App\Models\User';
     }
 
-    public function score(): float
+    protected array $fieldMappings = [
+        'email_verified_at' => 'email_verified_timestamp',
+        'created_at' => 'registration_date',
+    ];
+
+    protected array $computedFields = [
+        'is_verified' => null,
+    ];
+
+    public function __construct()
     {
-        return $this->score;
+        $this->computedFields = [
+            'is_verified' => fn ($model) => ! is_null($model->email_verified_at ?? null),
+        ];
     }
 }
 ```
@@ -173,34 +225,22 @@ readonly class EvaluationResult
 
 Core evaluation and scoring logic:
 
-```
+```plaintext
 Engine/
-├── RuleEngine.php
-├── EvaluationEngine.php
-├── Operators/
-│   ├── EqualsOperator.php
-│   ├── GreaterThanOperator.php
-│   ├── InOperator.php
-│   └── ...
-├── Scorers/
-│   ├── WeightedScorer.php
-│   ├── PassFailScorer.php
-│   └── ...
-└── Contracts/
-    ├── EvaluatorInterface.php
-    ├── OperatorInterface.php
-    └── ScorerInterface.php
+├── AdvancedRuleEngine.php
+└── RuleEngine.php
 ```
 
 ### Enums (src/Enums/)
 
 Type-safe enumerations:
 
-```
+```plaintext
 Enums/
-├── ScoringMethod.php
-├── OperatorType.php
-└── EvaluationStatus.php
+├── FieldType.php
+├── RuleOperator.php
+├── RulePriority.php
+└── ScoringMethod.php
 ```
 
 **Example:**
@@ -215,25 +255,38 @@ enum ScoringMethod: string
     case SUM = 'sum';
     case AVERAGE = 'average';
 }
+
+enum RuleOperator: string
+{
+    case EQUALS = '=';
+    case NOT_EQUALS = '!=';
+    case GREATER_THAN = '>';
+    case LESS_THAN = '<';
+    case GREATER_THAN_OR_EQUAL = '>=';
+    case LESS_THAN_OR_EQUAL = '<=';
+    case IN = 'in';
+    case NOT_IN = 'not_in';
+    case BETWEEN = 'between';
+    case CONTAINS = 'contains';
+}
 ```
 
 ### Events (src/Events/)
 
 Laravel events for key actions:
 
-```
+```plaintext
 Events/
 ├── CriteriaCreated.php
-├── CriteriaUpdated.php
 ├── EvaluationCompleted.php
-└── RuleAdded.php
+└── RuleExecuted.php
 ```
 
 ### Facades (src/Facades/)
 
 Laravel facades for convenient access:
 
-```
+```plaintext
 Facades/
 └── Eligify.php
 ```
@@ -248,79 +301,75 @@ Eligify::criteria('test')->evaluate($user);
 
 ### HTTP Layer (src/Http/)
 
-Web interface controllers and middleware:
+Web interface with Livewire components and middleware:
 
-```
+```plaintext
 Http/
-├── Controllers/
-│   ├── CriteriaController.php
-│   ├── EvaluationController.php
-│   └── PlaygroundController.php
+├── Livewire/
+│   ├── AuditLogList.php
+│   ├── CriteriaEditor.php
+│   ├── CriteriaList.php
+│   ├── CriteriaShow.php
+│   ├── Playground.php
+│   ├── RuleEditor.php
+│   ├── RuleLibraryList.php
+│   └── SettingsManager.php
 └── Middleware/
-    ├── EnsureEligifyEnabled.php
-    └── LogEvaluations.php
+    └── AuthorizeDashboard.php
 ```
 
 ### Listeners (src/Listeners/)
 
 Event listeners for async processing:
 
-```
+```plaintext
 Listeners/
-├── LogEvaluation.php
-├── SendNotification.php
-└── UpdateStatistics.php
+├── LogCriteriaCreated.php
+├── LogEvaluationCompleted.php
+└── LogRuleExecuted.php
 ```
 
 ### Models (src/Models/)
 
 Eloquent models for database persistence:
 
-```
+```plaintext
 Models/
+├── AuditLog.php
 ├── Criteria.php
-├── Rule.php
 ├── Evaluation.php
-└── Snapshot.php
+└── Rule.php
 ```
 
 ### Observers (src/Observers/)
 
 Model lifecycle observers:
 
-```
+```plaintext
 Observers/
 ├── CriteriaObserver.php
-└── EvaluationObserver.php
+└── RuleObserver.php
 ```
 
 ### Support (src/Support/)
 
 Helper classes and utilities:
 
-```
+```plaintext
 Support/
-├── Mappers/
-│   ├── BaseMapper.php
-│   ├── UserMapper.php
-│   └── ...
-├── Helpers.php
-├── CacheManager.php
-└── DataExtractor.php
+├── Benchmark.php
+├── Cache.php
+├── Config.php
+└── MappingRegistry.php
 ```
 
 ### Workflow (src/Workflow/)
 
 Workflow callback execution:
 
-```
+```plaintext
 Workflow/
-├── WorkflowManager.php
-├── Callbacks/
-│   ├── OnPassCallback.php
-│   └── OnFailCallback.php
-└── Contracts/
-    └── WorkflowInterface.php
+└── WorkflowManager.php
 ```
 
 ## Additional Directories

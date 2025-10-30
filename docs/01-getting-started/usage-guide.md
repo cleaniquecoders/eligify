@@ -20,7 +20,7 @@ This guide covers common usage patterns and practical examples for Eligify.
 ```php
 use CleaniqueCoders\Eligify\Facades\Eligify;
 
-$criteria = Eligify::criteria('basic_membership')
+$criteria = Eligify::criteria('Basic Membership')
     ->description('Basic membership eligibility')
     ->addRule('age', '>=', 18)
     ->addRule('email_verified', '==', true)
@@ -30,7 +30,7 @@ $criteria = Eligify::criteria('basic_membership')
 ### With Custom Threshold
 
 ```php
-$criteria = Eligify::criteria('premium_membership')
+$criteria = Eligify::criteria('Premium Membership')
     ->description('Premium tier membership')
     ->addRule('account_age_months', '>=', 6, 5)
     ->addRule('purchase_count', '>=', 10, 8)
@@ -44,7 +44,7 @@ $criteria = Eligify::criteria('premium_membership')
 ```php
 use CleaniqueCoders\Eligify\Enums\ScoringMethod;
 
-$criteria = Eligify::criteria('strict_compliance')
+$criteria = Eligify::criteria('Strict Compliance')
     ->description('All-or-nothing compliance check')
     ->addRule('kyc_verified', '==', true)
     ->addRule('terms_accepted', '==', true)
@@ -321,7 +321,7 @@ foreach ($criteriaNames as $criteriaName) {
 ### Basic Callbacks
 
 ```php
-$criteria = Eligify::criteria('loan_approval')
+$criteria = Eligify::criteria('Loan Approval')
     ->addRule('credit_score', '>=', 650)
     ->onPass(function($data, $result) {
         // Execute when approved
@@ -347,7 +347,7 @@ $criteria = Eligify::criteria('loan_approval')
 ### Tiered Callbacks
 
 ```php
-$criteria = Eligify::criteria('membership_tiers')
+$criteria = Eligify::criteria('Membership Tiers')
     ->addRule('points', '>=', 1000)
     ->passThreshold(60)
     ->onExcellent(function($data, $result) {
@@ -375,7 +375,7 @@ $criteria = Eligify::criteria('membership_tiers')
 ### Workflow Steps
 
 ```php
-$criteria = Eligify::criteria('complex_workflow')
+$criteria = Eligify::criteria('Complex Workflow')
     ->addRule('stage1', '==', 'complete')
     ->onPass(function($data, $result) {
         // Step 1: Update status
@@ -397,7 +397,7 @@ $criteria = Eligify::criteria('complex_workflow')
 ### Error Handling in Callbacks
 
 ```php
-$criteria = Eligify::criteria('safe_workflow')
+$criteria = Eligify::criteria('Safe Workflow')
     ->addRule('check', '==', true)
     ->onPass(function($data, $result) {
         try {
@@ -533,16 +533,16 @@ $failedToday = Evaluation::failed()->whereDate('evaluated_at', today())->get();
 
 ```php
 // ❌ Bad
-Eligify::criteria('approval');
+Eligify::criteria('Approval);
 
 // ✅ Good
-Eligify::criteria('personal_loan_approval_tier_1');
+Eligify::criteria('Personal Loan Approval Tier 1);
 ```
 
 ### 2. Add Descriptions
 
 ```php
-$criteria = Eligify::criteria('scholarship_eligibility')
+$criteria = Eligify::criteria('Scholarship Eligibility')
     ->description('Merit-based scholarship for undergraduate students in STEM fields')
     ->addRule('gpa', '>=', 3.5)
     ->save();
@@ -653,7 +653,7 @@ if ($duration > 1.0) {
 ### 10. Document Business Logic
 
 ```php
-$criteria = Eligify::criteria('insurance_underwriting')
+$criteria = Eligify::criteria('Insurance Underwriting')
     ->description('
         Insurance eligibility based on:
         - Age: 18-65 (weight: 8)

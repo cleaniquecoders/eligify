@@ -276,7 +276,7 @@ php artisan eligify:make-all-mappings
 #### Use in Eligibility Rules
 
 ```php
-Eligify::criteria('loan_approval')
+Eligify::criteria('Loan Approval')
     // Applicant fields
     ->addRule('applicant.income', '>=', 3000)
     ->addRule('applicant.employment_years', '>=', 2)
@@ -984,7 +984,7 @@ $data = [
     'debt_ratio' => $user->calculateDebtRatio(),
 ];
 
-Eligify::criteria('loan_approval')->evaluate($data);
+Eligify::criteria('Loan Approval')->evaluate($data);
 
 
 
@@ -999,7 +999,7 @@ Now, with v1.1.0:
 // ✅ The new way - automatic, consistent, reusable
 $data = ModelDataExtractor::forModel(User::class)->extract($user);
 
-Eligify::criteria('loan_approval')->evaluate($data);
+Eligify::criteria('Loan Approval')->evaluate($data);
 
 
 
@@ -1244,7 +1244,7 @@ class LoanApplicationMapping extends AbstractModelMapping
 $application = LoanApplication::find(1);
 $data = ModelDataExtractor::forModel(LoanApplication::class)->extract($application);
 
-$result = Eligify::criteria('loan_approval')
+$result = Eligify::criteria('Loan Approval')
     ->addRule('income', '>=', 3000)
     ->addRule('credit_score', '>=', 650)
     ->addRule('active_loans', '<=', 2)
@@ -1282,7 +1282,7 @@ class StudentMapping extends AbstractModelMapping
 $student = Student::find(1);
 $data = ModelDataExtractor::forModel(Student::class)->extract($student);
 
-$result = Eligify::criteria('scholarship_eligibility')
+$result = Eligify::criteria('Scholarship Eligibility')
     ->addRule('gpa', '>=', 3.5)
     ->addRule('attendance_rate', '>=', 0.9)
     ->addRule('extracurricular_count', '>=', 2)
@@ -1322,7 +1322,7 @@ class CustomerMapping extends AbstractModelMapping
 $customer = Customer::find(1);
 $data = ModelDataExtractor::forModel(Customer::class)->extract($customer);
 
-$result = Eligify::criteria('vip_tier')
+$result = Eligify::criteria('Vip Tier')
     ->addRule('total_orders', '>=', 20)
     ->addRule('lifetime_value', '>=', 10000)
     ->addRule('avg_order_value', '>=', 200)
@@ -1581,7 +1581,7 @@ Eligify is a flexible rule and criteria engine for Laravel that helps you determ
 #### 🎯 Intuitive Fluent API
 
 ```php
-Eligify::criteria('loan_approval')
+Eligify::criteria('Loan Approval')
     ->addRule('income', '>=', 3000)
     ->addRule('credit_score', '>=', 650)
     ->addRule('active_loans', '<=', 2)

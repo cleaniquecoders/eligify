@@ -169,7 +169,7 @@ Once you have mappings with prefixes, use them in your eligibility rules:
 ```php
 use CleaniqueCoders\Eligify\Facades\Eligify;
 
-Eligify::criteria('loan_approval')
+Eligify::criteria('Loan Approval')
     ->addRule('applicant.income', '>=', 3000)
     ->addRule('applicant.credit_score', '>=', 650)
     ->addRule('applicant.is_verified', '=', true)

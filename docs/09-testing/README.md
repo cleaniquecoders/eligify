@@ -24,7 +24,7 @@ test('loan approval passes for qualified applicant', function () {
         'credit_score' => 750,
     ]);
 
-    $result = Eligify::criteria('loan_approval')
+    $result = Eligify::criteria('Loan Approval')
         ->addRule('income', '>=', 3000)
         ->addRule('credit_score', '>=', 650)
         ->evaluate($applicant);

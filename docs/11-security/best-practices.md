@@ -30,7 +30,7 @@ public function evaluate(Request $request)
     ]);
 
     // Safe to use validated data
-    $result = Eligify::criteria('loan_approval')
+    $result = Eligify::criteria('Loan Approval')
         ->evaluate($validated);
 }
 ```
@@ -128,7 +128,7 @@ Configure which fields should be masked in audit logs:
 Validate and sanitize data in callbacks:
 
 ```php
-Eligify::criteria('loan_approval')
+Eligify::criteria('Loan Approval')
     ->onPass(function ($data) {
         // Validate before processing
         if (!isset($data['user_id']) || !is_numeric($data['user_id'])) {

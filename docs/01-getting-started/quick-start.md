@@ -11,7 +11,7 @@ Let's create a simple loan approval system.
 ```php
 use CleaniqueCoders\Eligify\Facades\Eligify;
 
-$criteria = Eligify::criteria('loan_approval')
+$criteria = Eligify::criteria('Loan Approval')
     ->addRule('income', '>=', 3000)
     ->addRule('credit_score', '>=', 650)
     ->addRule('active_loans', '<=', 2);
@@ -50,7 +50,7 @@ use App\Models\User;
 
 $user = User::find(1);
 
-$result = Eligify::criteria('scholarship')
+$result = Eligify::criteria('Scholarship')
     ->addRule('gpa', '>=', 3.5)
     ->addRule('attendance_rate', '>=', 0.9)
     ->evaluate($user);
@@ -61,7 +61,7 @@ $result = Eligify::criteria('scholarship')
 Execute callbacks based on results:
 
 ```php
-$criteria = Eligify::criteria('membership_upgrade')
+$criteria = Eligify::criteria('Membership Upgrade')
     ->addRule('points', '>=', 1000)
     ->addRule('active_months', '>=', 6)
     ->onPass(function ($user) {
@@ -80,7 +80,7 @@ $criteria->evaluate($user);
 Assign importance to rules:
 
 ```php
-$criteria = Eligify::criteria('job_applicant')
+$criteria = Eligify::criteria('Job Applicant')
     ->setScoring('weighted')
     ->addRule('experience_years', '>=', 3, weight: 40)
     ->addRule('education_level', 'in', ['bachelor', 'master'], weight: 30)
@@ -96,7 +96,7 @@ echo "Total score: " . $result->score() . "/100";
 Persist criteria for reuse:
 
 ```php
-$criteria = Eligify::criteria('insurance_eligibility')
+$criteria = Eligify::criteria('Insurance Eligibility')
     ->addRule('age', 'between', [18, 65])
     ->addRule('health_score', '>=', 60)
     ->save();
@@ -129,7 +129,7 @@ Test your criteria interactively:
 ### Age Verification
 
 ```php
-Eligify::criteria('age_verify')
+Eligify::criteria('Age Verify')
     ->addRule('age', '>=', 18)
     ->evaluate($user);
 ```
@@ -137,7 +137,7 @@ Eligify::criteria('age_verify')
 ### Range Check
 
 ```php
-Eligify::criteria('temperature_check')
+Eligify::criteria('Temperature Check')
     ->addRule('temperature', 'between', [36.1, 37.2])
     ->evaluate($reading);
 ```
@@ -145,7 +145,7 @@ Eligify::criteria('temperature_check')
 ### Multiple Options
 
 ```php
-Eligify::criteria('region_check')
+Eligify::criteria('Region Check')
     ->addRule('country', 'in', ['US', 'CA', 'UK'])
     ->evaluate($location);
 ```
@@ -153,7 +153,7 @@ Eligify::criteria('region_check')
 ### Nested Data
 
 ```php
-Eligify::criteria('profile_completeness')
+Eligify::criteria('Profile Completeness')
     ->addRule('profile.bio', 'not_empty')
     ->addRule('profile.avatar', 'not_empty')
     ->addRule('profile.verified', 'equals', true)

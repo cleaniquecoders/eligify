@@ -18,7 +18,7 @@ Eligify is a Laravel package that provides a flexible rule and criteria engine f
 ```php
 use CleaniqueCoders\Eligify\Facades\Eligify;
 
-$result = Eligify::criteria('loan_approval')
+$result = Eligify::criteria('Loan Approval')
     ->addRule('income', '>=', 3000)
     ->addRule('credit_score', '>=', 650)
     ->addRule('active_loans', '<=', 2)

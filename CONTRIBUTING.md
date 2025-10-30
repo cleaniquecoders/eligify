@@ -156,7 +156,7 @@ A clear and concise description of any alternative solutions or features you've 
 **Code Example**
 ```php
 // How you envision using the feature
-Eligify::criteria('example')
+Eligify::criteria('Example')
     ->yourNewFeature()
     ->evaluate($data);
 ```
@@ -287,7 +287,7 @@ use CleaniqueCoders\Eligify\Facades\Eligify;
 
 it('can evaluate criteria with multiple rules', function () {
     // Arrange
-    $criteria = Eligify::criteria('test')
+    $criteria = Eligify::criteria('Test')
         ->addRule('age', '>=', 18)
         ->addRule('income', '>=', 3000);
 

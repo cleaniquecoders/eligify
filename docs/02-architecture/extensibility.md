@@ -63,7 +63,7 @@ class ContainsWordOperator implements OperatorInterface
 ### Step 3: Use Your Operator
 
 ```php
-Eligify::criteria('content_check')
+Eligify::criteria('Content Check')
     ->addRule('description', 'contains_word', 'premium')
     ->evaluate($product);
 ```
@@ -124,7 +124,7 @@ class TieredScorer implements ScorerInterface
 ### Step 3: Use Your Scorer
 
 ```php
-Eligify::criteria('membership_tier')
+Eligify::criteria('Membership Tier')
     ->setScoring('tiered')
     ->addRule('points', '>=', 1000)
     ->addRule('months_active', '>=', 12)
@@ -213,7 +213,7 @@ class LoanApplicationMapper extends BaseMapper
 $application = LoanApplication::find(1);
 
 // Mapper is automatically used
-$result = Eligify::criteria('loan_approval')->evaluate($application);
+$result = Eligify::criteria('Loan Approval')->evaluate($application);
 ```
 
 ## Event Listeners

@@ -11,7 +11,7 @@ The builder pattern allows you to create criteria definitions using chainable me
 ```php
 use CleaniqueCoders\Eligify\Facades\Eligify;
 
-$criteria = Eligify::criteria('loan_approval')
+$criteria = Eligify::criteria('Loan Approval')
     ->addRule('income', '>=', 3000)
     ->addRule('credit_score', '>=', 650)
     ->setScoring('weighted')
@@ -23,7 +23,7 @@ $criteria = Eligify::criteria('loan_approval')
 ### Named Criteria
 
 ```php
-$criteria = Eligify::criteria('scholarship_eligibility');
+$criteria = Eligify::criteria('Scholarship Eligibility);
 ```
 
 ### Anonymous Criteria
@@ -102,7 +102,7 @@ $criteria = Eligify::criteria(); // No name, one-time use
 **Example:**
 
 ```php
-Eligify::criteria('premium_upgrade')
+Eligify::criteria('Premium Upgrade')
     ->setScoring('weighted')
     ->setThreshold(80)  // Need 80% to qualify
     ->addRule('points', '>=', 1000, weight: 50)
@@ -136,7 +136,7 @@ Execute when evaluation fails:
 ### Both Callbacks
 
 ```php
-Eligify::criteria('membership_upgrade')
+Eligify::criteria('Membership Upgrade')
     ->addRule('points', '>=', 1000)
     ->onPass(fn($user) => $user->upgradeMembership())
     ->onFail(fn($user) => $user->sendUpgradeReminder())
@@ -148,7 +148,7 @@ Eligify::criteria('membership_upgrade')
 Group related rules together:
 
 ```php
-Eligify::criteria('comprehensive_check')
+Eligify::criteria('Comprehensive Check')
     ->addRuleGroup('identity', [
         ['field' => 'email_verified', 'operator' => '==', 'value' => true],
         ['field' => 'phone_verified', 'operator' => '==', 'value' => true],
@@ -164,7 +164,7 @@ Eligify::criteria('comprehensive_check')
 Add rules based on conditions:
 
 ```php
-$builder = Eligify::criteria('dynamic_criteria')
+$builder = Eligify::criteria('Dynamic Criteria')
     ->addRule('age', '>=', 18);
 
 if ($requiresVerification) {
@@ -183,7 +183,7 @@ $result = $builder->evaluate($user);
 ### Clone Existing Criteria
 
 ```php
-$baseCriteria = Eligify::criteria('base_approval')
+$baseCriteria = Eligify::criteria('Base Approval')
     ->addRule('age', '>=', 18)
     ->addRule('country', 'in', ['US', 'CA']);
 
@@ -225,7 +225,7 @@ $premiumCriteria = $baseCriteria->clone()
 
 ```php
 try {
-    $criteria = Eligify::criteria('test')
+    $criteria = Eligify::criteria('Test')
         ->addRule('invalid_field', 'unknown_operator', 'value')
         ->validate()
         ->save();
@@ -249,7 +249,7 @@ The builder validates:
 ### Save to Database
 
 ```php
-$criteria = Eligify::criteria('loan_approval')
+$criteria = Eligify::criteria('Loan Approval')
     ->addRule('income', '>=', 3000)
     ->addRule('credit_score', '>=', 650)
     ->save();  // Persists to database
@@ -290,7 +290,7 @@ $rules = [
     ['field' => 'credit_score', 'operator' => '>=', 'value' => 650, 'weight' => 40],
 ];
 
-Eligify::criteria('loan_approval')
+Eligify::criteria('Loan Approval')
     ->addRules($rules)
     ->save();
 ```
@@ -362,7 +362,7 @@ $array = $criteria->toArray();
 Complete example showing multiple features:
 
 ```php
-$criteria = Eligify::criteria('comprehensive_loan_approval')
+$criteria = Eligify::criteria('Comprehensive Loan Approval')
     ->setDescription('Full loan approval criteria for standard applicants')
     ->setScoring('weighted')
     ->setThreshold(75)

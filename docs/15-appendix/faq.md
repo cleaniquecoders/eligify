@@ -52,7 +52,7 @@ php artisan vendor:publish --tag=eligify-config
 ```php
 use CleaniqueCoders\Eligify\Facades\Eligify;
 
-$result = Eligify::criteria('loan_approval')
+$result = Eligify::criteria('Loan Approval')
     ->addRule('income', '>=', 3000)
     ->addRule('credit_score', '>=', 650)
     ->evaluate($applicant);
@@ -70,7 +70,7 @@ $criteria = Criteria::create([
     ],
 ]);
 
-$result = Eligify::criteria('loan_approval')
+$result = Eligify::criteria('Loan Approval')
     ->loadFromDatabase($criteria)
     ->evaluate($applicant);
 ```
@@ -103,7 +103,7 @@ Yes, use dot notation:
 Yes! Enable caching per criteria:
 
 ```php
-$result = Eligify::criteria('loan_approval')
+$result = Eligify::criteria('Loan Approval')
     ->cacheFor(3600) // 1 hour
     ->evaluate($applicant);
 ```

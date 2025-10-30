@@ -32,7 +32,7 @@ if ($applicant->income >= 3000 && $applicant->credit_score >= 650) {
 ### Eligify Approach
 
 ```php
-$result = Eligify::criteria('loan_approval')
+$result = Eligify::criteria('Loan Approval')
     ->addRule('income', '>=', 3000)
     ->addRule('credit_score', '>=', 650)
     ->onPass(fn($e) => $e->approve())
@@ -151,7 +151,7 @@ class LoanService
 {
     public function evaluate(User $applicant): EvaluationResult
     {
-        return Eligify::criteria('loan_approval')
+        return Eligify::criteria('Loan Approval')
             ->addRule('income', '>=', 3000)
             ->addRule('credit_score', '>=', 650)
             ->addRule('employment_months', '>=', 12)

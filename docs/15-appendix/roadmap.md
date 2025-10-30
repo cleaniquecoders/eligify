@@ -32,7 +32,7 @@ Future features and development plans for Eligify.
 
 ```php
 // Machine learning-based scoring
-$result = Eligify::criteria('loan_approval')
+$result = Eligify::criteria('Loan Approval')
     ->scoringMethod('ml_model', 'loan_risk_model')
     ->evaluate($applicant);
 
@@ -50,7 +50,7 @@ $v1 = Criteria::find(1)->version(1);
 $v2 = Criteria::find(1)->version(2);
 
 // Evaluate against historical version
-$result = Eligify::criteria('loan_approval')
+$result = Eligify::criteria('Loan Approval')
     ->version(1)
     ->evaluate($applicant);
 ```
@@ -162,7 +162,7 @@ foreach ($suggestions as $rule) {
 
 ```php
 // Detect unusual evaluation patterns
-Eligify::criteria('loan_approval')
+Eligify::criteria('Loan Approval')
     ->withAnomalyDetection()
     ->evaluate($applicant);
 
@@ -189,7 +189,7 @@ if ($prediction->likelihood < 0.2) {
 
 ```php
 // Multi-stage approval process
-$result = Eligify::criteria('loan_approval')
+$result = Eligify::criteria('Loan Approval')
     ->requireApproval(['manager', 'senior_manager'])
     ->evaluate($applicant);
 ```

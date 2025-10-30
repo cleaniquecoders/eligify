@@ -11,7 +11,7 @@ Create a new criteria builder instance.
 ```php
 use CleaniqueCoders\Eligify\Facades\Eligify;
 
-$builder = Eligify::criteria('loan_approval');
+$builder = Eligify::criteria('Loan Approval');
 ```
 
 **Parameters:**

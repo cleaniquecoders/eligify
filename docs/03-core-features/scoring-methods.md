@@ -9,6 +9,7 @@ Eligify supports multiple scoring methods to calculate eligibility scores based 
 Rules have individual weights, and the score is calculated as a percentage of total possible weight.
 
 **How it works:**
+
 - Each rule has a weight (default: 1)
 - Score = (sum of passed rule weights / total weight) × 100
 - Result is 0-100
@@ -16,7 +17,7 @@ Rules have individual weights, and the score is calculated as a percentage of to
 **Example:**
 
 ```php
-Eligify::criteria('loan_approval')
+Eligify::criteria('Loan Approval')
     ->setScoring('weighted')
     ->addRule('income', '>=', 3000, weight: 40)
     ->addRule('credit_score', '>=', 650, weight: 60)
@@ -24,12 +25,14 @@ Eligify::criteria('loan_approval')
 ```
 
 **Calculation:**
+
 - If both pass: (40 + 60) / 100 × 100 = 100%
 - If only income passes: 40 / 100 × 100 = 40%
 - If only credit passes: 60 / 100 × 100 = 60%
 - If both fail: 0 / 100 × 100 = 0%
 
 **Use cases:**
+
 - Loan approvals
 - Job candidate screening
 - Scholarship eligibility
@@ -40,6 +43,7 @@ Eligify::criteria('loan_approval')
 All rules must pass for eligibility. Score is either 100 (all pass) or 0 (any fail).
 
 **How it works:**
+
 - All rules must pass
 - Score = 100 if all pass, 0 otherwise
 - No partial credit
@@ -56,10 +60,12 @@ Eligify::criteria('age_verification')
 ```
 
 **Calculation:**
+
 - All pass: Score = 100
 - Any fail: Score = 0
 
 **Use cases:**
+
 - Age verification
 - Compliance checks
 - Security requirements
@@ -70,6 +76,7 @@ Eligify::criteria('age_verification')
 Score is the sum of all passed rule weights.
 
 **How it works:**
+
 - Add weights of all passed rules
 - No normalization to 100
 - Score can exceed 100
@@ -87,10 +94,12 @@ Eligify::criteria('loyalty_points')
 ```
 
 **Calculation:**
+
 - All pass: 10 + 20 + 15 + 5 = 50 points
 - Only purchase and referral: 10 + 20 = 30 points
 
 **Use cases:**
+
 - Points systems
 - Achievement tracking
 - Bonus calculations
@@ -101,6 +110,7 @@ Eligify::criteria('loyalty_points')
 Score is the percentage of rules that passed.
 
 **How it works:**
+
 - Count passed rules
 - Score = (passed count / total count) × 100
 - Weights are ignored
@@ -118,11 +128,13 @@ Eligify::criteria('profile_completeness')
 ```
 
 **Calculation:**
+
 - 4 rules, all pass: 4/4 × 100 = 100%
 - 4 rules, 3 pass: 3/4 × 100 = 75%
 - 4 rules, 2 pass: 2/4 × 100 = 50%
 
 **Use cases:**
+
 - Profile completeness
 - Feature adoption
 - Task completion
@@ -220,7 +232,7 @@ Use:
 ### Loan Approval (Weighted)
 
 ```php
-Eligify::criteria('loan_approval')
+Eligify::criteria('Loan Approval')
     ->setScoring('weighted')
     ->setThreshold(75)
     ->addRule('credit_score', '>=', 650, weight: 40)

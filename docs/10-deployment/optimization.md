@@ -28,7 +28,7 @@ return [
 use CleaniqueCoders\Eligify\Facades\Eligify;
 
 // Cache for 1 hour
-$result = Eligify::criteria('loan_approval')
+$result = Eligify::criteria('Loan Approval')
     ->addRule('income', '>=', 3000)
     ->cacheFor(3600)
     ->evaluate($applicant);
@@ -57,7 +57,7 @@ Artisan::command('eligify:warm-cache', function () {
     $commonApplicants = User::where('status', 'pending')->limit(100)->get();
 
     foreach ($commonApplicants as $applicant) {
-        Eligify::criteria('loan_approval')
+        Eligify::criteria('Loan Approval')
             ->addRule('income', '>=', 3000)
             ->addRule('credit_score', '>=', 650)
             ->cacheFor(7200)
@@ -223,7 +223,7 @@ class ArchiveAuditsCommand extends Command
 use CleaniqueCoders\Eligify\Facades\Eligify;
 
 // Load criteria from database only when needed
-$criteria = Eligify::criteria('loan_approval')
+$criteria = Eligify::criteria('Loan Approval')
     ->lazy()
     ->evaluate($applicant);
 
@@ -251,7 +251,7 @@ use CleaniqueCoders\Eligify\Facades\Eligify;
 // Evaluate multiple entities efficiently
 $applicants = User::where('status', 'pending')->get();
 
-$results = Eligify::criteria('loan_approval')
+$results = Eligify::criteria('Loan Approval')
     ->addRule('income', '>=', 3000)
     ->addRule('credit_score', '>=', 650)
     ->evaluateBatch($applicants);
@@ -321,7 +321,7 @@ use App\Models\User;
 User::where('status', 'pending')
     ->lazy(100)
     ->each(function (User $applicant) {
-        $result = Eligify::criteria('loan_approval')
+        $result = Eligify::criteria('Loan Approval')
             ->addRule('income', '>=', 3000)
             ->evaluate($applicant);
 
@@ -446,7 +446,7 @@ use CleaniqueCoders\Eligify\Facades\Eligify;
 // Track evaluation performance
 $start = microtime(true);
 
-$result = Eligify::criteria('loan_approval')
+$result = Eligify::criteria('Loan Approval')
     ->addRule('income', '>=', 3000)
     ->evaluate($applicant);
 
