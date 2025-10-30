@@ -52,6 +52,9 @@ class EligifyServiceProvider extends PackageServiceProvider
                 CleanupAuditLogsCommand::class,
                 BenchmarkCommand::class,
                 MakeMappingCommand::class,
+                Commands\CacheClearCommand::class,
+                Commands\CacheWarmupCommand::class,
+                Commands\CacheStatsCommand::class,
             ]);
     }
 

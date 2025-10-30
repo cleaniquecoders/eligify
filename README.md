@@ -16,6 +16,7 @@ Eligify is a flexible rule and criteria engine that determines whether an entity
 - 🎨 **Web Dashboard** - Optional Telescope-style UI for management (disabled by default)
 - 🧩 **Model Integration** - Seamless Laravel Eloquent integration
 - 📊 **Flexible Scoring** - Weighted, pass/fail, percentage, and custom methods
+- ⚡ **Smart Caching** - Built-in evaluation and rule compilation caching for optimal performance (experimental)
 
 ## Installation
 

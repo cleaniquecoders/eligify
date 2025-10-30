@@ -7,6 +7,7 @@ use CleaniqueCoders\Eligify\Enums\RuleOperator;
 use CleaniqueCoders\Eligify\Enums\ScoringMethod;
 use CleaniqueCoders\Eligify\Models\Criteria;
 use CleaniqueCoders\Eligify\Models\Rule;
+use CleaniqueCoders\Eligify\Support\EligifyCache;
 use Illuminate\Support\Collection;
 
 class RuleEngine
@@ -15,9 +16,12 @@ class RuleEngine
 
     protected array $executionLog = [];
 
+    protected EligifyCache $cache;
+
     public function __construct()
     {
         $this->config = config('eligify');
+        $this->cache = new EligifyCache;
     }
 
     /**
@@ -34,7 +38,8 @@ class RuleEngine
         // Convert Snapshot to array if needed
         $dataArray = $data instanceof Snapshot ? $data->toArray() : $data;
 
-        $rules = $criteria->rules()->where('is_active', true)->orderBy('order')->get();
+        // Get compiled rules (with caching if enabled)
+        $rules = $this->getCompiledRules($criteria);
 
         if ($rules->isEmpty()) {
             return $this->buildResult(true, 100, [], 'No rules to evaluate');
@@ -50,6 +55,20 @@ class RuleEngine
         $decision = $this->getDecision($passed);
 
         return $this->buildResult($passed, $score, $failedRules->toArray(), $decision);
+    }
+
+    /**
+     * Get compiled rules for a criteria (with caching)
+     */
+    protected function getCompiledRules(Criteria $criteria): Collection
+    {
+        if (! $this->cache->isCompilationCacheEnabled()) {
+            return $criteria->rules()->where('is_active', true)->orderBy('order')->get();
+        }
+
+        return $this->cache->rememberCompilation($criteria, function () use ($criteria) {
+            return $criteria->rules()->where('is_active', true)->orderBy('order')->get();
+        });
     }
 
     /**

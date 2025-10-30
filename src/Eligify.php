@@ -9,6 +9,7 @@ use CleaniqueCoders\Eligify\Engine\AdvancedRuleEngine;
 use CleaniqueCoders\Eligify\Engine\RuleEngine;
 use CleaniqueCoders\Eligify\Models\Criteria;
 use CleaniqueCoders\Eligify\Models\Evaluation;
+use CleaniqueCoders\Eligify\Support\EligifyCache;
 
 class Eligify
 {
@@ -16,9 +17,12 @@ class Eligify
 
     protected ?AdvancedRuleEngine $advancedEngine = null;
 
+    protected EligifyCache $cache;
+
     public function __construct()
     {
         $this->ruleEngine = new RuleEngine;
+        $this->cache = new EligifyCache;
     }
 
     /**
@@ -35,9 +39,10 @@ class Eligify
      * @param  string|Criteria  $criteria  The criteria name or model
      * @param  array|Snapshot  $data  The data to evaluate (accepts both formats)
      * @param  bool  $saveEvaluation  Whether to save the evaluation result
+     * @param  bool  $useCache  Whether to use cache (defaults to config setting)
      * @return array Evaluation result with passed status, score, and details
      */
-    public function evaluate(string|Criteria $criteria, array|Snapshot $data, bool $saveEvaluation = true): array
+    public function evaluate(string|Criteria $criteria, array|Snapshot $data, bool $saveEvaluation = true, ?bool $useCache = null): array
     {
         // Get criteria model if string provided
         if (is_string($criteria)) {
@@ -53,6 +58,26 @@ class Eligify
         // Convert Snapshot to array for storage operations
         $dataArray = $data instanceof Snapshot ? $data->toArray() : $data;
 
+        // Determine if we should use cache
+        $shouldUseCache = $useCache ?? $this->cache->isEvaluationCacheEnabled();
+
+        // Use cache if enabled
+        if ($shouldUseCache) {
+            $result = $this->cache->rememberEvaluation($criteriaModel, $data, function () use ($criteriaModel, $data, $dataArray, $saveEvaluation) {
+                return $this->performEvaluation($criteriaModel, $data, $dataArray, $saveEvaluation);
+            });
+        } else {
+            $result = $this->performEvaluation($criteriaModel, $data, $dataArray, $saveEvaluation);
+        }
+
+        return $result;
+    }
+
+    /**
+     * Perform the actual evaluation (extracted for caching)
+     */
+    protected function performEvaluation(Criteria $criteriaModel, array|Snapshot $data, array $dataArray, bool $saveEvaluation): array
+    {
         // Run the evaluation using appropriate engine
         $engine = $this->getEngineForCriteria($criteriaModel);
         $result = $engine->evaluate($criteriaModel, $data);
@@ -422,5 +447,92 @@ class Eligify
         return ($useAdvanced || $hasComplexFeatures)
             ? $this->getAdvancedRuleEngine()
             : $this->ruleEngine;
+    }
+
+    /**
+     * Get the cache instance
+     */
+    public function getCache(): EligifyCache
+    {
+        return $this->cache;
+    }
+
+    /**
+     * Invalidate cache for a specific criteria
+     */
+    public function invalidateCache(string|Criteria $criteria): bool
+    {
+        $criteriaModel = is_string($criteria)
+            ? Criteria::where('slug', str($criteria)->slug())->first()
+            : $criteria;
+
+        if (! $criteriaModel) {
+            return false;
+        }
+
+        return $this->cache->invalidateCriteriaEvaluations($criteriaModel);
+    }
+
+    /**
+     * Warm up cache for a criteria with sample data
+     */
+    public function warmupCache(string|Criteria $criteria, array $sampleDataSets): int
+    {
+        $criteriaModel = is_string($criteria)
+            ? Criteria::where('slug', str($criteria)->slug())->first()
+            : $criteria;
+
+        if (! $criteriaModel) {
+            throw new \InvalidArgumentException('Criteria not found');
+        }
+
+        $warmedUp = 0;
+
+        foreach ($sampleDataSets as $data) {
+            try {
+                // Evaluate and cache the result
+                $this->evaluate($criteriaModel, $data, false, true);
+                $warmedUp++;
+            } catch (\Throwable $e) {
+                logger()->warning('Failed to warm up cache', [
+                    'criteria' => $criteriaModel->name,
+                    'error' => $e->getMessage(),
+                ]);
+            }
+        }
+
+        return $warmedUp;
+    }
+
+    /**
+     * Check if an evaluation is cached
+     */
+    public function isCached(string|Criteria $criteria, array|Snapshot $data): bool
+    {
+        $criteriaModel = is_string($criteria)
+            ? Criteria::where('slug', str($criteria)->slug())->first()
+            : $criteria;
+
+        if (! $criteriaModel) {
+            return false;
+        }
+
+        return $this->cache->hasEvaluation($criteriaModel, $data);
+    }
+
+    /**
+     * Flush all evaluation caches
+     */
+    public function flushCache(): bool
+    {
+        return $this->cache->flushEvaluationCache();
+    }
+
+    /**
+     * Get cache statistics
+     */
+    public function getCacheStats(): array
+    {
+        return $this->cache->getStatistics();
     }
 }

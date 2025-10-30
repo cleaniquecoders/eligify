@@ -4,10 +4,13 @@ namespace CleaniqueCoders\Eligify\Observers;
 
 use CleaniqueCoders\Eligify\Audit\AuditLogger;
 use CleaniqueCoders\Eligify\Models\Criteria;
+use CleaniqueCoders\Eligify\Support\EligifyCache;
 
 class CriteriaObserver
 {
     protected AuditLogger $auditLogger;
+
+    protected EligifyCache $cache;
 
     // Store original attributes temporarily
     protected static array $originalAttributes = [];
@@ -15,6 +18,7 @@ class CriteriaObserver
     public function __construct(AuditLogger $auditLogger)
     {
         $this->auditLogger = $auditLogger;
+        $this->cache = new EligifyCache;
     }
 
     /**
@@ -57,6 +61,9 @@ class CriteriaObserver
 
         // Log general update
         $this->auditLogger->logCriteriaUpdated($criteria, $originalAttributes);
+
+        // Invalidate cache after update
+        $this->invalidateCache($criteria);
     }
 
     /**
@@ -69,5 +76,45 @@ class CriteriaObserver
             'criteria_slug' => $criteria->slug,
             'deleted_at' => now(),
         ], $criteria->getAttributes());
+
+        // Invalidate cache after deletion
+        $this->invalidateCache($criteria);
+    }
+
+    /**
+     * Handle the Criteria "restored" event.
+     */
+    public function restored(Criteria $criteria): void
+    {
+        // Invalidate cache after restoration
+        $this->invalidateCache($criteria);
+    }
+
+    /**
+     * Invalidate all cache related to this criteria
+     */
+    protected function invalidateCache(Criteria $criteria): void
+    {
+        if (! config('eligify.evaluation.cache_enabled', true)) {
+            return;
+        }
+
+        try {
+            // Invalidate evaluation cache
+            $this->cache->invalidateCriteriaEvaluations($criteria);
+
+            // Invalidate compilation cache
+            $this->cache->invalidateCompilation($criteria);
+
+            logger()->debug('Cache invalidated for criteria', [
+                'criteria_id' => $criteria->id,
+                'criteria_name' => $criteria->name,
+            ]);
+        } catch (\Throwable $e) {
+            logger()->error('Failed to invalidate cache for criteria', [
+                'criteria_id' => $criteria->id,
+                'error' => $e->getMessage(),
+            ]);
+        }
     }
 }

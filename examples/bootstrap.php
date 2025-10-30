@@ -44,6 +44,22 @@ $app->singleton('events', function ($app) {
     return new Dispatcher($app);
 });
 
+// Set up cache manager
+$app->singleton('cache', function ($app) {
+    return new \Illuminate\Cache\CacheManager($app);
+});
+
+$app->singleton('cache.store', function ($app) {
+    return $app['cache']->driver();
+});
+
+// Register array cache driver
+$app['config']->set('cache.default', 'array');
+$app['config']->set('cache.stores.array', [
+    'driver' => 'array',
+    'serialize' => false,
+]);
+
 // Register Eligify as a singleton
 $app->singleton(\CleaniqueCoders\Eligify\Eligify::class, function () {
     return new \CleaniqueCoders\Eligify\Eligify;
