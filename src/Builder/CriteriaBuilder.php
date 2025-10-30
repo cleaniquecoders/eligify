@@ -33,7 +33,7 @@ class CriteriaBuilder
 
         // Find or create criteria
         $this->criteria = Criteria::firstOrCreate(
-            ['slug' => str($criteriaName)->slug()],
+            ['slug' => str($criteriaName)->lower()->slug()],
             [
                 'uuid' => (string) str()->uuid(),
                 'name' => $criteriaName,
