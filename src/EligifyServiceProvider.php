@@ -45,6 +45,8 @@ class EligifyServiceProvider extends PackageServiceProvider
             ->hasConfigFile()
             ->hasViews()
             ->hasMigration('create_eligify_table')
+            ->hasMigration('add_visibility_columns_to_eligify_criteria')
+            ->hasMigration('create_eligify_criteriables_table')
             ->hasCommands([
                 EligifyCommand::class,
                 CriteriaCommand::class,

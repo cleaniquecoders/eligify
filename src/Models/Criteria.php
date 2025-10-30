@@ -26,11 +26,16 @@ class Criteria extends Model
         'slug',
         'description',
         'is_active',
+        'type',
+        'group',
+        'category',
+        'tags',
         'meta',
     ];
 
     protected $casts = [
         'is_active' => 'boolean',
+        'tags' => 'array',
         'meta' => 'array',
     ];
 
@@ -80,5 +85,41 @@ class Criteria extends Model
     public function scopeByName($query, string $name)
     {
         return $query->where('name', $name);
+    }
+
+    /**
+     * Scope: filter by type(s)
+     */
+    public function scopeType($query, string|array $type)
+    {
+        return $query->whereIn('type', (array) $type);
+    }
+
+    /**
+     * Scope: filter by group(s)
+     */
+    public function scopeGroup($query, string|array $group)
+    {
+        return $query->whereIn('group', (array) $group);
+    }
+
+    /**
+     * Scope: filter by category(ies)
+     */
+    public function scopeCategory($query, string|array $category)
+    {
+        return $query->whereIn('category', (array) $category);
+    }
+
+    /**
+     * Scope: filter by tags (AND semantics across provided tags)
+     */
+    public function scopeTagged($query, string|array $tags)
+    {
+        foreach ((array) $tags as $tag) {
+            $query->whereJsonContains('tags', $tag);
+        }
+
+        return $query;
     }
 }

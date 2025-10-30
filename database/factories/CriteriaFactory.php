@@ -19,10 +19,13 @@ class CriteriaFactory extends Factory
             'slug' => Str::slug($name),
             'description' => fake()->sentence(),
             'is_active' => fake()->boolean(80), // 80% chance of being active
+            'type' => fake()->randomElement(['subscription', 'feature', 'policy']),
+            'group' => fake()->randomElement(['billing', 'access-control', 'risk']),
+            'category' => fake()->randomElement(['basic', 'premium', 'enterprise']),
+            'tags' => fake()->randomElements(['beta', 'internal', 'deprecated', 'ga'], fake()->numberBetween(0, 3)),
             'meta' => [
-                'category' => fake()->randomElement(['finance', 'education', 'hr', 'government', 'ecommerce']),
                 'difficulty' => fake()->randomElement(['easy', 'medium', 'hard']),
-                'tags' => fake()->words(3),
+                'source' => 'factory',
             ],
         ];
     }
