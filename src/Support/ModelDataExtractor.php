@@ -86,16 +86,22 @@ class ModelDataExtractor
      * 6. Applies custom computed fields (user-defined calculations)
      *
      * @param  Model  $model  The Eloquent model instance to extract data from
-     * @return array Flat array of key-value pairs suitable for rule evaluation
+     * @return ExtractedModelData Wrapped data object with enhanced functionality
      *
      * @example
      * ```php
      * $extractor = new ModelDataExtractor();
-     * $data = $extractor->extract($user);
-     * // Returns: ['id' => 1, 'email' => 'user@example.com', 'created_days_ago' => 365, ...]
+     * $extracted = $extractor->extract($user);
+     *
+     * // Access data directly
+     * $income = $extracted->income;
+     * $score = $extracted->get('credit_score', 650);
+     *
+     * // Convert to array for rule engine
+     * $data = $extracted->toArray();
      * ```
      */
-    public function extract(Model $model): array
+    public function extract(Model $model): ExtractedModelData
     {
         $data = [];
 
@@ -123,7 +129,33 @@ class ModelDataExtractor
 
         ksort($data);
 
-        return $data;
+        // Wrap in ExtractedModelData with metadata
+        return new ExtractedModelData($data, [
+            'model_class' => get_class($model),
+            'model_key' => $model->getKey(),
+            'extractor_config' => $this->config,
+        ]);
+    }
+
+    /**
+     * Extract and return as a raw array (legacy compatibility)
+     *
+     * Use this method if you need the raw array format for backward compatibility
+     * or integration with code that explicitly requires arrays.
+     *
+     * @param  Model  $model  The Eloquent model instance to extract data from
+     * @return array Flat array of key-value pairs
+     *
+     * @example
+     * ```php
+     * $extractor = new ModelDataExtractor();
+     * $data = $extractor->extractArray($user);
+     * // Returns: ['id' => 1, 'email' => 'user@example.com', ...]
+     * ```
+     */
+    public function extractArray(Model $model): array
+    {
+        return $this->extract($model)->toArray();
     }
 
     /**

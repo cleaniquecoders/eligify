@@ -18,6 +18,7 @@ ELIGIFY_UI_ENABLED=true
 ![Playground Screenshot](../screenshots/05-playground.png)
 
 The Playground lets you:
+
 - Load any example criteria
 - Test with custom data
 - See real-time evaluation results
@@ -93,11 +94,30 @@ The Playground lets you:
     - Feature adoption scoring
     - Automated upgrade recommendations
 
-11. **[User Account Verification](11-user-account-verification.php)** - User Management
-    - UserModelMapping automatic data extraction
-    - Account age and verification checks
-    - Model-based evaluation demonstration
+11. **[User Account Verification](11-user-account-verification.php)** - Security & Compliance
+    - Account eligibility
+    - Security checks
+    - Verification workflows
     - Batch user evaluation
+
+### Developer Tools Examples
+
+12. **[Playground Sample Generator](12-playground-sample-generator.php)** - Testing
+    - Generate test data
+    - Interactive playground samples
+    - UI integration
+
+13. **[Model Mapping Generator](13-model-mapping-generator.php)** - Code Generation
+    - Auto-generate model mappings
+    - CLI command usage
+    - Custom field extractors
+
+14. **[ExtractedModelData Usage](14-extracted-model-data.php)** - Data Handling ⭐ **NEW**
+    - Type-safe data container
+    - Data filtering and transformation
+    - Method chaining
+    - Integration with evaluation
+    - Immutability benefits
 
 ## 🚀 Quick Start
 

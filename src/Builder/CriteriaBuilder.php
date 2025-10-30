@@ -214,6 +214,16 @@ class CriteriaBuilder
     }
 
     /**
+     * Set name for this criteria
+     */
+    public function name(string $name): self
+    {
+        $this->criteria->update(['name' => $name]);
+
+        return $this;
+    }
+
+    /**
      * Set description for this criteria
      */
     public function description(string $description): self

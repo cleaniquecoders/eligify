@@ -174,20 +174,30 @@ trait HasEligibility
     {
         // Use the enhanced data extractor
         $extractor = $this->getDataExtractor();
-        $data = $extractor->extract($model);
+        $extracted = $extractor->extract($model);
 
         // Allow for additional customization in subclasses
-        return $this->customizeExtractedData($model, $data);
+        $customized = $this->customizeExtractedData($model, $extracted);
+
+        // Convert to array if ExtractedModelData was returned
+        return $customized instanceof \CleaniqueCoders\Eligify\Support\ExtractedModelData
+            ? $customized->toArray()
+            : $customized;
     }
 
     /**
      * Customize extracted data - override this method for additional customization
+     *
+     * @param  Model  $model  The source model
+     * @param  \CleaniqueCoders\Eligify\Support\ExtractedModelData  $data  The extracted data
+     * @return array|\CleaniqueCoders\Eligify\Support\ExtractedModelData Either format is accepted
      */
-    protected function customizeExtractedData(Model $model, array $data): array
+    protected function customizeExtractedData(Model $model, \CleaniqueCoders\Eligify\Support\ExtractedModelData $data): array|\CleaniqueCoders\Eligify\Support\ExtractedModelData
     {
-        // Default implementation - return data as-is
+        // Default implementation - return data as array for backward compatibility
         // Override this method in your policy for custom field mappings
-        return $data;
+        // You can return either ExtractedModelData or array
+        return $data->toArray();
     }
 
     /**
