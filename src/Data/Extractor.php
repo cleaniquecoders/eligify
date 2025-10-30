@@ -2,6 +2,7 @@
 
 namespace CleaniqueCoders\Eligify\Data;
 
+use CleaniqueCoders\Eligify\Data\Contracts\ModelMapping;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -47,7 +48,7 @@ use Illuminate\Database\Eloquent\Model;
  * - `setRelationshipMappings()` - Defines custom relationship data mappings
  * - `setComputedFields()` - Adds custom computed fields via closures
  *
- * @see \CleaniqueCoders\Eligify\Contracts\ModelMapping For creating custom model mappings
+ * @see \CleaniqueCoders\Eligify\Data\Contracts\ModelMapping For creating custom model mappings
  */
 class Extractor
 {
@@ -539,7 +540,7 @@ class Extractor
      * $loanData = ModelDataExtractor::forModel(LoanApplication::class)->extract($loan);
      * ```
      *
-     * @see \CleaniqueCoders\Eligify\Contracts\ModelMapping For creating custom mapping classes
+     * @see \CleaniqueCoders\Eligify\Data\Contracts\ModelMapping For creating custom mapping classes
      */
     public static function forModel(string $modelClass): self
     {
@@ -557,7 +558,7 @@ class Extractor
             if (class_exists($mappingClass)) {
                 $mapping = new $mappingClass;
 
-                if ($mapping instanceof \CleaniqueCoders\Eligify\Contracts\ModelMapping) {
+                if ($mapping instanceof ModelMapping) {
                     return $mapping->configure($extractor);
                 }
             }
@@ -568,7 +569,7 @@ class Extractor
         if ($defaultMapping && class_exists($defaultMapping)) {
             $mapping = new $defaultMapping;
 
-            if ($mapping instanceof \CleaniqueCoders\Eligify\Contracts\ModelMapping) {
+            if ($mapping instanceof ModelMapping) {
                 return $mapping->configure($extractor);
             }
         }
