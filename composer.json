@@ -40,7 +40,10 @@
         "psr-4": {
             "CleaniqueCoders\\Eligify\\": "src/",
             "CleaniqueCoders\\Eligify\\Database\\Factories\\": "database/factories/"
-        }
+        },
+        "files": [
+            "support/helpers.php"
+        ]
     },
     "autoload-dev": {
         "psr-4": {

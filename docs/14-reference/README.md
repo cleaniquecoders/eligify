@@ -14,6 +14,7 @@ Comprehensive reference for developers integrating Eligify.
 - **[Criteria Builder](api/criteria-builder.md)** - Fluent builder API
 - **[Evaluation Result](api/evaluation-result.md)** - Result object structure
 - **[Models](api/models.md)** - Eloquent model APIs
+- **[Helpers](api/helpers.md)** - Eligify Helpers
 
 ### Reference Guides
 
