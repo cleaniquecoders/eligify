@@ -22,6 +22,7 @@ if ($applicant->income >= 3000 && $applicant->credit_score >= 650) {
 ```
 
 **Issues:**
+
 - Hard-coded thresholds
 - No audit trail
 - Not reusable
@@ -41,6 +42,7 @@ $result = Eligify::criteria('Loan Approval')
 ```
 
 **Benefits:**
+
 - ✅ Data-driven (can store in database)
 - ✅ Automatic audit trail
 - ✅ Reusable across codebase
@@ -53,10 +55,12 @@ $result = Eligify::criteria('Loan Approval')
 ### Generic Rule Engine (e.g., Laravel Rules, JSON Logic)
 
 **Pros:**
+
 - Flexible for any use case
 - Language-agnostic
 
 **Cons:**
+
 - No built-in audit trail
 - No Laravel model integration
 - No caching strategy
@@ -66,6 +70,7 @@ $result = Eligify::criteria('Loan Approval')
 ### Eligify
 
 **Pros:**
+
 - ✅ Purpose-built for eligibility
 - ✅ Deep Laravel integration
 - ✅ Built-in audit trail
@@ -74,6 +79,7 @@ $result = Eligify::criteria('Loan Approval')
 - ✅ Snapshot system for compliance
 
 **Cons:**
+
 - Laravel-specific
 - Eligibility-focused (not general-purpose)
 
@@ -95,7 +101,7 @@ $result = Eligify::criteria('Loan Approval')
 
 ## When to Use Eligify
 
-### ✅ Use Eligify When:
+### ✅ Use Eligify When
 
 - Building loan/credit approval systems
 - Implementing scholarship eligibility
@@ -107,7 +113,7 @@ $result = Eligify::criteria('Loan Approval')
 - Want data-driven criteria
 - Require traceable decisions
 
-### ❌ Consider Alternatives When:
+### ❌ Consider Alternatives When
 
 - Simple true/false checks
 - One-off eligibility logic

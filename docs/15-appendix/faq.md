@@ -11,6 +11,7 @@ Eligify is a Laravel package that provides a flexible rule and criteria engine f
 ### Who should use Eligify?
 
 Developers building systems that require:
+
 - Automated decision-making (loan approvals, scholarships, etc.)
 - Complex eligibility criteria
 - Audit trails for compliance
@@ -181,6 +182,7 @@ See [Testing Guide](../09-testing/README.md).
 ### Why aren't my rules evaluating correctly?
 
 Check:
+
 1. Field names are correct
 2. Data types match operator expectations
 3. Entity has the field or relationship
@@ -191,6 +193,7 @@ See [Troubleshooting Guide](../10-deployment/troubleshooting.md).
 ### Cache not working?
 
 Verify:
+
 1. Cache driver is configured
 2. `'cache.enabled' => true` in config
 3. Using `->cacheFor()` on builder
@@ -198,6 +201,7 @@ Verify:
 ### Audit logs not created?
 
 Check:
+
 1. `'audit.enabled' => true` in config
 2. Database migrations ran
 3. No errors in logs
@@ -220,7 +224,7 @@ See [Authorization Guide](../11-security/authorization.md).
 
 ### How do I report security issues?
 
-Email: security@cleaniquecoders.com
+Email: <security@cleaniquecoders.com>
 
 See [Vulnerability Reporting](../11-security/vulnerability-reporting.md).
 

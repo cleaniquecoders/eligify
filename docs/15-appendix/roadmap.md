@@ -255,7 +255,7 @@ We'd love to hear your ideas! Share feedback:
 
 - [GitHub Discussions](https://github.com/cleaniquecoders/eligify/discussions)
 - [Feature Requests](https://github.com/cleaniquecoders/eligify/issues/new?template=feature_request.md)
-- Email: hello@cleaniquecoders.com
+- Email: <hello@cleaniquecoders.com>
 
 ## Related
 

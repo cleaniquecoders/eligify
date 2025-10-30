@@ -18,6 +18,7 @@ Optimized for loan approvals, credit checks, and financial eligibility:
 ```
 
 **Includes:**
+
 - Weighted scoring by default
 - High threshold (80%)
 - Financial-specific operators
@@ -25,6 +26,7 @@ Optimized for loan approvals, credit checks, and financial eligibility:
 - Extended retention (7 years)
 
 **Configuration:**
+
 ```php
 [
     'scoring' => [
@@ -53,6 +55,7 @@ For patient eligibility, insurance approval:
 ```
 
 **Includes:**
+
 - Pass/fail scoring
 - Strict requirements
 - HIPAA-compliant audit logging
@@ -67,6 +70,7 @@ For scholarships, admissions, program eligibility:
 ```
 
 **Includes:**
+
 - Weighted scoring
 - Moderate threshold (70%)
 - Grade and achievement operators
@@ -80,6 +84,7 @@ For discount eligibility, loyalty programs:
 ```
 
 **Includes:**
+
 - Sum scoring
 - Points-based rules
 - Short retention period
@@ -93,6 +98,7 @@ For benefit programs, aid qualification:
 ```
 
 **Includes:**
+
 - Pass/fail scoring
 - Comprehensive audit trail
 - Long retention

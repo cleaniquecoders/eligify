@@ -15,12 +15,14 @@ Operators define how field values are compared during rule evaluation. Eligify i
 **Description:** Exact match comparison
 
 **Example:**
+
 ```php
 ->addRule('status', '==', 'active')
 ->addRule('verified', 'equals', true)
 ```
 
 **Supported Types:**
+
 - String
 - Number
 - Boolean
@@ -35,12 +37,14 @@ Operators define how field values are compared during rule evaluation. Eligify i
 **Description:** Not equal comparison
 
 **Example:**
+
 ```php
 ->addRule('status', '!=', 'banned')
 ->addRule('type', 'not_equals', 'guest')
 ```
 
 **Supported Types:**
+
 - String
 - Number
 - Boolean
@@ -55,12 +59,14 @@ Operators define how field values are compared during rule evaluation. Eligify i
 **Description:** Numeric greater than
 
 **Example:**
+
 ```php
 ->addRule('age', '>', 18)
 ->addRule('score', 'greater_than', 100)
 ```
 
 **Supported Types:**
+
 - Number
 - Date (as timestamp)
 
@@ -73,12 +79,14 @@ Operators define how field values are compared during rule evaluation. Eligify i
 **Description:** Numeric greater than or equal to
 
 **Example:**
+
 ```php
 ->addRule('income', '>=', 3000)
 ->addRule('points', 'gte', 1000)
 ```
 
 **Supported Types:**
+
 - Number
 - Date (as timestamp)
 
@@ -91,12 +99,14 @@ Operators define how field values are compared during rule evaluation. Eligify i
 **Description:** Numeric less than
 
 **Example:**
+
 ```php
 ->addRule('debt', '<', 10000)
 ->addRule('attempts', 'less_than', 3)
 ```
 
 **Supported Types:**
+
 - Number
 - Date (as timestamp)
 
@@ -109,12 +119,14 @@ Operators define how field values are compared during rule evaluation. Eligify i
 **Description:** Numeric less than or equal to
 
 **Example:**
+
 ```php
 ->addRule('age', '<=', 65)
 ->addRule('loans', 'lte', 2)
 ```
 
 **Supported Types:**
+
 - Number
 - Date (as timestamp)
 
@@ -127,12 +139,14 @@ Operators define how field values are compared during rule evaluation. Eligify i
 **Description:** Value exists in array
 
 **Example:**
+
 ```php
 ->addRule('country', 'in', ['US', 'CA', 'UK'])
 ->addRule('role', 'contains', ['admin', 'editor'])
 ```
 
 **Supported Types:**
+
 - String
 - Number
 - Mixed
@@ -146,11 +160,13 @@ Operators define how field values are compared during rule evaluation. Eligify i
 **Description:** Value not in array
 
 **Example:**
+
 ```php
 ->addRule('status', 'not_in', ['banned', 'suspended'])
 ```
 
 **Supported Types:**
+
 - String
 - Number
 - Mixed
@@ -164,12 +180,14 @@ Operators define how field values are compared during rule evaluation. Eligify i
 **Description:** Value within range (inclusive)
 
 **Example:**
+
 ```php
 ->addRule('age', 'between', [18, 65])
 ->addRule('score', 'between', [0, 100])
 ```
 
 **Supported Types:**
+
 - Number
 - Date
 
@@ -182,12 +200,14 @@ Operators define how field values are compared during rule evaluation. Eligify i
 **Description:** Field is empty, null, or zero
 
 **Example:**
+
 ```php
 ->addRule('notes', 'empty')
 ->addRule('warnings', 'is_empty')
 ```
 
 **Considered Empty:**
+
 - `null`
 - `""`
 - `[]`
@@ -203,12 +223,14 @@ Operators define how field values are compared during rule evaluation. Eligify i
 **Description:** Field has a value
 
 **Example:**
+
 ```php
 ->addRule('email', 'not_empty')
 ->addRule('phone', 'filled')
 ```
 
 **Considered Not Empty:**
+
 - Any value except those in "Empty" list
 
 ---
@@ -220,6 +242,7 @@ Operators define how field values are compared during rule evaluation. Eligify i
 **Description:** Field exists in data
 
 **Example:**
+
 ```php
 ->addRule('profile', 'exists')
 ->addRule('settings', 'has')
@@ -234,6 +257,7 @@ Operators define how field values are compared during rule evaluation. Eligify i
 **Description:** Field doesn't exist in data
 
 **Example:**
+
 ```php
 ->addRule('deleted_at', 'not_exists')
 ```
@@ -247,6 +271,7 @@ Operators define how field values are compared during rule evaluation. Eligify i
 **Description:** String begins with value
 
 **Example:**
+
 ```php
 ->addRule('email', 'starts_with', 'admin@')
 ->addRule('code', 'begins_with', 'PRE-')
@@ -263,6 +288,7 @@ Operators define how field values are compared during rule evaluation. Eligify i
 **Description:** String ends with value
 
 **Example:**
+
 ```php
 ->addRule('email', 'ends_with', '@company.com')
 ->addRule('filename', 'ends_with', '.pdf')
@@ -279,6 +305,7 @@ Operators define how field values are compared during rule evaluation. Eligify i
 **Description:** String contains substring
 
 **Example:**
+
 ```php
 ->addRule('description', 'contains_text', 'premium')
 ->addRule('tags', 'includes', 'featured')
@@ -295,6 +322,7 @@ Operators define how field values are compared during rule evaluation. Eligify i
 **Description:** Matches regular expression
 
 **Example:**
+
 ```php
 ->addRule('phone', 'matches', '/^\+1\d{10}$/')
 ->addRule('postal_code', 'regex', '/^[A-Z]\d[A-Z]\s?\d[A-Z]\d$/')
@@ -311,12 +339,14 @@ Operators define how field values are compared during rule evaluation. Eligify i
 **Description:** Date is before specified date
 
 **Example:**
+
 ```php
 ->addRule('birth_date', 'before', now()->subYears(18))
 ->addRule('expires_at', 'before', now())
 ```
 
 **Supported Formats:**
+
 - Carbon instance
 - DateTime instance
 - String (Y-m-d format)
@@ -331,12 +361,14 @@ Operators define how field values are compared during rule evaluation. Eligify i
 **Description:** Date is after specified date
 
 **Example:**
+
 ```php
 ->addRule('created_at', 'after', now()->subYear())
 ->addRule('last_login', 'after', now()->subDays(30))
 ```
 
 **Supported Formats:**
+
 - Carbon instance
 - DateTime instance
 - String (Y-m-d format)
@@ -351,6 +383,7 @@ Operators define how field values are compared during rule evaluation. Eligify i
 **Description:** Date within range
 
 **Example:**
+
 ```php
 ->addRule('joined_at', 'date_between', [
     now()->subYear(),
@@ -359,6 +392,7 @@ Operators define how field values are compared during rule evaluation. Eligify i
 ```
 
 **Supported Formats:**
+
 - Array of [start, end] dates
 - Both dates use same format options as Before/After
 
@@ -371,6 +405,7 @@ Operators define how field values are compared during rule evaluation. Eligify i
 **Description:** Value is null
 
 **Example:**
+
 ```php
 ->addRule('deleted_at', 'is_null')
 ```
@@ -384,6 +419,7 @@ Operators define how field values are compared during rule evaluation. Eligify i
 **Description:** Value is not null
 
 **Example:**
+
 ```php
 ->addRule('email', 'not_null')
 ```
@@ -397,6 +433,7 @@ Operators define how field values are compared during rule evaluation. Eligify i
 **Description:** Value is boolean
 
 **Example:**
+
 ```php
 ->addRule('verified', 'is_boolean')
 ```
@@ -410,6 +447,7 @@ Operators define how field values are compared during rule evaluation. Eligify i
 **Description:** Value is numeric
 
 **Example:**
+
 ```php
 ->addRule('quantity', 'is_numeric')
 ```
@@ -423,6 +461,7 @@ Operators define how field values are compared during rule evaluation. Eligify i
 **Description:** Value is string
 
 **Example:**
+
 ```php
 ->addRule('name', 'is_string')
 ```
@@ -436,6 +475,7 @@ Operators define how field values are compared during rule evaluation. Eligify i
 **Description:** Value is array
 
 **Example:**
+
 ```php
 ->addRule('tags', 'is_array')
 ```

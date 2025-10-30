@@ -13,6 +13,7 @@ This guide helps you diagnose and resolve common problems with Eligify in produc
 **Problem:** `Package cleaniquecoders/eligify not found`
 
 **Solution:**
+
 ```bash
 # Clear composer cache
 composer clear-cache
@@ -32,6 +33,7 @@ composer config repositories.eligify vcs https://github.com/cleaniquecoders/elig
 **Problem:** Migration fails with "Table already exists"
 
 **Solution:**
+
 ```bash
 # Check existing tables
 php artisan db:show
@@ -51,6 +53,7 @@ php artisan migrate:reset --path=vendor/cleaniquecoders/eligify/database/migrati
 **Problem:** `Class 'Eligify' not found`
 
 **Solution:**
+
 ```php
 // Clear application cache
 php artisan config:clear
@@ -73,6 +76,7 @@ php artisan route:clear
 **Problem:** Rules pass/fail unexpectedly
 
 **Solution:**
+
 ```php
 use CleaniqueCoders\Eligify\Facades\Eligify;
 
@@ -96,6 +100,7 @@ dd($value); // Should be the actual income value
 **Problem:** `Field 'xyz' not found on entity`
 
 **Solution:**
+
 ```php
 // Option 1: Use correct field name
 $result = Eligify::criteria('Test')
@@ -124,6 +129,7 @@ class Applicant extends Model
 **Problem:** Custom operator doesn't work
 
 **Solution:**
+
 ```php
 // Register operator before use
 use CleaniqueCoders\Eligify\Facades\Eligify;
@@ -148,6 +154,7 @@ public function boot()
 **Problem:** Evaluations taking too long
 
 **Solution:**
+
 ```php
 // Enable caching
 Eligify::criteria('Slow Criteria')
@@ -173,6 +180,7 @@ $applicant = User::with('profile', 'employment')->find($id);
 **Problem:** Memory exhausted when processing many evaluations
 
 **Solution:**
+
 ```php
 // Use chunking instead of loading all at once
 User::where('status', 'pending')
@@ -201,6 +209,7 @@ gc_collect_cycles();
 **Problem:** Cache doesn't seem to work
 
 **Solution:**
+
 ```bash
 # Verify cache driver is configured
 php artisan config:show cache
@@ -245,6 +254,7 @@ dd(Cache::has($cacheKey));
 **Problem:** Evaluations complete but no audit logs
 
 **Solution:**
+
 ```php
 // Verify audit is enabled
 // config/eligify.php
@@ -277,6 +287,7 @@ dd($audits);
 **Problem:** Migration fails with "column already exists"
 
 **Solution:**
+
 ```php
 // Create migration to fix schema
 php artisan make:migration fix_eligify_schema
@@ -302,6 +313,7 @@ php artisan migrate:fresh
 **Problem:** Queued evaluations don't execute
 
 **Solution:**
+
 ```bash
 # Start queue worker
 php artisan queue:work eligibility
@@ -324,6 +336,7 @@ php artisan queue:retry all
 **Problem:** Jobs timeout for long evaluations
 
 **Solution:**
+
 ```php
 // Increase timeout in config
 // config/queue.php
@@ -353,6 +366,7 @@ class EvaluateCriteriaJob implements ShouldQueue
 **Problem:** API requests return 401
 
 **Solution:**
+
 ```php
 // Verify authentication middleware
 Route::middleware(['auth:sanctum'])->group(function () {
@@ -374,6 +388,7 @@ dd($personalAccessToken);
 **Problem:** User can't access eligibility features
 
 **Solution:**
+
 ```php
 // Check policy/gate
 Gate::define('manage-eligibility', function ($user) {
@@ -401,6 +416,7 @@ class EligibilityPolicy
 **Problem:** Too many requests error
 
 **Solution:**
+
 ```php
 // Adjust rate limits
 // app/Http/Kernel.php
@@ -424,6 +440,7 @@ RateLimiter::for('eligibility', function (Request $request) {
 **Problem:** Snapshots not being created
 
 **Solution:**
+
 ```php
 // Verify snapshot is called
 $snapshot = Eligify::snapshot($applicant, 'loan_application');
@@ -450,6 +467,7 @@ dd($data); // Should contain all relevant fields
 **Problem:** Eligify UI shows 404 or blank page
 
 **Solution:**
+
 ```bash
 # Publish UI assets
 php artisan vendor:publish --tag=eligify-views
@@ -467,6 +485,7 @@ php artisan route:list | grep eligify
 **Problem:** Livewire components not working
 
 **Solution:**
+
 ```bash
 # Update Livewire
 composer update livewire/livewire
@@ -486,6 +505,7 @@ php artisan livewire:publish --config
 **Problem:** PHP warning about undefined array key
 
 **Solution:**
+
 ```php
 // Use null coalescing operator
 $value = $data['field'] ?? null;
@@ -507,6 +527,7 @@ $result = Eligify::criteria('Test')
 **Problem:** Eligify class not found errors
 
 **Solution:**
+
 ```bash
 # Regenerate autoload files
 composer dump-autoload
