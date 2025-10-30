@@ -91,16 +91,6 @@ Gate::define('viewEligify', function ($user) {
 
 📖 **[Full Documentation](docs/README.md)**
 
-**Key Guides:**
-
-- [Quick Start Guide](docs/README.md#quick-start)
-- [UI Setup Guide](docs/ui-setup-guide.md) - Dashboard configuration & authorization
-- [Environment Variables](docs/environment-variables.md) - Complete `.env` reference
-- [Configuration Guide](docs/configuration.md) - All config options
-- [Model Data Extraction](docs/model-data-extraction.md) - Extract & evaluate Eloquent models
-- [CLI Commands](docs/cli-commands.md) - Artisan command reference
-- [Examples](examples/README.md) - 12+ real-world examples
-
 ## Testing
 
 ```bash
