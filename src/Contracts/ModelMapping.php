@@ -51,4 +51,11 @@ interface ModelMapping
      * Get field description for a specific field
      */
     public function getFieldDescription(string $field): ?string;
+
+    /**
+     * Get the prefix for this mapping
+     *
+     * Used to namespace fields like "applicant.income" or "user.email"
+     */
+    public function getPrefix(): string;
 }

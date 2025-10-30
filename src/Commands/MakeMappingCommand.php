@@ -218,7 +218,13 @@ class MakeMappingCommand extends Command
                 if ($returnType && method_exists($returnType, 'getName')) {
                     $returnTypeName = $returnType->getName();
                     if (Str::contains($returnTypeName, 'Illuminate\Database\Eloquent\Relations')) {
-                        $relationships[] = $methodName;
+                        // Get the related model class
+                        $relatedModelClass = $this->getRelatedModelClass($model, $methodName);
+                        $relationships[$methodName] = [
+                            'name' => $methodName,
+                            'relatedModel' => $relatedModelClass,
+                            'hasMapping' => $this->checkIfMappingExists($relatedModelClass),
+                        ];
                     }
                 }
             } catch (\Exception $e) {
@@ -227,6 +233,47 @@ class MakeMappingCommand extends Command
         }
 
         return $relationships;
+    }
+
+    protected function getRelatedModelClass(Model $model, string $relationshipName): ?string
+    {
+        try {
+            $relation = $model->{$relationshipName}();
+
+            if (method_exists($relation, 'getRelated')) {
+                return get_class($relation->getRelated());
+            }
+        } catch (\Exception $e) {
+            // Silently fail if we can't get the related model
+        }
+
+        return null;
+    }
+
+    protected function checkIfMappingExists(?string $modelClass): bool
+    {
+        if (! $modelClass) {
+            return false;
+        }
+
+        // Try to find mapping class in common locations
+        $modelName = class_basename($modelClass);
+        $mappingClassName = $modelName.'Mapping';
+
+        // Check in package mappings
+        $packageMappingClass = "CleaniqueCoders\\Eligify\\Mappings\\{$mappingClassName}";
+        if (class_exists($packageMappingClass)) {
+            return true;
+        }
+
+        // Check in app mappings
+        $namespace = $this->getDefaultNamespace($modelClass);
+        $appMappingClass = "{$namespace}\\{$mappingClassName}";
+        if (class_exists($appMappingClass)) {
+            return true;
+        }
+
+        return false;
     }
 
     protected function generateFieldMappings(array $fields): array
@@ -260,16 +307,40 @@ class MakeMappingCommand extends Command
     {
         $mappings = [];
 
-        foreach ($relationships as $relationship) {
-            // Generate common relationship mappings
-            $mappings[$relationship.'.count'] = Str::snake($relationship).'_count';
+        foreach ($relationships as $relationshipData) {
+            // Handle both old array format and new associative format
+            if (is_string($relationshipData)) {
+                $relationship = $relationshipData;
+                $relatedModel = null;
+                $hasMapping = false;
+            } else {
+                $relationship = $relationshipData['name'];
+                $relatedModel = $relationshipData['relatedModel'] ?? null;
+                $hasMapping = $relationshipData['hasMapping'] ?? false;
+            }
 
-            // Add common aggregations for likely numeric relationships
-            if (Str::plural($relationship) === $relationship) {
-                // It's likely a plural relationship (hasMany, belongsToMany)
-                $singular = Str::singular($relationship);
-                $mappings[$relationship.'.sum:amount'] = 'total_'.$singular.'_amount';
-                $mappings[$relationship.'.avg:rating'] = 'avg_'.$singular.'_rating';
+            if ($hasMapping && $relatedModel) {
+                // If the related model has a mapping, suggest using that mapping's prefix
+                $modelName = class_basename($relatedModel);
+                $prefix = Str::snake($modelName);
+
+                // Add a comment in the generated mappings
+                $this->info("  → Relationship '{$relationship}' uses {$modelName} which has a mapping with prefix '{$prefix}'");
+
+                // Generate basic count, but user should manually configure field mappings from related mapper
+                $mappings[$relationship.'.count'] = Str::snake($relationship).'_count';
+                $mappings["// {$relationship} uses {$modelName}Mapping"] = "// You can reference fields like: {$relationship}.{$prefix}.field_name";
+            } else {
+                // Generate common relationship mappings
+                $mappings[$relationship.'.count'] = Str::snake($relationship).'_count';
+
+                // Add common aggregations for likely numeric relationships
+                if (Str::plural($relationship) === $relationship) {
+                    // It's likely a plural relationship (hasMany, belongsToMany)
+                    $singular = Str::singular($relationship);
+                    $mappings[$relationship.'.sum:amount'] = 'total_'.$singular.'_amount';
+                    $mappings[$relationship.'.avg:rating'] = 'avg_'.$singular.'_rating';
+                }
             }
         }
 
@@ -314,10 +385,16 @@ class MakeMappingCommand extends Command
     ): string {
         $stub = File::get(__DIR__.'/../../stubs/model-mapping.stub');
 
+        // Generate prefix from model name
+        $modelName = class_basename($modelClass);
+        $prefix = Str::snake($modelName);
+
         $replacements = [
             '{{ namespace }}' => $namespace,
             '{{ class }}' => $className,
             '{{ modelClass }}' => $modelClass,
+            '{{ modelName }}' => $modelName,
+            '{{ prefix }}' => $prefix,
             '{{ date }}' => now()->format('Y-m-d H:i:s'),
             '{{ fieldMappings }}' => $this->formatArrayForStub($fieldMappings, 8),
             '{{ relationshipMappings }}' => $this->formatArrayForStub($relationshipMappings, 8),
@@ -338,7 +415,12 @@ class MakeMappingCommand extends Command
         $lines = [];
 
         foreach ($data as $key => $value) {
-            $lines[] = "\n{$spaces}'{$key}' => '{$value}',";
+            // Handle comment lines
+            if (Str::startsWith($key, '//')) {
+                $lines[] = "\n{$spaces}{$value}";
+            } else {
+                $lines[] = "\n{$spaces}'{$key}' => '{$value}',";
+            }
         }
 
         return implode('', $lines)."\n".str_repeat(' ', $indent - 4);

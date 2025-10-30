@@ -42,23 +42,27 @@ flowchart TD
 ### 1. Quick Extraction (Simple Use Cases)
 
 **When to use:**
+
 - Prototyping or testing
 - Simple models without custom requirements
 - One-off extractions
 - You want default behavior
 
 **Example:**
+
 ```php
 $extractor = new Extractor();
 $data = $extractor->extract($user);
 ```
 
 **Pros:**
+
 - ✅ Fastest to implement
 - ✅ No configuration needed
 - ✅ Good for quick tests
 
 **Cons:**
+
 - ❌ No customization
 - ❌ Same config for all models
 - ❌ Harder to maintain at scale
@@ -68,12 +72,14 @@ $data = $extractor->extract($user);
 ### 2. Custom Configuration (One-off Customization)
 
 **When to use:**
+
 - Need specific field mappings for a single extraction
 - Adding computed fields on-the-fly
 - Exploratory data analysis
 - Non-production scripts
 
 **Example:**
+
 ```php
 $extractor = new Extractor([
     'include_relationships' => true,
@@ -94,11 +100,13 @@ $data = $extractor->extract($user);
 ```
 
 **Pros:**
+
 - ✅ Flexible per-extraction
 - ✅ No config files needed
 - ✅ Good for exploration
 
 **Cons:**
+
 - ❌ Configuration not reusable
 - ❌ Duplicated logic across codebase
 - ❌ Hard to maintain
@@ -108,6 +116,7 @@ $data = $extractor->extract($user);
 ### 3. Model-Specific Extractors (RECOMMENDED for Production)
 
 **When to use:**
+
 - Production applications
 - Multiple model types with different extraction needs
 - Team environments requiring consistency
@@ -116,6 +125,7 @@ $data = $extractor->extract($user);
 **Example:**
 
 **Step 1: Configure in `config/eligify.php`**
+
 ```php
 'model_extraction' => [
     'model_mappings' => [
@@ -127,6 +137,68 @@ $data = $extractor->extract($user);
 ```
 
 **Step 2: Create mapping class**
+```php
+namespace App\Eligify\Mappings;
+
+use CleaniqueCoders\Eligify\Mappings\AbstractModelMapping;
+use CleaniqueCoders\Eligify\Data\Extractor;
+
+class UserMapping extends AbstractModelMapping
+{
+    protected ?string $prefix = 'user';
+
+    protected array $fieldMappings = [
+        'annual_income' => 'income',
+        'credit_rating' => 'credit_score',
+    ];
+
+    protected array $computedFields = [];
+
+    public function __construct()
+    {
+        $this->computedFields = [
+            'risk_score' => fn($model) => $model->calculateRisk(),
+        ];
+    }
+
+    public function getModelClass(): string
+    {
+        return \App\Models\User::class;
+    }
+
+    public function getName(): string
+    {
+        return 'User';
+    }
+
+    public function getDescription(): string
+    {
+        return 'User account and financial data';
+    }
+
+    public function configure(Extractor $extractor): Extractor
+    {
+        $extractor = parent::configure($extractor);
+
+        // Include profile relationship using ProfileMapping
+        $extractor->setRelationshipMappings([
+            'profile' => [
+                'employment_status' => 'is_employed',
+            ],
+        ]);
+
+        return $extractor;
+    }
+}
+```
+
+### Step 3: Use in code
+
+```php
+$data = Extractor::forModel(User::class)->extract($user);
+```
+```
+
 ```php
 namespace App\Eligify\Mappings;
 
@@ -155,11 +227,13 @@ class UserMapping implements ModelMapping
 ```
 
 **Step 3: Use in code**
+
 ```php
 $data = Extractor::forModel(User::class)->extract($user);
 ```
 
 **Pros:**
+
 - ✅ Centralized configuration
 - ✅ Reusable across application
 - ✅ Type-safe with model classes
@@ -168,6 +242,7 @@ $data = Extractor::forModel(User::class)->extract($user);
 - ✅ Version controlled
 
 **Cons:**
+
 - ❌ Requires initial setup
 - ❌ More files to manage
 
@@ -293,24 +368,28 @@ $results = collect($users)->map(fn($user) => [
 ### ✅ Do's
 
 1. **Use `forModel()` for production code**
+
    ```php
    // Good: Centralized, maintainable
    Extractor::forModel(User::class)->extract($user)
    ```
 
 2. **Create mapping classes for each model type**
+
    ```php
    // Good: Organized, reusable
    class UserMapping implements ModelMapping { ... }
    ```
 
 3. **Keep computed fields pure and testable**
+
    ```php
    // Good: Simple, testable calculation
    'risk_score' => fn($model, $data) => ($data['income'] / $data['debt']) * 100
    ```
 
 4. **Document your field mappings**
+
    ```php
    // Good: Clear documentation
    ->setFieldMappings([
@@ -321,6 +400,7 @@ $results = collect($users)->map(fn($user) => [
 ### ❌ Don'ts
 
 1. **Don't duplicate extraction logic**
+
    ```php
    // Bad: Repeated in multiple places
    $extractor = new Extractor();
@@ -329,6 +409,7 @@ $results = collect($users)->map(fn($user) => [
    ```
 
 2. **Don't perform side effects in computed fields**
+
    ```php
    // Bad: Modifies database
    'score' => function($model) {
@@ -338,12 +419,14 @@ $results = collect($users)->map(fn($user) => [
    ```
 
 3. **Don't ignore sensitive data filtering**
+
    ```php
    // Bad: Exposes sensitive data
    new Extractor(['exclude_sensitive_fields' => false])
    ```
 
 4. **Don't nest extractors recursively**
+
    ```php
    // Bad: Can cause infinite loops
    'profile_data' => fn($model) =>
@@ -358,9 +441,181 @@ $results = collect($users)->map(fn($user) => [
 | **Pattern 2: Custom** | One-off scripts, exploration | ⏱️ Minutes | ⭐⭐ Medium | ⚠️ Limited | ⚠️ Maybe |
 | **Pattern 3: forModel** | Production, teams | ⏰ Hours | ⭐⭐⭐ High | ✅ Yes | ✅ Yes |
 
+## Using Relationships with Existing Model Mappings
+
+When your models have relationships, you should reuse existing model mappings instead of duplicating field mapping logic. This keeps your code DRY and maintainable.
+
+### Pattern 1: Include Relationship Fields
+
+When you have a User model with a Profile relationship, and both have their own mapping classes:
+
+```php
+// ProfileMapping.php
+class ProfileMapping extends AbstractModelMapping
+{
+    protected ?string $prefix = 'profile';
+
+    protected array $fieldMappings = [
+        'bio' => 'biography',
+        'employment_status' => 'employed',
+    ];
+
+    public function getModelClass(): string
+    {
+        return Profile::class;
+    }
+
+    // ... other required methods
+}
+
+// UserMapping.php - reuses ProfileMapping
+class UserMapping extends AbstractModelMapping
+{
+    protected ?string $prefix = 'user';
+
+    protected array $fieldMappings = [
+        'email' => 'email_address',
+    ];
+
+    public function configure(Extractor $extractor): Extractor
+    {
+        $extractor = parent::configure($extractor);
+
+        // Include specific fields from ProfileMapping
+        $extractor->setRelationshipMappings([
+            'profile' => [
+                'biography' => 'user_bio',        // Maps profile.biography -> user_bio
+                'employed' => 'is_employed',       // Maps profile.employed -> is_employed
+            ],
+        ]);
+
+        return $extractor;
+    }
+
+    // ... other required methods
+}
+```
+
+**Result:** User data includes `user.email_address`, `user_bio`, and `is_employed`
+
+### Pattern 2: Nested Relationships
+
+For multi-level relationships like Order -> Customer -> Address:
+
+```php
+class OrderMapping extends AbstractModelMapping
+{
+    protected ?string $prefix = 'order';
+
+    public function configure(Extractor $extractor): Extractor
+    {
+        $extractor = parent::configure($extractor);
+
+        $extractor->setRelationshipMappings([
+            // Direct relationship
+            'customer' => [
+                'email_address' => 'customer_email',
+            ],
+            // Nested relationship: customer's address
+            'customer.address' => [
+                'street_address' => 'shipping_street',
+                'city_name' => 'shipping_city',
+                'zip_code' => 'shipping_zip',
+            ],
+        ]);
+
+        return $extractor;
+    }
+}
+```
+
+**Result:** Order data includes fields from three different mappings seamlessly
+
+### Pattern 3: Relationship Data in Computed Fields
+
+Use related model data in computed fields:
+
+```php
+class EmployeeMapping extends AbstractModelMapping
+{
+    protected ?string $prefix = 'employee';
+
+    protected array $computedFields = [];
+
+    public function __construct()
+    {
+        $this->computedFields = [
+            'works_at_large_company' => function ($model) {
+                if (!$model->relationLoaded('company')) {
+                    return false;
+                }
+                // Reference company data through relationship
+                return ($model->company->employee_count ?? 0) > 100;
+            },
+        ];
+    }
+
+    public function configure(Extractor $extractor): Extractor
+    {
+        $extractor = parent::configure($extractor);
+
+        // Include company fields using CompanyMapping
+        $extractor->setRelationshipMappings([
+            'company' => [
+                'company_name' => 'employer_name',
+                'employees' => 'employer_size',
+            ],
+        ]);
+
+        return $extractor;
+    }
+}
+```
+
+**Result:** Employee data includes company fields and computed field based on company data
+
+### Auto-Generation with Relationships
+
+When using the mapper generation commands, relationships with existing mappings are automatically detected:
+
+```bash
+php artisan eligify:make-mapping User
+```
+
+If User model has a `profile()` relationship and ProfileMapping exists, the generated code will include:
+
+```php
+public function configure(Extractor $extractor): Extractor
+{
+    $extractor = parent::configure($extractor);
+
+    // Relationship: uses ProfileModelMapping for profile
+    $extractor->setRelationshipMappings([
+        'profile' => [
+            // Add specific profile fields you want to include
+        ],
+    ]);
+
+    return $extractor;
+}
+```
+
+### Benefits of Reusing Mappings
+
+✅ **No Duplication**: Field mapping logic defined once per model
+✅ **Consistent**: Same field transformations everywhere
+✅ **Maintainable**: Update mapping in one place
+✅ **Type-Safe**: Use actual mapping classes, not string references
+✅ **Prefixed**: Each mapping has its own namespace (e.g., `user.email` vs `profile.bio`)
+
+### Full Example
+
+See `examples/17-relationship-mapping-usage.php` for complete working examples of all patterns.
+
 ## Further Reading
 
 - [Model Mappings Documentation](model-mappings.md)
+- [Mapper Generation Guide](mapper-generation-guide.md)
 - [Configuration Guide](configuration.md)
 - [Advanced Features](advanced-features.md)
 - [Usage Guide](usage-guide.md)

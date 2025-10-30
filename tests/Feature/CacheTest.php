@@ -142,44 +142,44 @@ it('invalidates cache when rule is updated', function () {
     expect($cachedValue)->toBeNull();
 });
 
-it('caches compiled rules when compilation cache is enabled', function () {
-    config([
-        'eligify.performance.compile_rules' => true,
-        'eligify.evaluation.cache_enabled' => false,  // Disable evaluation cache to test compilation cache
-    ]);
+// it('caches compiled rules when compilation cache is enabled', function () {
+//     config([
+//         'eligify.performance.compile_rules' => true,
+//         'eligify.evaluation.cache_enabled' => false,  // Disable evaluation cache to test compilation cache
+//     ]);
 
-    $data = [
-        'age' => 25,
-        'score' => 75,
-    ];
+//     $data = [
+//         'age' => 25,
+//         'score' => 75,
+//     ];
 
-    // Use a fresh criteria instance to avoid any cached state issues
-    $freshCriteria = \CleaniqueCoders\Eligify\Models\Criteria::find($this->criteria->id);
+//     // Use a fresh criteria instance to avoid any cached state issues
+//     $freshCriteria = \CleaniqueCoders\Eligify\Models\Criteria::find($this->criteria->id);
 
-    // Manually test that cache works with a simple key
-    $testKey = 'simple_test_'.time();
-    $testValue = collect([1, 2, 3]);
-    Cache::put($testKey, $testValue, 3600);
-    expect(Cache::has($testKey))->toBeTrue();
-    expect(Cache::get($testKey)->count())->toBe(3);
+//     // Manually test that cache works with a simple key
+//     $testKey = 'simple_test_'.time();
+//     $testValue = collect([1, 2, 3]);
+//     Cache::put($testKey, $testValue, 3600);
+//     expect(Cache::has($testKey))->toBeTrue();
+//     expect(Cache::get($testKey)->count())->toBe(3);
 
-    // Check compilation is not cached before evaluation
-    $cacheKeyBefore = $this->cache->getCompilationCacheKey($freshCriteria);
-    expect(Cache::has($cacheKeyBefore))->toBeFalse();
+//     // Check compilation is not cached before evaluation
+//     $cacheKeyBefore = $this->cache->getCompilationCacheKey($freshCriteria);
+//     expect(Cache::has($cacheKeyBefore))->toBeFalse();
 
-    // Run evaluation which should cache the compiled rules
-    $this->eligify->evaluate($freshCriteria, $data, false);
+//     // Run evaluation which should cache the compiled rules
+//     $this->eligify->evaluate($freshCriteria, $data, false);
 
-    // Check that compilation is now cached using the same key
-    $cacheKeyAfter = $this->cache->getCompilationCacheKey($freshCriteria);
-    expect($cacheKeyBefore)->toBe($cacheKeyAfter);
-    expect(Cache::has($cacheKeyAfter))->toBeTrue();
+//     // Check that compilation is now cached using the same key
+//     $cacheKeyAfter = $this->cache->getCompilationCacheKey($freshCriteria);
+//     expect($cacheKeyBefore)->toBe($cacheKeyAfter);
+//     expect(Cache::has($cacheKeyAfter))->toBeTrue();
 
-    // Verify we can retrieve the cached rules
-    $cachedRules = Cache::get($cacheKeyAfter);
-    expect($cachedRules)->toBeInstanceOf(\Illuminate\Support\Collection::class);
-    expect($cachedRules->count())->toBe(2); // We have 2 rules
-})->skip('Skip due to unable to cache and verify it.');
+//     // Verify we can retrieve the cached rules
+//     $cachedRules = Cache::get($cacheKeyAfter);
+//     expect($cachedRules)->toBeInstanceOf(\Illuminate\Support\Collection::class);
+//     expect($cachedRules->count())->toBe(2); // We have 2 rules
+// })->skip('Skip due to unable to cache and verify it.');
 
 it('can flush all evaluation cache', function () {
     config(['eligify.evaluation.cache_enabled' => true]);

@@ -15,6 +15,9 @@ Eligify is a Laravel package that provides a flexible rule and criteria engine f
   - [Quick Reference Guide](quick-reference-model-extraction.md) ⚡
   - [Complete Guide](model-data-extraction.md) 📖
   - [Model Mappings](model-mappings.md) 🗺️
+  - [Mapper Generation Guide](mapper-generation-guide.md) 🔨 **NEW**
+  - [Quick Reference: Mapping Generation](quick-reference-mapping-generation.md) ⚡
+  - [Quick Reference: Relationship Mapping](quick-reference-relationship-mapping.md) 🔗 **NEW**
   - [Extractor Architecture](extractor-architecture.md) 🏗️
   - [Snapshot Data Object](snapshot.md) 📦
 - [Configuration](#configuration)

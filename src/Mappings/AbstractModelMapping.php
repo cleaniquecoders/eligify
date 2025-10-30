@@ -38,6 +38,11 @@ abstract class AbstractModelMapping implements ModelMapping
     protected array $fieldTypes = [];
 
     /**
+     * Prefix for this mapping (e.g., "applicant", "user")
+     */
+    protected ?string $prefix = null;
+
+    /**
      * Configure the extractor with all mappings
      */
     public function configure(Extractor $extractor): Extractor
@@ -264,5 +269,47 @@ abstract class AbstractModelMapping implements ModelMapping
     public function getFieldDescription(string $field): ?string
     {
         return $this->fieldDescriptions[$field] ?? null;
+    }
+
+    /**
+     * Get the prefix for this mapping
+     *
+     * Auto-generates from model class name if not explicitly set
+     */
+    public function getPrefix(): string
+    {
+        if ($this->prefix !== null) {
+            return $this->prefix;
+        }
+
+        // Auto-generate from model class name
+        $modelClass = $this->getModelClass();
+        $modelName = class_basename($modelClass);
+
+        return \Illuminate\Support\Str::snake($modelName, '.');
+    }
+
+    /**
+     * Get field mappings array
+     */
+    public function getFieldMappings(): array
+    {
+        return $this->fieldMappings;
+    }
+
+    /**
+     * Get relationship mappings array
+     */
+    public function getRelationshipMappings(): array
+    {
+        return $this->relationshipMappings;
+    }
+
+    /**
+     * Get computed fields array
+     */
+    public function getComputedFields(): array
+    {
+        return $this->computedFields;
     }
 }

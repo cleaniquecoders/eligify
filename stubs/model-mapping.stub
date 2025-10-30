@@ -42,11 +42,32 @@ class {{ class }} extends AbstractModelMapping
     ];
 
     /**
+     * Prefix for this mapping (used for field namespacing like "{{ prefix }}.field_name")
+     */
+    protected ?string $prefix = '{{ prefix }}';
+
+    /**
      * Initialize computed fields with closures
      */
     public function __construct()
     {
         $this->computedFields = [{{ computedFields }}
         ];
+    }
+
+    /**
+     * Get human-readable name for this mapping
+     */
+    public function getName(): string
+    {
+        return '{{ modelName }}';
+    }
+
+    /**
+     * Get description of what this mapping does
+     */
+    public function getDescription(): string
+    {
+        return 'Model mapping for {{ modelClass }} with field extraction and computed values';
     }
 }

@@ -33,6 +33,11 @@ class UserModelMapping extends AbstractModelMapping
     ];
 
     /**
+     * Prefix for this mapping
+     */
+    protected ?string $prefix = 'user';
+
+    /**
      * Initialize computed fields with closures
      */
     public function __construct()

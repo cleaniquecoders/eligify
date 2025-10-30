@@ -9,6 +9,7 @@ use CleaniqueCoders\Eligify\Commands\CleanupAuditLogsCommand;
 use CleaniqueCoders\Eligify\Commands\CriteriaCommand;
 use CleaniqueCoders\Eligify\Commands\EligifyCommand;
 use CleaniqueCoders\Eligify\Commands\EvaluateCommand;
+use CleaniqueCoders\Eligify\Commands\MakeAllMappingsCommand;
 use CleaniqueCoders\Eligify\Commands\MakeMappingCommand;
 use CleaniqueCoders\Eligify\Engine\RuleEngine;
 use CleaniqueCoders\Eligify\Events\CriteriaCreated;
@@ -52,6 +53,7 @@ class EligifyServiceProvider extends PackageServiceProvider
                 CleanupAuditLogsCommand::class,
                 BenchmarkCommand::class,
                 MakeMappingCommand::class,
+                MakeAllMappingsCommand::class,
                 Commands\CacheClearCommand::class,
                 Commands\CacheWarmupCommand::class,
                 Commands\CacheStatsCommand::class,
