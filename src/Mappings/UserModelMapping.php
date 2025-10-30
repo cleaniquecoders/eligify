@@ -55,8 +55,8 @@ class UserModelMapping extends AbstractModelMapping
         $this->fieldTypes = [
             'name' => 'string',
             'email' => 'string',
-            'email_verified_timestamp' => 'datetime',
-            'registration_date' => 'datetime',
+            'email_verified_timestamp' => 'date',
+            'registration_date' => 'date',
             'is_verified' => 'boolean',
         ];
     }

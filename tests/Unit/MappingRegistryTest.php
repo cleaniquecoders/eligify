@@ -58,7 +58,7 @@ describe('MappingRegistry', function () {
 
         expect($emailVerifiedField)->toBeArray()
             ->and($emailVerifiedField)->toHaveKeys(['type', 'description', 'category', 'original'])
-            ->and($emailVerifiedField['type'])->toBe('datetime')
+            ->and($emailVerifiedField['type'])->toBe('date')
             ->and($emailVerifiedField['category'])->toBe('attribute')
             ->and($emailVerifiedField['original'])->toBe('email_verified_at');
     });
@@ -135,8 +135,8 @@ describe('MappingRegistry', function () {
     test('field types are available', function () {
         $mapping = MappingRegistry::get(UserModelMapping::class);
 
-        expect($mapping->getFieldType('email_verified_timestamp'))->toBe('datetime')
-            ->and($mapping->getFieldType('registration_date'))->toBe('datetime')
+        expect($mapping->getFieldType('email_verified_timestamp'))->toBe('date')
+            ->and($mapping->getFieldType('registration_date'))->toBe('date')
             ->and($mapping->getFieldType('is_verified'))->toBe('boolean');
     });
 

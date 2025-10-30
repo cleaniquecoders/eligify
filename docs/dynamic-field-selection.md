@@ -55,8 +55,8 @@ Step 1: Select Mapping
 
 Step 2: Select Field
 ├─ Model Attributes
-│  ├─ email_verified_timestamp (datetime) - When the email was verified
-│  └─ registration_date (datetime) - Account creation date
+│  ├─ email_verified_timestamp (date) - When the email was verified
+│  └─ registration_date (date) - Account creation date
 ├─ Computed Fields
 │  └─ is_verified (boolean) - Whether the user has verified their email
 └─ Relationships
@@ -136,7 +136,7 @@ protected array $fieldDescriptions = [
 
 protected array $fieldTypes = [
     'subscription_tier' => 'string',
-    'subscription_expires' => 'datetime',
+    'subscription_expires' => 'date',
 ];
 ```
 
@@ -222,8 +222,8 @@ class UserModelMapping extends AbstractModelMapping
 
         // Define field types
         $this->fieldTypes = [
-            'email_verified_timestamp' => 'datetime',
-            'registration_date' => 'datetime',
+            'email_verified_timestamp' => 'date',
+            'registration_date' => 'date',
             'is_verified' => 'boolean',
         ];
     }
@@ -290,13 +290,13 @@ $fields = MappingRegistry::getFields(UserMapping::class);
 // [
 //     'email_verified_timestamp' => [
 //         'original' => 'email_verified_at',
-//         'type' => 'datetime',
+//         'type' => 'date',
 //         'description' => 'When the email was verified (nullable)',
 //         'category' => 'attribute',
 //     ],
 //     'registration_date' => [
 //         'original' => 'created_at',
-//         'type' => 'datetime',
+//         'type' => 'date',
 //         'description' => 'Account creation date',
 //         'category' => 'attribute',
 //     ],
@@ -404,7 +404,7 @@ updatedField()
 | `integer` | Whole numbers | 100, -50, 0 | ==, !=, >, >=, <, <=, between, in |
 | `numeric` | Decimals | 99.99, 3.14 | ==, !=, >, >=, <, <=, between |
 | `boolean` | True/false | true, false, 1, 0 | ==, != |
-| `datetime` | Date/time | "2024-01-01", "2024-12-31 23:59:59" | ==, !=, >, >=, <, <=, between |
+| `date` | Date/time | "2024-01-01", "2024-12-31 23:59:59" | ==, !=, >, >=, <, <=, between |
 | `array` | Lists | ["a","b","c"] | in, not_in, contains, empty, not_empty |
 
 ### Type Auto-Population
@@ -437,8 +437,8 @@ Groups fields by category with type information:
 ```blade
 <select wire:model.live="field">
     <optgroup label="Model Attributes">
-        <option value="email_verified_timestamp">email_verified_timestamp (datetime)</option>
-        <option value="registration_date">registration_date (datetime)</option>
+        <option value="email_verified_timestamp">email_verified_timestamp (date)</option>
+        <option value="registration_date">registration_date (date)</option>
     </optgroup>
     <optgroup label="Computed Fields">
         <option value="is_verified">is_verified (boolean)</option>

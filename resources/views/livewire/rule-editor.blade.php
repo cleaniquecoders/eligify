@@ -166,7 +166,7 @@
                     </svg>
                     <div class="flex-1">
                         <p class="text-sm font-medium text-blue-900">
-                            Field Type: <strong>{{ $this->fieldTypes[$fieldType] }}</strong>
+                            Field Type: <strong>{{ $this->fieldTypes[$fieldType] ?? ucfirst($fieldType) }}</strong>
                         </p>
                         <ul class="mt-2 text-xs text-blue-800 space-y-1">
                             <li class="flex items-center">
