@@ -34,7 +34,7 @@ $result = Eligify::criteria('Loan Approval')
     ->evaluate($applicant);
 
 // Cache until manually cleared
-$result = Eligify::criteria('static_rules')
+$result = Eligify::criteria('Static Rules')
     ->addRule('age', '>=', 18)
     ->cacheForever()
     ->evaluate($applicant);
@@ -272,7 +272,7 @@ foreach ($results as $applicantId => $result) {
 use CleaniqueCoders\Eligify\Facades\Eligify;
 
 // Queue evaluation for background processing
-Eligify::criteria('heavy_computation')
+Eligify::criteria('Heavy Computation')
     ->addRule('complex_calculation', '>=', 100)
     ->evaluateAsync($applicant);
 

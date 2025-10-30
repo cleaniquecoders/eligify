@@ -68,7 +68,7 @@ test('multi-stage application process', function () {
     ]);
 
     // Stage 1: Basic eligibility
-    $basic = Eligify::criteria('basic_eligibility')
+    $basic = Eligify::criteria('Basic Eligibility')
         ->addRule('age', '>=', 18)
         ->addRule('citizenship', '==', 'US')
         ->evaluate($applicant);
@@ -76,7 +76,7 @@ test('multi-stage application process', function () {
     expect($basic->passed())->toBeTrue();
 
     // Stage 2: Financial assessment
-    $financial = Eligify::criteria('financial_assessment')
+    $financial = Eligify::criteria('Financial Assessment')
         ->addRule('income', '>=', 3000)
         ->addRule('debt_ratio', '<=', 0.4)
         ->evaluate($applicant);
@@ -84,7 +84,7 @@ test('multi-stage application process', function () {
     expect($financial->passed())->toBeTrue();
 
     // Stage 3: Credit check
-    $credit = Eligify::criteria('credit_check')
+    $credit = Eligify::criteria('Credit Check')
         ->addRule('credit_score', '>=', 650)
         ->addRule('delinquencies', '==', 0)
         ->evaluate($applicant);
@@ -146,7 +146,7 @@ test('audit trail is complete', function () {
 
     $this->actingAs($user);
 
-    $result = Eligify::criteria('test')
+    $result = Eligify::criteria('Test')
         ->addRule('income', '>=', 3000)
         ->evaluate($applicant);
 
@@ -183,7 +183,7 @@ test('evaluation triggers correct events', function () {
         'credit_score' => 600, // Fails
     ]);
 
-    Eligify::criteria('test')
+    Eligify::criteria('Test')
         ->addRule('income', '>=', 3000)
         ->addRule('credit_score', '>=', 650)
         ->evaluate($applicant);
@@ -196,7 +196,7 @@ test('evaluation triggers correct events', function () {
 test('event listener updates statistics', function () {
     $applicant = User::factory()->create(['income' => 5000]);
 
-    Eligify::criteria('test')
+    Eligify::criteria('Test')
         ->addRule('income', '>=', 3000)
         ->evaluate($applicant);
 
@@ -220,7 +220,7 @@ test('evaluation results are cached', function () {
     $applicant = User::factory()->create(['income' => 5000]);
 
     // First evaluation
-    $result1 = Eligify::criteria('cacheable')
+    $result1 = Eligify::criteria('Cacheable')
         ->addRule('income', '>=', 3000)
         ->cacheFor(60)
         ->evaluate($applicant);
@@ -229,7 +229,7 @@ test('evaluation results are cached', function () {
     expect(Cache::has("eligify:cacheable:{$applicant->id}"))->toBeTrue();
 
     // Second evaluation should use cache
-    $result2 = Eligify::criteria('cacheable')
+    $result2 = Eligify::criteria('Cacheable')
         ->addRule('income', '>=', 3000)
         ->evaluate($applicant);
 
@@ -239,7 +239,7 @@ test('evaluation results are cached', function () {
 test('cache invalidation works', function () {
     $applicant = User::factory()->create(['income' => 5000]);
 
-    Eligify::criteria('test')
+    Eligify::criteria('Test')
         ->addRule('income', '>=', 3000)
         ->cacheFor(60)
         ->evaluate($applicant);
@@ -303,7 +303,7 @@ test('evaluation can be queued', function () {
 
     $applicant = User::factory()->create();
 
-    Eligify::criteria('async_test')
+    Eligify::criteria('Async Test')
         ->addRule('income', '>=', 3000)
         ->evaluateAsync($applicant);
 
@@ -341,7 +341,7 @@ test('approval notification sent', function () {
 
     $applicant = User::factory()->create(['income' => 5000]);
 
-    Eligify::criteria('loan')
+    Eligify::criteria('Loan')
         ->addRule('income', '>=', 3000)
         ->onPass(fn($entity) => $entity->notify(new LoanApprovedNotification()))
         ->evaluate($applicant);
@@ -354,7 +354,7 @@ test('rejection notification sent with details', function () {
 
     $applicant = User::factory()->create(['income' => 2000]);
 
-    Eligify::criteria('loan')
+    Eligify::criteria('Loan')
         ->addRule('income', '>=', 3000)
         ->onFail(fn($entity, $result) =>
             $entity->notify(new LoanRejectedNotification($result))
@@ -382,7 +382,7 @@ test('evaluates with relationships', function () {
         ->has(Employment::factory()->state(['months' => 12]))
         ->create(['income' => 5000]);
 
-    $result = Eligify::criteria('advanced')
+    $result = Eligify::criteria('Advanced')
         ->addRule('income', '>=', 3000)
         ->addRule('profile.verified', '==', true)
         ->addRule('employment.months', '>=', 6)
@@ -432,7 +432,7 @@ test('handles missing field gracefully', function () {
     $applicant = User::factory()->create(); // No 'income' field
 
     expect(fn() =>
-        Eligify::criteria('test')
+        Eligify::criteria('Test')
             ->addRule('nonexistent_field', '>=', 3000)
             ->evaluate($applicant)
     )->toThrow(FieldNotFoundException::class);
@@ -440,7 +440,7 @@ test('handles missing field gracefully', function () {
 
 test('handles invalid operator', function () {
     expect(fn() =>
-        Eligify::criteria('test')
+        Eligify::criteria('Test')
             ->addRule('income', 'invalid_op', 3000)
     )->toThrow(InvalidOperatorException::class);
 });
@@ -473,7 +473,7 @@ test('handles concurrent evaluations', function () {
 
 ```php
 beforeEach(function () {
-    $this->criteria = Eligify::criteria('test')
+    $this->criteria = Eligify::criteria('Test')
         ->addRule('income', '>=', 3000)
         ->addRule('credit_score', '>=', 650);
 });

@@ -79,7 +79,7 @@ Callbacks receive both subject and result:
 ### 1. Approval Workflows
 
 ```php
-Eligify::criteria('application_approval')
+Eligify::criteria('Application Approval')
     ->addRule('documents_complete', '==', true)
     ->addRule('background_check', '==', 'passed')
     ->onPass(function ($application) {
@@ -99,7 +99,7 @@ Eligify::criteria('application_approval')
 ### 2. Membership Upgrades
 
 ```php
-Eligify::criteria('premium_upgrade')
+Eligify::criteria('Premium Upgrade')
     ->addRule('points', '>=', 1000)
     ->addRule('active_months', '>=', 6)
     ->onPass(function ($user) {
@@ -127,7 +127,7 @@ Eligify::criteria('premium_upgrade')
 ### 3. Content Publishing
 
 ```php
-Eligify::criteria('publish_check')
+Eligify::criteria('Publish Check')
     ->addRule('word_count', '>=', 500)
     ->addRule('images_count', '>=', 1)
     ->addRule('seo_score', '>=', 70)
@@ -147,7 +147,7 @@ Eligify::criteria('publish_check')
 ### 4. Access Control
 
 ```php
-Eligify::criteria('admin_access')
+Eligify::criteria('Admin Access')
     ->addRule('role', 'in', ['admin', 'super_admin'])
     ->addRule('2fa_enabled', '==', true)
     ->addRule('ip_whitelisted', '==', true)
@@ -248,7 +248,7 @@ test('onPass callback executes when criteria pass', function () {
 
     $callbackExecuted = false;
 
-    Eligify::criteria('test')
+    Eligify::criteria('Test')
         ->addRule('points', '>=', 1000)
         ->onPass(function () use (&$callbackExecuted) {
             $callbackExecuted = true;
@@ -263,7 +263,7 @@ test('onFail callback executes when criteria fail', function () {
 
     $callbackExecuted = false;
 
-    Eligify::criteria('test')
+    Eligify::criteria('Test')
         ->addRule('points', '>=', 1000)
         ->onFail(function () use (&$callbackExecuted) {
             $callbackExecuted = true;
@@ -346,7 +346,7 @@ test('onFail callback executes when criteria fail', function () {
 ### Approval Chain
 
 ```php
-Eligify::criteria('multi_stage_approval')
+Eligify::criteria('Multi Stage Approval')
     ->addRule('stage_1_approved', '==', true)
     ->addRule('stage_2_approved', '==', true)
     ->onPass(function ($application) {

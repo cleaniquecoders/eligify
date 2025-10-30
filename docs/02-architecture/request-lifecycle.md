@@ -4,7 +4,7 @@ This document explains how an eligibility evaluation flows through the Eligify s
 
 ## Overview
 
-When you call `Eligify::criteria('name')->evaluate($subject)`, the request goes through multiple stages. Understanding this flow helps with debugging, optimization, and extending the system.
+When you call `Eligify::criteria('Name')->evaluate($subject)`, the request goes through multiple stages. Understanding this flow helps with debugging, optimization, and extending the system.
 
 ## The Complete Flow
 

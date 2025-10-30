@@ -51,7 +51,7 @@ All rules must pass for eligibility. Score is either 100 (all pass) or 0 (any fa
 **Example:**
 
 ```php
-Eligify::criteria('age_verification')
+Eligify::criteria('Age Verification')
     ->setScoring('pass_fail')
     ->addRule('age', '>=', 18)
     ->addRule('id_verified', '==', true)
@@ -84,7 +84,7 @@ Score is the sum of all passed rule weights.
 **Example:**
 
 ```php
-Eligify::criteria('loyalty_points')
+Eligify::criteria('Loyalty Points')
     ->setScoring('sum')
     ->addRule('purchased_this_month', '==', true, weight: 10)
     ->addRule('referred_friend', '==', true, weight: 20)
@@ -118,7 +118,7 @@ Score is the percentage of rules that passed.
 **Example:**
 
 ```php
-Eligify::criteria('profile_completeness')
+Eligify::criteria('Profile Completeness')
     ->setScoring('average')
     ->addRule('bio', 'not_empty')
     ->addRule('avatar', 'not_empty')
@@ -160,7 +160,7 @@ Eligify::criteria('profile_completeness')
 **Example:**
 
 ```php
-Eligify::criteria('premium_upgrade')
+Eligify::criteria('Premium Upgrade')
     ->setScoring('weighted')
     ->setThreshold(80)  // Need 80% to qualify
     ->addRule('points', '>=', 1000, weight: 50)
@@ -244,7 +244,7 @@ Eligify::criteria('Loan Approval')
 ### Age Verification (Pass/Fail)
 
 ```php
-Eligify::criteria('age_verify')
+Eligify::criteria('Age Verify')
     ->setScoring('pass_fail')
     ->addRule('age', '>=', 18)
     ->addRule('id_verified', '==', true);
@@ -253,7 +253,7 @@ Eligify::criteria('age_verify')
 ### Rewards Program (Sum)
 
 ```php
-Eligify::criteria('monthly_rewards')
+Eligify::criteria('Monthly Rewards')
     ->setScoring('sum')
     ->setThreshold(100)
     ->addRule('purchase_made', '==', true, weight: 50)
@@ -265,7 +265,7 @@ Eligify::criteria('monthly_rewards')
 ### Profile Setup (Average)
 
 ```php
-Eligify::criteria('profile_complete')
+Eligify::criteria('Profile Complete')
     ->setScoring('average')
     ->setThreshold(80)
     ->addRule('name', 'not_empty')

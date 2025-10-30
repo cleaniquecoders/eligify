@@ -108,7 +108,7 @@ test('unqualified applicant gets rejected', function () {
 ### With Weighted Scoring
 
 ```php
-$result = Eligify::criteria('loan_approval_weighted')
+$result = Eligify::criteria('Loan Approval Weighted')
     ->addRule('income', '>=', 3000, 0.4)
     ->addRule('credit_score', '>=', 650, 0.6)
     ->scoringMethod('weighted')
@@ -122,7 +122,7 @@ $result = Eligify::criteria('loan_approval_weighted')
 ### With Additional Criteria
 
 ```php
-$result = Eligify::criteria('loan_approval_strict')
+$result = Eligify::criteria('Loan Approval Strict')
     ->addRule('income', '>=', 3000)
     ->addRule('credit_score', '>=', 650)
     ->addRule('employment_months', '>=', 12)
@@ -139,7 +139,7 @@ $loanAmount = 50000;
 $minIncome = $loanAmount * 0.06; // 6% of loan amount
 $minCreditScore = $loanAmount > 25000 ? 700 : 650;
 
-$result = Eligify::criteria('dynamic_loan_approval')
+$result = Eligify::criteria('Dynamic Loan Approval')
     ->addRule('income', '>=', $minIncome)
     ->addRule('credit_score', '>=', $minCreditScore)
     ->evaluate($applicant);

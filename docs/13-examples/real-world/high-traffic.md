@@ -16,7 +16,7 @@ $result = Eligify::criteria('Loan Approval')
     ->evaluate($applicant);
 
 // Strategy 2: Queue for async processing
-$result = Eligify::criteria('heavy_computation')
+$result = Eligify::criteria('Heavy Computation')
     ->addRule('complex_calculation', '>=', 100)
     ->evaluateAsync($applicant);
 

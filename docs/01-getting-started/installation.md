@@ -118,7 +118,7 @@ Test with a simple evaluation:
 ```php
 use CleaniqueCoders\Eligify\Facades\Eligify;
 
-$result = Eligify::criteria('test')
+$result = Eligify::criteria('Test')
     ->addRule('age', '>=', 18)
     ->evaluate(['age' => 25]);
 

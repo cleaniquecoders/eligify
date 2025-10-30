@@ -213,7 +213,7 @@ public function register()
 ```php
 use CleaniqueCoders\Eligify\Facades\Eligify;
 
-$criteria = Eligify::criteria('delivery_eligibility')
+$criteria = Eligify::criteria('Delivery Eligibility')
     ->addRule('package_count', 'divisible_by', 12)
     ->addRule('delivery_date', 'is_business_day', true)
     ->addRule('store_location', 'within_distance', [
@@ -425,7 +425,7 @@ Add rules that only apply under certain conditions.
 ### Simple Conditional Rules
 
 ```php
-$criteria = Eligify::criteria('age_restricted_content')
+$criteria = Eligify::criteria('Age Restricted Content')
     ->addRule('age', '>=', 18)
     ->addConditionalRule(
         condition: fn($data) => $data['age'] < 21,
@@ -490,7 +490,7 @@ Organize rules into logical groups.
 ### Basic Rule Groups
 
 ```php
-$criteria = Eligify::criteria('comprehensive_check')
+$criteria = Eligify::criteria('Comprehensive Check')
     ->addRuleGroup('identity', [
         ['field' => 'ssn_verified', 'operator' => '==', 'value' => true, 'weight' => 10],
         ['field' => 'address_verified', 'operator' => '==', 'value' => true, 'weight' => 8],
@@ -513,7 +513,7 @@ class GroupedCriteria
 {
     public function createWithGroupRequirements()
     {
-        return Eligify::criteria('strict_approval')
+        return Eligify::criteria('Strict Approval')
             ->addRuleGroup('critical', [
                 ['field' => 'kyc_complete', 'operator' => '==', 'value' => true],
                 ['field' => 'sanctions_clear', 'operator' => '==', 'value' => true],
@@ -570,7 +570,7 @@ $result = $workflow->execute($data);
 ```php
 use Illuminate\Support\Facades\Queue;
 
-$criteria = Eligify::criteria('async_approval')
+$criteria = Eligify::criteria('Async Approval')
     ->addRule('credit_score', '>=', 650)
     ->onPass(function($data, $result) {
         // Queue async tasks

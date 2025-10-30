@@ -45,7 +45,7 @@ Eligify::clearCache(?string $criteria = null): void
 ### Criteria Builder
 
 ```php
-$builder = Eligify::criteria('name')
+$builder = Eligify::criteria('Name')
     ->addRule(string $field, string $operator, mixed $value, ?float $weight = null)
     ->scoringMethod(string $method)
     ->passingThreshold(int $threshold)

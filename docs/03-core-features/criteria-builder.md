@@ -261,13 +261,13 @@ echo $criteria->id;  // Database ID
 ### Load from Database
 
 ```php
-$criteria = Eligify::load('loan_approval');
+$criteria = Eligify::load('Loan Approval');
 ```
 
 ### Update Existing
 
 ```php
-$criteria = Eligify::load('loan_approval')
+$criteria = Eligify::load('Loan Approval')
     ->addRule('employment_status', '==', 'employed')
     ->save();  // Updates existing record
 ```
@@ -275,7 +275,7 @@ $criteria = Eligify::load('loan_approval')
 ### Delete
 
 ```php
-$criteria = Eligify::load('loan_approval');
+$criteria = Eligify::load('Loan Approval');
 $criteria->delete();
 ```
 
@@ -314,7 +314,7 @@ $criteria = Eligify::import($definition);
 ### Export to Array
 
 ```php
-$criteria = Eligify::load('premium_check');
+$criteria = Eligify::load('Premium Check');
 $array = $criteria->toArray();
 
 /*

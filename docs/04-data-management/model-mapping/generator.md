@@ -182,7 +182,7 @@ When a relationship has a mapping, you can access nested fields:
 
 ```php
 // If Application has a 'user' relationship with UserMapping
-Eligify::criteria('application_review')
+Eligify::criteria('Application Review')
     ->addRule('application.amount', '<=', 50000)
     ->addRule('application.user.is_verified', '=', true)  // Access user fields via mapping
     ->addRule('application.user.credit_score', '>=', 700)

@@ -16,7 +16,7 @@ use CleaniqueCoders\Eligify\Facades\Eligify;
 test('income rule evaluates correctly', function () {
     $applicant = User::factory()->create(['income' => 5000]);
 
-    $result = Eligify::criteria('test')
+    $result = Eligify::criteria('Test')
         ->addRule('income', '>=', 3000)
         ->evaluate($applicant);
 
@@ -26,7 +26,7 @@ test('income rule evaluates correctly', function () {
 test('credit score rule fails correctly', function () {
     $applicant = User::factory()->create(['credit_score' => 550]);
 
-    $result = Eligify::criteria('test')
+    $result = Eligify::criteria('Test')
         ->addRule('credit_score', '>=', 650)
         ->evaluate($applicant);
 
@@ -45,7 +45,7 @@ test('all rules must pass', function () {
         'employment_months' => 12,
     ]);
 
-    $result = Eligify::criteria('loan')
+    $result = Eligify::criteria('Loan')
         ->addRule('income', '>=', 3000)
         ->addRule('credit_score', '>=', 650)
         ->addRule('employment_months', '>=', 6)
@@ -64,7 +64,7 @@ test('all rules must pass', function () {
 test('equals operator works', function () {
     $user = User::factory()->create(['status' => 'active']);
 
-    $result = Eligify::criteria('test')
+    $result = Eligify::criteria('Test')
         ->addRule('status', '==', 'active')
         ->evaluate($user);
 
@@ -74,7 +74,7 @@ test('equals operator works', function () {
 test('in operator with arrays', function () {
     $user = User::factory()->create(['country' => 'US']);
 
-    $result = Eligify::criteria('test')
+    $result = Eligify::criteria('Test')
         ->addRule('country', 'in', ['US', 'CA', 'UK'])
         ->evaluate($user);
 
@@ -84,7 +84,7 @@ test('in operator with arrays', function () {
 test('between operator', function () {
     $user = User::factory()->create(['age' => 25]);
 
-    $result = Eligify::criteria('test')
+    $result = Eligify::criteria('Test')
         ->addRule('age', 'between', [18, 65])
         ->evaluate($user);
 
@@ -106,7 +106,7 @@ beforeEach(function () {
 test('custom operator works', function () {
     $user = User::factory()->create(['points' => 100]);
 
-    $result = Eligify::criteria('test')
+    $result = Eligify::criteria('Test')
         ->addRule('points', 'divisible_by', 10)
         ->evaluate($user);
 
@@ -125,7 +125,7 @@ test('weighted scoring calculates correctly', function () {
         'credit_score' => 750,
     ]);
 
-    $result = Eligify::criteria('loan')
+    $result = Eligify::criteria('Loan')
         ->addRule('income', '>=', 3000, 0.4)
         ->addRule('credit_score', '>=', 650, 0.6)
         ->scoringMethod('weighted')
@@ -141,7 +141,7 @@ test('partial weighted score', function () {
         'credit_score' => 600, // fails (0%)
     ]);
 
-    $result = Eligify::criteria('loan')
+    $result = Eligify::criteria('Loan')
         ->addRule('income', '>=', 3000, 0.4)
         ->addRule('credit_score', '>=', 650, 0.6)
         ->scoringMethod('weighted')
@@ -161,7 +161,7 @@ test('pass fail scoring is binary', function () {
         'credit_score' => 750,
     ]);
 
-    $result = Eligify::criteria('loan')
+    $result = Eligify::criteria('Loan')
         ->addRule('income', '>=', 3000)
         ->addRule('credit_score', '>=', 650)
         ->scoringMethod('pass_fail')
@@ -211,7 +211,7 @@ test('custom extractor method', function () {
         }
     };
 
-    $result = Eligify::criteria('test')
+    $result = Eligify::criteria('Test')
         ->addRule('credit_score', '>=', 650)
         ->evaluate($applicant);
 
@@ -258,11 +258,11 @@ use Illuminate\Support\Facades\Cache;
 test('evaluation is cached', function () {
     $applicant = User::factory()->create(['income' => 5000]);
 
-    $result1 = Eligify::criteria('loan')
+    $result1 = Eligify::criteria('Loan')
         ->addRule('income', '>=', 3000)
         ->evaluate($applicant);
 
-    $result2 = Eligify::criteria('loan')
+    $result2 = Eligify::criteria('Loan')
         ->addRule('income', '>=', 3000)
         ->evaluate($applicant);
 
@@ -271,7 +271,7 @@ test('evaluation is cached', function () {
 });
 
 test('cache can be cleared', function () {
-    Eligify::criteria('test')
+    Eligify::criteria('Test')
         ->addRule('income', '>=', 3000)
         ->evaluate(User::factory()->create());
 
@@ -291,7 +291,7 @@ test('onPass callback executes', function () {
 
     $applicant = User::factory()->create(['income' => 5000]);
 
-    Eligify::criteria('test')
+    Eligify::criteria('Test')
         ->addRule('income', '>=', 3000)
         ->onPass(function ($entity) use (&$executed) {
             $executed = true;
@@ -306,7 +306,7 @@ test('onFail callback executes', function () {
 
     $applicant = User::factory()->create(['income' => 2000]);
 
-    Eligify::criteria('test')
+    Eligify::criteria('Test')
         ->addRule('income', '>=', 3000)
         ->onFail(function ($entity, $result) use (&$executed) {
             $executed = true;
@@ -346,7 +346,7 @@ use CleaniqueCoders\Eligify\Models\Audit;
 test('audit log is created', function () {
     $applicant = User::factory()->create(['income' => 5000]);
 
-    Eligify::criteria('test')
+    Eligify::criteria('Test')
         ->addRule('income', '>=', 3000)
         ->evaluate($applicant);
 
@@ -386,7 +386,7 @@ expect()->extend('toPassEligibility', function () {
 });
 
 test('uses custom expectation', function () {
-    $result = Eligify::criteria('test')
+    $result = Eligify::criteria('Test')
         ->addRule('income', '>=', 3000)
         ->evaluate(User::factory()->create(['income' => 5000]));
 
@@ -408,7 +408,7 @@ test('mocks external API', function () {
 
     $applicant = User::factory()->create();
 
-    $result = Eligify::criteria('loan')
+    $result = Eligify::criteria('Loan')
         ->addRule('external_credit_score', '>=', 650)
         ->evaluate($applicant);
 
@@ -427,7 +427,7 @@ use CleaniqueCoders\Eligify\Events\CriteriaEvaluated;
 test('fires evaluation event', function () {
     Event::fake([CriteriaEvaluated::class]);
 
-    Eligify::criteria('test')
+    Eligify::criteria('Test')
         ->addRule('income', '>=', 3000)
         ->evaluate(User::factory()->create(['income' => 5000]));
 
@@ -443,7 +443,7 @@ test('fires evaluation event', function () {
 test('follows AAA pattern', function () {
     // Arrange
     $applicant = User::factory()->create(['income' => 5000]);
-    $criteria = Eligify::criteria('loan')
+    $criteria = Eligify::criteria('Loan')
         ->addRule('income', '>=', 3000);
 
     // Act

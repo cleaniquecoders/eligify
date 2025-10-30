@@ -18,7 +18,7 @@ HR department needs to automatically screen job candidates based on minimum requ
 ```php
 use CleaniqueCoders\Eligify\Facades\Eligify;
 
-$result = Eligify::criteria('job_screening')
+$result = Eligify::criteria('Job Screening')
     ->addRule('years_experience', '>=', 3)
     ->addRule('matching_skills_count', '>=', 5)
     ->addRule('has_certification', '==', true)

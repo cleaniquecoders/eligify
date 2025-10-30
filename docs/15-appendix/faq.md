@@ -82,7 +82,7 @@ Eligify::registerOperator('divisible_by', function ($value, $divisor) {
     return $value % $divisor === 0;
 });
 
-$result = Eligify::criteria('test')
+$result = Eligify::criteria('Test')
     ->addRule('points', 'divisible_by', 10)
     ->evaluate($entity);
 ```
@@ -113,7 +113,7 @@ $result = Eligify::criteria('Loan Approval')
 Yes, for async processing:
 
 ```php
-$result = Eligify::criteria('heavy_computation')
+$result = Eligify::criteria('Heavy Computation')
     ->evaluateAsync($applicant);
 ```
 
@@ -128,7 +128,7 @@ See [High-Traffic Optimization](../13-examples/real-world/high-traffic.md) and [
 Yes:
 
 ```php
-$result = Eligify::criteria('loan')
+$result = Eligify::criteria('Loan')
     ->addRule('income', '>=', 3000, 0.4)
     ->addRule('credit_score', '>=', 650, 0.6)
     ->scoringMethod('weighted')
@@ -140,7 +140,7 @@ $result = Eligify::criteria('loan')
 Yes, use callbacks:
 
 ```php
-$result = Eligify::criteria('loan')
+$result = Eligify::criteria('Loan')
     ->onPass(fn($entity) => $entity->approve())
     ->onFail(fn($entity) => $entity->reject())
     ->evaluate($applicant);
@@ -166,7 +166,7 @@ Yes! See [Multi-Tenant Example](../13-examples/real-world/multi-tenant.md).
 test('qualified applicant passes', function () {
     $applicant = User::factory()->create(['income' => 5000]);
 
-    $result = Eligify::criteria('test')
+    $result = Eligify::criteria('Test')
         ->addRule('income', '>=', 3000)
         ->evaluate($applicant);
 

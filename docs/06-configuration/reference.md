@@ -102,7 +102,7 @@ Controls how eligibility scores are calculated:
 
 ```php
 // Override per criteria
-$criteria = Eligify::criteria('strict_approval')
+$criteria = Eligify::criteria('Strict Approval')
     ->passThreshold(85)  // Overrides config default
     ->scoringMethod(ScoringMethod::PASS_FAIL)
     ->save();

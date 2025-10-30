@@ -7,7 +7,7 @@ Automatic plan upgrade suggestions based on usage patterns.
 ```php
 use CleaniqueCoders\Eligify\Facades\Eligify;
 
-$result = Eligify::criteria('enterprise_upgrade')
+$result = Eligify::criteria('Enterprise Upgrade')
     ->addRule('monthly_active_users', '>=', 1000)
     ->addRule('api_calls_per_day', '>=', 10000)
     ->addRule('team_size', '>=', 10)

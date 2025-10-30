@@ -10,7 +10,7 @@ use CleaniqueCoders\Eligify\Facades\Eligify;
 function processLoanApplication($applicant)
 {
     // Stage 1: Basic eligibility check
-    $basicCheck = Eligify::criteria('basic_eligibility')
+    $basicCheck = Eligify::criteria('Basic Eligibility')
         ->addRule('age', 'between', [18, 65])
         ->addRule('citizenship', '==', 'US')
         ->evaluate($applicant);
@@ -24,7 +24,7 @@ function processLoanApplication($applicant)
     }
 
     // Stage 2: Financial assessment
-    $financialCheck = Eligify::criteria('financial_assessment')
+    $financialCheck = Eligify::criteria('Financial Assessment')
         ->addRule('income', '>=', 3000)
         ->addRule('debt_ratio', '<=', 0.4)
         ->addRule('employment_months', '>=', 12)
@@ -39,7 +39,7 @@ function processLoanApplication($applicant)
     }
 
     // Stage 3: Credit check
-    $creditCheck = Eligify::criteria('credit_check')
+    $creditCheck = Eligify::criteria('Credit Check')
         ->addRule('credit_score', '>=', 650)
         ->addRule('delinquencies', '==', 0)
         ->addRule('bankruptcies', '==', 0)

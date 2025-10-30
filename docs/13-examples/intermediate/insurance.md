@@ -18,7 +18,7 @@ Insurance company needs to assess applicant eligibility and calculate risk-based
 ```php
 use CleaniqueCoders\Eligify\Facades\Eligify;
 
-$result = Eligify::criteria('insurance_underwriting')
+$result = Eligify::criteria('Insurance Underwriting')
     ->addRule('age', 'between', [18, 65], 0.2)
     ->addRule('smoker', '==', false, 0.3)
     ->addRule('bmi', '<=', 30, 0.25)

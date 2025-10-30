@@ -296,7 +296,7 @@ Facades/
 ```php
 use CleaniqueCoders\Eligify\Facades\Eligify;
 
-Eligify::criteria('test')->evaluate($user);
+Eligify::criteria('Test')->evaluate($user);
 ```
 
 ### HTTP Layer (src/Http/)

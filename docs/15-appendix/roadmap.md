@@ -37,7 +37,7 @@ $result = Eligify::criteria('Loan Approval')
     ->evaluate($applicant);
 
 // Fuzzy logic scoring
-$result = Eligify::criteria('candidate_fit')
+$result = Eligify::criteria('Candidate Fit')
     ->scoringMethod('fuzzy')
     ->evaluate($candidate);
 ```
@@ -71,7 +71,7 @@ Eligify::abTest('loan_approval', [
 
 ```php
 // Evaluate rules in parallel
-$result = Eligify::criteria('complex')
+$result = Eligify::criteria('Complex')
     ->parallel()
     ->addRule('slow_check_1', 'custom', ...)
     ->addRule('slow_check_2', 'custom', ...)
@@ -82,7 +82,7 @@ $result = Eligify::criteria('complex')
 
 ```php
 // Pre-compile criteria for faster execution
-php artisan eligify:compile loan_approval
+php artisan eligify:compile Loan Approval
 
 // Use compiled version
 $result = Eligify::compiled('loan_approval')->evaluate($applicant);
@@ -92,7 +92,7 @@ $result = Eligify::compiled('loan_approval')->evaluate($applicant);
 
 ```php
 // Distribute evaluations across multiple workers
-Eligify::criteria('bulk_evaluation')
+Eligify::criteria('Bulk Evaluation')
     ->distributed()
     ->evaluateBatch($applicants);
 ```
@@ -103,7 +103,7 @@ Eligify::criteria('bulk_evaluation')
 
 ```php
 // Rules that depend on other rules
-$result = Eligify::criteria('complex')
+$result = Eligify::criteria('Complex')
     ->addRule('income', '>=', 3000)
     ->addRule('credit_score', '>=', 650)
     ->addRuleIf('income', '>=', 5000, function ($builder) {
@@ -116,7 +116,7 @@ $result = Eligify::criteria('complex')
 
 ```php
 // Logical grouping of rules
-$result = Eligify::criteria('loan')
+$result = Eligify::criteria('Loan')
     ->group('basic', function ($group) {
         $group->addRule('age', '>=', 18);
         $group->addRule('citizenship', '==', 'US');
@@ -133,7 +133,7 @@ $result = Eligify::criteria('loan')
 
 ```php
 // Criteria that change based on time
-$result = Eligify::criteria('seasonal_discount')
+$result = Eligify::criteria('Seasonal Discount')
     ->addRule('membership_months', '>=', 6)
     ->addRule('current_month', 'in', [11, 12]) // November, December
     ->evaluate($customer);

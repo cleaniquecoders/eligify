@@ -11,7 +11,7 @@ Government agency needs to determine eligibility for financial assistance progra
 ```php
 use CleaniqueCoders\Eligify\Facades\Eligify;
 
-$result = Eligify::criteria('aid_qualification')
+$result = Eligify::criteria('Aid Qualification')
     ->addRule('annual_income', '<=', 25000)
     ->addRule('family_size', '>=', 3)
     ->addRule('citizenship_status', '==', 'citizen')

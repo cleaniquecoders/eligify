@@ -222,14 +222,14 @@ This stores the criteria in the database for reuse.
 ### Loading Criteria
 
 ```php
-$criteria = Eligify::load('loan_approval');
+$criteria = Eligify::load('Loan Approval');
 $result = $criteria->evaluate($applicant);
 ```
 
 ### Updating Criteria
 
 ```php
-$criteria = Eligify::load('loan_approval')
+$criteria = Eligify::load('Loan Approval')
     ->addRule('employment_status', '==', 'employed')
     ->save();
 ```

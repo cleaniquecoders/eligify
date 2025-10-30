@@ -11,7 +11,7 @@ E-commerce platform wants to automatically offer discounts to loyal customers.
 ```php
 use CleaniqueCoders\Eligify\Facades\Eligify;
 
-$result = Eligify::criteria('vip_discount')
+$result = Eligify::criteria('Vip Discount')
     ->addRule('total_purchases', '>=', 1000)
     ->addRule('loyalty_tier', 'in', ['gold', 'platinum'])
     ->addRule('account_age_months', '>=', 6)

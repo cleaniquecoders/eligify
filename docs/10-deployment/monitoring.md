@@ -48,7 +48,7 @@ Eligify::criteria('Loan Approval')
 use Illuminate\Support\Facades\Log;
 
 try {
-    $result = Eligify::criteria('test')
+    $result = Eligify::criteria('Test')
         ->addRule('income', '>=', 3000)
         ->evaluate($applicant);
 } catch (\Exception $e) {
@@ -198,7 +198,7 @@ Route::get('/health/eligify', function () {
             public $test_value = 100;
         };
 
-        $result = Eligify::criteria('health_check')
+        $result = Eligify::criteria('Health Check')
             ->addRule('test_value', '>=', 50)
             ->withoutCache()
             ->evaluate($testEntity);
@@ -368,7 +368,7 @@ return [
 // Log to Sentry
 use Sentry\State\Scope;
 
-Eligify::criteria('test')
+Eligify::criteria('Test')
     ->onError(function ($exception, $entity) {
         \Sentry\captureException($exception, function (Scope $scope) use ($entity) {
             $scope->setContext('eligify', [

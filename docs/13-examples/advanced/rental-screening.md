@@ -9,7 +9,7 @@ use CleaniqueCoders\Eligify\Facades\Eligify;
 
 $monthlyRent = 1500;
 
-$result = Eligify::criteria('rental_screening')
+$result = Eligify::criteria('Rental Screening')
     ->addRule('monthly_income', '>=', $monthlyRent * 3)
     ->addRule('credit_score', '>=', 650)
     ->addRule('eviction_history_count', '==', 0)

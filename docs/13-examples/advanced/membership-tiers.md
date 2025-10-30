@@ -14,7 +14,7 @@ use CleaniqueCoders\Eligify\Facades\Eligify;
 function determineMembershipTier($customer): string
 {
     // Check highest tier first
-    $platinum = Eligify::criteria('platinum_tier')
+    $platinum = Eligify::criteria('Platinum Tier')
         ->addRule('annual_spend', '>=', 10000)
         ->addRule('referrals_count', '>=', 10)
         ->addRule('account_age_months', '>=', 12)
@@ -24,7 +24,7 @@ function determineMembershipTier($customer): string
         return 'Platinum';
     }
 
-    $gold = Eligify::criteria('gold_tier')
+    $gold = Eligify::criteria('Gold Tier')
         ->addRule('annual_spend', '>=', 5000)
         ->addRule('referrals_count', '>=', 5)
         ->addRule('account_age_months', '>=', 6)
@@ -34,7 +34,7 @@ function determineMembershipTier($customer): string
         return 'Gold';
     }
 
-    $silver = Eligify::criteria('silver_tier')
+    $silver = Eligify::criteria('Silver Tier')
         ->addRule('annual_spend', '>=', 1000)
         ->addRule('referrals_count', '>=', 2)
         ->evaluate($customer);

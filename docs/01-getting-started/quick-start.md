@@ -102,7 +102,7 @@ $criteria = Eligify::criteria('Insurance Eligibility')
     ->save();
 
 // Later, load and use it
-$criteria = Eligify::load('insurance_eligibility');
+$criteria = Eligify::load('Insurance Eligibility');
 $result = $criteria->evaluate($person);
 ```
 

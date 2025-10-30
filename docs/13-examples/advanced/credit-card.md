@@ -7,7 +7,7 @@ Complex credit evaluation with multiple weighted factors.
 ```php
 use CleaniqueCoders\Eligify\Facades\Eligify;
 
-$result = Eligify::criteria('credit_card_approval')
+$result = Eligify::criteria('Credit Card Approval')
     ->addRule('credit_score', '>=', 700, 0.35)
     ->addRule('annual_income', '>=', 40000, 0.25)
     ->addRule('debt_to_income_ratio', '<=', 0.35, 0.20)

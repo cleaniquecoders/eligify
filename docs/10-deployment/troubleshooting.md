@@ -77,7 +77,7 @@ php artisan route:clear
 use CleaniqueCoders\Eligify\Facades\Eligify;
 
 // Enable debug mode
-$result = Eligify::criteria('test')
+$result = Eligify::criteria('Test')
     ->addRule('income', '>=', 3000)
     ->debug()
     ->evaluate($applicant);
@@ -98,12 +98,12 @@ dd($value); // Should be the actual income value
 **Solution:**
 ```php
 // Option 1: Use correct field name
-$result = Eligify::criteria('test')
+$result = Eligify::criteria('Test')
     ->addRule('correct_field_name', '>=', 3000)
     ->evaluate($applicant);
 
 // Option 2: Use relationship dot notation
-$result = Eligify::criteria('test')
+$result = Eligify::criteria('Test')
     ->addRule('profile.income', '>=', 3000)
     ->evaluate($applicant);
 
@@ -150,7 +150,7 @@ public function boot()
 **Solution:**
 ```php
 // Enable caching
-Eligify::criteria('slow_criteria')
+Eligify::criteria('Slow Criteria')
     ->addRule('complex_field', '>=', 1000)
     ->cacheFor(3600)
     ->evaluate($applicant);
@@ -158,7 +158,7 @@ Eligify::criteria('slow_criteria')
 // Check for N+1 queries
 DB::enableQueryLog();
 
-$result = Eligify::criteria('test')
+$result = Eligify::criteria('Test')
     ->addRule('profile.verified', '==', true)
     ->evaluate($applicant);
 
@@ -178,7 +178,7 @@ $applicant = User::with('profile', 'employment')->find($id);
 User::where('status', 'pending')
     ->chunk(100, function ($applicants) {
         foreach ($applicants as $applicant) {
-            $result = Eligify::criteria('test')
+            $result = Eligify::criteria('Test')
                 ->addRule('income', '>=', 3000)
                 ->evaluate($applicant);
 
@@ -228,7 +228,7 @@ redis-cli FLUSHDB
 ],
 
 // Force cache usage
-$result = Eligify::criteria('test')
+$result = Eligify::criteria('Test')
     ->addRule('income', '>=', 3000)
     ->cacheFor(3600)
     ->evaluate($applicant);
@@ -260,7 +260,7 @@ Schema::hasTable('eligify_audits');
 
 // Check for errors
 try {
-    $result = Eligify::criteria('test')
+    $result = Eligify::criteria('Test')
         ->addRule('income', '>=', 3000)
         ->evaluate($applicant);
 } catch (\Exception $e) {
@@ -496,7 +496,7 @@ if (array_key_exists('field', $data)) {
 }
 
 // Update criteria rules to handle missing data
-$result = Eligify::criteria('test')
+$result = Eligify::criteria('Test')
     ->addRule('optional_field', '>=', 3000)
     ->allowNull('optional_field')
     ->evaluate($applicant);
@@ -552,7 +552,7 @@ DB::listen(function ($query) {
 ### Dump Evaluation State
 
 ```php
-$result = Eligify::criteria('test')
+$result = Eligify::criteria('Test')
     ->addRule('income', '>=', 3000)
     ->tap(function ($builder) {
         dd($builder->getRules());

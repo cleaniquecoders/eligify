@@ -56,7 +56,7 @@ $audit = Audit::factory()
 
 // For specific criteria
 $audit = Audit::factory()
-    ->forCriteria('loan_approval')
+    ->forCriteria('Loan Approval')
     ->create();
 ```
 
@@ -343,7 +343,7 @@ use CleaniqueCoders\Eligify\Support\TestHelpers\WithCriteria;
 uses(WithCriteria::class);
 
 test('uses criteria trait', function () {
-    $criteria = $this->createCriteria('test', [
+    $criteria = $this->createCriteria('Test', [
         ['field' => 'income', 'operator' => '>=', 'value' => 3000],
     ]);
 
@@ -413,7 +413,7 @@ use CleaniqueCoders\Eligify\Support\TestHelpers\Benchmark;
 
 test('evaluation is fast', function () {
     $time = Benchmark::measure(function () {
-        Eligify::criteria('test')
+        Eligify::criteria('Test')
             ->addRule('income', '>=', 3000)
             ->evaluate(User::factory()->create());
     });
