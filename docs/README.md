@@ -10,16 +10,12 @@ Eligify is a Laravel package that provides a flexible rule and criteria engine f
 - [Quick Start](#quick-start)
 - [Core Concepts](#core-concepts)
 - [UI Dashboard](ui-setup-guide.md) 🎨
-  - [Dynamic Field Selection](dynamic-field-selection.md) 🎯 **NEW**
-- [Model Data Extraction](#model-data-extraction)
-  - [Quick Reference Guide](quick-reference-model-extraction.md) ⚡
-  - [Complete Guide](model-data-extraction.md) 📖
-  - [Model Mappings](model-mappings.md) 🗺️
-  - [Mapper Generation Guide](mapper-generation-guide.md) 🔨 **NEW**
-  - [Quick Reference: Mapping Generation](quick-reference-mapping-generation.md) ⚡
-  - [Quick Reference: Relationship Mapping](quick-reference-relationship-mapping.md) 🔗 **NEW**
-  - [Extractor Architecture](extractor-architecture.md) 🏗️
-  - [Snapshot Data Object](snapshot.md) 📦
+  - [Dynamic Field Selection](dynamic-field-selection.md) 🎯
+- [Model Mapping & Data Extraction](#model-mapping--data-extraction)
+  - [**Model Mapping Guide**](model-mapping-guide.md) � **START HERE**
+  - [Relationship Mapping Cheatsheet](relationship-mapping-cheatsheet.md) 🔴 **MUST READ**
+  - [Mapper Generation Guide](mapper-generation-guide.md) 🔨 Auto-generate mappings
+  - [Snapshot Data Object](snapshot.md) 📦 Data snapshots
 - [Configuration](#configuration)
   - [Configuration Guide](configuration.md) ⚙️
   - [Environment Variables](environment-variables.md) 🔧
@@ -289,167 +285,97 @@ $criteria->onPass(function($data, $result) {
 });
 ```
 
-## Model Data Extraction
+## Model Mapping & Data Extraction
 
-Eligify provides a powerful **Model Data Extractor** system that automatically extracts and transforms data from your Eloquent models for eligibility evaluation. This makes it easy to evaluate models without manually mapping their attributes.
-
-### Overview
-
-The Model Data Extractor:
-
-- **Extracts** basic model attributes
-- **Computes** derived fields (age, duration, etc.)
-- **Processes** relationships and aggregates
-- **Applies** custom field mappings
-- **Handles** sensitive data exclusion
+Eligify provides a powerful system to extract and transform data from Eloquent models for eligibility evaluation.
 
 ### Quick Example
 
 ```php
 use CleaniqueCoders\Eligify\Data\Extractor;
 
-// Extract data from a User model
-$user = User::with(['orders', 'subscriptions'])->find(1);
-$extractor = Extractor::forModel('App\Models\User');
+// Extract data from a model
+$user = User::with('profile')->find(1);
+$extractor = Extractor::forModel(User::class);
 $data = $extractor->extract($user);
 
-// Now evaluate with extracted data
+// Evaluate with extracted data
 $result = Eligify::evaluate('premium_membership', $data);
 ```
 
-### Built-in Model Mappings
+### Creating Model Mappings
 
-Eligify includes a default **UserModelMapping** that provides:
+The model mapping system supports 4 powerful patterns for handling relationships and data transformation:
 
-#### Field Mappings
-
-```php
-'email_verified_at' => 'email_verified_timestamp'
-'created_at' => 'registration_date'
-```
-
-#### Computed Fields
-
-- `is_verified` - Email verification status
-
-### Using the Extractor
-
-#### Basic Usage
+#### Pattern 1: Direct Field Reference
 
 ```php
-$extractor = new Extractor();
-$data = $extractor->extract($user);
-
-// Extracted data includes:
-// - All model attributes
-// - Computed timestamp fields (account_age_days, etc.)
-// - Relationship counts and summaries
-// - Custom computed fields
-```
-
-#### Model-Specific Extractor
-
-```php
-// Use preconfigured extractor for User models
-$extractor = Extractor::forModel('App\Models\User');
-$data = $extractor->extract($user);
-
-// Results include UserModelMapping computed fields:
-// [
-//     'name' => 'John Doe',
-//     'email' => 'john@example.com',
-//     'registration_date' => '2024-01-15 10:30:00',
-//     'is_verified' => true,
-//     'total_orders' => 15,
-//     'lifetime_value' => 2500.00,
-//     'customer_tier' => 'gold',
-//     'account_age_days' => 287,
-//     ...
-// ]
-```
-
-#### Direct Model Evaluation
-
-```php
-// Add HasEligibility trait to your model
-class User extends Model
+class UserMapping extends AbstractModelMapping
 {
-    use \CleaniqueCoders\Eligify\Concerns\HasEligibility;
-}
-
-// The trait automatically uses the extractor
-$result = $user->evaluateEligibility('premium_membership');
-```
-
-> **💡 See It In Action**: Check out [Example 11: User Account Verification](../examples/11-user-account-verification.php) for a complete demonstration of UserModelMapping with real user evaluation scenarios.
-
-### Creating Custom Mappings
-
-Create your own model mapping classes for custom extraction logic.
-
-#### 1. Create Mapping Class
-
-```php
-namespace App\Eligify\Mappings;
-
-use CleaniqueCoders\Eligify\Mappings\AbstractModelMapping;
-
-class CustomerModelMapping extends AbstractModelMapping
-{
-    public function getModelClass(): string
+    public function configure(Extractor $extractor): Extractor
     {
-        return 'App\Models\Customer';
-    }
+        $extractor = parent::configure($extractor);
 
-    protected array $fieldMappings = [
-        'created_at' => 'customer_since',
-        'last_login_at' => 'last_activity',
-    ];
+        // Reference OUTPUT fields from ProfileMapping
+        $extractor->setRelationshipMappings([
+            'profile' => [
+                'biography' => 'user_bio',     // ProfileMapping outputs 'biography'
+                'employed' => 'is_employed',   // ProfileMapping outputs 'employed'
+            ],
+        ]);
 
-    public function __construct()
-    {
-        $this->computedFields = [
-            // Relationship count
-            'total_orders' => fn($m) => $this->safeRelationshipCount($m, 'orders'),
-
-            // Relationship sum
-            'total_spent' => fn($m) => $this->safeRelationshipSum($m, 'orders', 'total'),
-
-            // Relationship average
-            'avg_order_value' => fn($m) => $this->safeRelationshipAvg($m, 'orders', 'total'),
-
-            // Complex logic
-            'loyalty_tier' => function($m) {
-                $spent = $this->safeRelationshipSum($m, 'orders', 'total');
-                return match(true) {
-                    $spent >= 10000 => 'platinum',
-                    $spent >= 5000 => 'gold',
-                    $spent >= 1000 => 'silver',
-                    default => 'bronze'
-                };
-            },
-
-            // Date calculations
-            'last_purchase_days' => function($m) {
-                $date = $this->safeRelationshipMax($m, 'orders', 'created_at');
-                return $date ? now()->diffInDays($date) : null;
-            },
-        ];
+        return $extractor;
     }
 }
 ```
 
-#### 2. Register in Config
-
-Add your mapping to `config/eligify.php`:
+#### Pattern 2: Spread Operator (All Fields)
 
 ```php
-'model_extraction' => [
-    'model_mappings' => [
-        'App\Models\User' => \CleaniqueCoders\Eligify\Mappings\UserModelMapping::class,
-        'App\Models\Customer' => \App\Eligify\Mappings\CustomerModelMapping::class,
-    ],
-],
+// Include ALL fields from ProfileMapping automatically
+$profileMapping = app(ProfileMapping::class);
+$extractor->setRelationshipMappings([
+    'profile' => $profileMapping->getFieldMappings(),
+]);
+```
+
+#### Pattern 3: Nested Relationships
+
+```php
+// Multi-level: Order → Customer → Address
+$extractor->setRelationshipMappings([
+    'customer' => ['email_address' => 'customer_email'],
+    'customer.address' => ['street_address' => 'shipping_street'],
+]);
+```
+
+#### Pattern 4: Computed Fields with Relationships
+
+```php
+$this->computedFields = [
+    'works_at_large_company' => function ($model) {
+        return ($model->company->employee_count ?? 0) > 100;
+    },
+];
+```
+
+### 📖 Complete Documentation
+
+For complete guides on all 4 patterns with working examples:
+
+- **[Model Mapping Guide](model-mapping-guide.md)** - Complete guide with all patterns
+- **[Relationship Mapping Cheatsheet](relationship-mapping-cheatsheet.md)** - Quick reference
+- **[Mapper Generation Guide](mapper-generation-guide.md)** - Auto-generate mappings
+- **[Example 17](../examples/17-relationship-mapping-usage.php)** - Working code for all patterns
+
+### Generate Mappings Automatically
+
+```bash
+# Generate single mapping
+php artisan eligify:make-mapping "App\Models\User"
+
+# Generate all mappings
+php artisan eligify:make-all-mappings
 ```
 
 #### 3. Use Your Mapping
@@ -871,7 +797,7 @@ $data = $extractor->extract($user);
 $result = Eligify::evaluate('premium_membership', $data);
 ```
 
-> **Note**: Model-based evaluation automatically uses the [Model Data Extractor](#model-data-extraction) to extract and compute fields. See the Model Data Extraction section for details on creating custom mappings.
+> **Note**: Model-based evaluation automatically uses the [Model Mapping system](#model-mapping--data-extraction) to extract and compute fields. See the [Model Mapping Guide](model-mapping-guide.md) for details on creating custom mappings.
 
 #### Batch Evaluation
 
@@ -971,7 +897,7 @@ class OrderModelMapping extends AbstractModelMapping
 }
 ```
 
-See the [Model Data Extraction](#model-data-extraction) section and [Model Mappings Guide](model-mappings.md) for complete documentation.
+See the [Model Mapping Guide](model-mapping-guide.md) for complete documentation on all 4 patterns with working examples.
 
 ### Custom Scoring Methods
 
