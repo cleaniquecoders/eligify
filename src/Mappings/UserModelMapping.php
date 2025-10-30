@@ -41,5 +41,39 @@ class UserModelMapping extends AbstractModelMapping
             // Verification status
             'is_verified' => fn ($model) => ! is_null($model->email_verified_at ?? null),
         ];
+
+        // Field descriptions for UI display
+        $this->fieldDescriptions = [
+            'name' => 'User full name',
+            'email' => 'User email address',
+            'email_verified_timestamp' => 'When the email was verified (nullable)',
+            'registration_date' => 'Account creation date',
+            'is_verified' => 'Whether the user has verified their email',
+        ];
+
+        // Field types for validation and UI hints
+        $this->fieldTypes = [
+            'name' => 'string',
+            'email' => 'string',
+            'email_verified_timestamp' => 'datetime',
+            'registration_date' => 'datetime',
+            'is_verified' => 'boolean',
+        ];
+    }
+
+    /**
+     * Get human-readable name for this mapping
+     */
+    public function getName(): string
+    {
+        return 'User';
+    }
+
+    /**
+     * Get description of what this mapping does
+     */
+    public function getDescription(): string
+    {
+        return 'Standard mapping for User models including profile data, verification status, and registration information';
     }
 }

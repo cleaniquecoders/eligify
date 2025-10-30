@@ -28,6 +28,16 @@ abstract class AbstractModelMapping implements ModelMapping
     protected array $computedFields = [];
 
     /**
+     * Field descriptions for UI display
+     */
+    protected array $fieldDescriptions = [];
+
+    /**
+     * Field types for UI and validation
+     */
+    protected array $fieldTypes = [];
+
+    /**
      * Configure the extractor with all mappings
      */
     public function configure(Extractor $extractor): Extractor
@@ -171,5 +181,88 @@ abstract class AbstractModelMapping implements ModelMapping
         } catch (\Exception $e) {
             return $default;
         }
+    }
+
+    /**
+     * Get human-readable name for this mapping
+     */
+    abstract public function getName(): string;
+
+    /**
+     * Get description of what this mapping does
+     */
+    abstract public function getDescription(): string;
+
+    /**
+     * Get all available fields with their metadata
+     *
+     * @return array Format: ['field_name' => ['type' => 'string', 'description' => '...', 'category' => 'attribute|relationship|computed']]
+     */
+    public function getAvailableFields(): array
+    {
+        $fields = [];
+
+        // Add model attributes (from field mappings)
+        foreach ($this->fieldMappings as $original => $mapped) {
+            $fields[$mapped] = [
+                'original' => $original,
+                'type' => $this->fieldTypes[$mapped] ?? $this->fieldTypes[$original] ?? 'string',
+                'description' => $this->fieldDescriptions[$mapped] ?? $this->fieldDescriptions[$original] ?? "Field: {$mapped}",
+                'category' => 'attribute',
+            ];
+        }
+
+        // Add computed fields
+        foreach ($this->computedFields as $field => $closure) {
+            if (! isset($fields[$field])) {
+                $fields[$field] = [
+                    'type' => $this->fieldTypes[$field] ?? 'mixed',
+                    'description' => $this->fieldDescriptions[$field] ?? "Computed: {$field}",
+                    'category' => 'computed',
+                ];
+            }
+        }
+
+        // Add relationship fields
+        foreach ($this->relationshipMappings as $relationship => $config) {
+            if (is_array($config)) {
+                foreach ($config as $key => $value) {
+                    $fieldName = "{$relationship}_{$key}";
+                    if (! isset($fields[$fieldName])) {
+                        $fields[$fieldName] = [
+                            'type' => $this->fieldTypes[$fieldName] ?? 'mixed',
+                            'description' => $this->fieldDescriptions[$fieldName] ?? "Relationship: {$fieldName}",
+                            'category' => 'relationship',
+                        ];
+                    }
+                }
+            }
+        }
+
+        // Sort by category then name
+        uasort($fields, function ($a, $b) {
+            $categoryOrder = ['attribute' => 1, 'computed' => 2, 'relationship' => 3];
+            $catCompare = ($categoryOrder[$a['category']] ?? 4) <=> ($categoryOrder[$b['category']] ?? 4);
+
+            return $catCompare !== 0 ? $catCompare : 0;
+        });
+
+        return $fields;
+    }
+
+    /**
+     * Get field type for a specific field
+     */
+    public function getFieldType(string $field): ?string
+    {
+        return $this->fieldTypes[$field] ?? null;
+    }
+
+    /**
+     * Get field description for a specific field
+     */
+    public function getFieldDescription(string $field): ?string
+    {
+        return $this->fieldDescriptions[$field] ?? null;
     }
 }

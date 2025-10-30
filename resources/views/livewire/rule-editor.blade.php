@@ -10,19 +10,102 @@
     </div>
 
     <form wire:submit.prevent="save" class="space-y-4 bg-white border rounded p-4">
-        <!-- Field -->
-        <div>
-            <label for="field" class="block text-sm font-medium text-gray-700 mb-1">Field</label>
-            <input
-                type="text"
-                id="field"
-                wire:model="field"
-                class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="e.g., income, age, credit_score"
-                required
-            >
-            @error('field') <span class="text-xs text-red-600">{{ $message }}</span> @enderror
-            <p class="text-xs text-gray-500 mt-1">The field name to evaluate (e.g., model attribute or data key)</p>
+        <!-- Mapping Selection & Manual Input Toggle -->
+        <div class="bg-gray-50 border border-gray-200 rounded-lg p-4 space-y-3">
+            <div class="flex items-center justify-between">
+                <h3 class="text-sm font-semibold text-gray-900">Field Selection Method</h3>
+                <button
+                    type="button"
+                    wire:click="toggleManualInput"
+                    class="px-3 py-1 text-xs border rounded {{ $useManualInput ? 'bg-blue-50 border-blue-300 text-blue-700' : 'bg-white border-gray-300 text-gray-700' }}"
+                >
+                    {{ $useManualInput ? '✓ Manual Input' : 'Use Manual Input' }}
+                </button>
+            </div>
+
+            @if(!$useManualInput)
+                <!-- Mapping Selection -->
+                <div>
+                    <label for="selectedMapping" class="block text-sm font-medium text-gray-700 mb-1">
+                        1. Select Model Mapping <span class="text-gray-400">(Optional)</span>
+                    </label>
+                    <select
+                        id="selectedMapping"
+                        wire:model.live="selectedMapping"
+                        class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                        <option value="">-- Select a mapping or use manual input --</option>
+                        @foreach($this->mappingClasses as $class => $meta)
+                            <option value="{{ $class }}">{{ $meta['name'] }} ({{ $meta['model'] }})</option>
+                        @endforeach
+                    </select>
+                    @if($selectedMapping)
+                        <p class="text-xs text-gray-600 mt-1">
+                            📋 {{ $this->mappingClasses[$selectedMapping]['description'] ?? 'No description available' }}
+                        </p>
+                    @endif
+                </div>
+
+                @if($selectedMapping)
+                    <!-- Field Selection from Mapping -->
+                    <div>
+                        <label for="field" class="block text-sm font-medium text-gray-700 mb-1">
+                            2. Select Field from Mapping
+                        </label>
+                        <select
+                            id="field"
+                            wire:model.live="field"
+                            class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            required
+                        >
+                            <option value="">-- Select a field --</option>
+                            @php
+                                $fields = $this->availableFields;
+                                $categories = ['attribute' => 'Model Attributes', 'computed' => 'Computed Fields', 'relationship' => 'Relationships'];
+                            @endphp
+                            @foreach($categories as $category => $label)
+                                @php
+                                    $categoryFields = array_filter($fields, fn($f) => $f['category'] === $category);
+                                @endphp
+                                @if(!empty($categoryFields))
+                                    <optgroup label="{{ $label }}">
+                                        @foreach($categoryFields as $fieldName => $fieldMeta)
+                                            <option value="{{ $fieldName }}">
+                                                {{ $fieldName }} ({{ $fieldMeta['type'] }})
+                                            </option>
+                                        @endforeach
+                                    </optgroup>
+                                @endif
+                            @endforeach
+                        </select>
+                        @error('field') <span class="text-xs text-red-600">{{ $message }}</span> @enderror
+                        @if($field && isset($this->availableFields[$field]))
+                            <p class="text-xs text-gray-600 mt-1">
+                                ℹ️ {{ $this->availableFields[$field]['description'] ?? 'No description' }}
+                            </p>
+                        @endif
+                    </div>
+                @endif
+            @endif
+
+            @if($useManualInput || !$selectedMapping)
+                <!-- Manual Field Input -->
+                <div>
+                    <label for="field_manual" class="block text-sm font-medium text-gray-700 mb-1">
+                        {{ $useManualInput ? 'Field Name' : '2. Or Enter Field Manually' }}
+                    </label>
+                    <input
+                        type="text"
+                        id="field_manual"
+                        wire:model="field"
+                        class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        placeholder="e.g., income, age, credit_score"
+                        required
+                    >
+                    @error('field') <span class="text-xs text-red-600">{{ $message }}</span> @enderror
+                    <p class="text-xs text-gray-500 mt-1">Enter the field name to evaluate (e.g., model attribute or data key)</p>
+                </div>
+            @endif
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">

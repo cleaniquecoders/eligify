@@ -7,6 +7,7 @@ use CleaniqueCoders\Eligify\Enums\RuleOperator;
 use CleaniqueCoders\Eligify\Enums\RulePriority;
 use CleaniqueCoders\Eligify\Models\Criteria;
 use CleaniqueCoders\Eligify\Models\Rule;
+use CleaniqueCoders\Eligify\Support\MappingRegistry;
 use Livewire\Component;
 
 class RuleEditor extends Component
@@ -16,6 +17,10 @@ class RuleEditor extends Component
     public ?int $criteriaId = null;
 
     public ?int $ruleId = null;
+
+    public ?string $selectedMapping = null; // Selected mapping class
+
+    public bool $useManualInput = false; // Toggle manual field input
 
     public string $field = '';
 
@@ -343,6 +348,76 @@ class RuleEditor extends Component
             FieldType::NUMERIC => '0.01',
             default => 'any',
         };
+    }
+
+    /**
+     * Get all available mapping classes with metadata
+     */
+    public function getMappingClassesProperty(): array
+    {
+        return MappingRegistry::all();
+    }
+
+    /**
+     * Get available fields for the selected mapping
+     */
+    public function getAvailableFieldsProperty(): array
+    {
+        if (! $this->selectedMapping) {
+            return [];
+        }
+
+        return MappingRegistry::getFields($this->selectedMapping);
+    }
+
+    /**
+     * Handle when mapping selection changes
+     */
+    public function updatedSelectedMapping()
+    {
+        // Reset field when mapping changes
+        $this->field = '';
+        $this->fieldType = null;
+
+        // If a mapping is selected, disable manual input
+        $this->useManualInput = false;
+    }
+
+    /**
+     * Handle when field selection changes
+     */
+    public function updatedField()
+    {
+        // Auto-populate field type from mapping metadata if available
+        if ($this->selectedMapping && ! $this->useManualInput) {
+            $fields = $this->getAvailableFieldsProperty();
+            if (isset($fields[$this->field])) {
+                $fieldMeta = $fields[$this->field];
+                $this->fieldType = $fieldMeta['type'] ?? null;
+
+                // Reset operator to first available for the new field type
+                $this->updatedFieldType();
+            }
+        }
+    }
+
+    /**
+     * Toggle manual input mode
+     */
+    public function toggleManualInput()
+    {
+        $this->useManualInput = ! $this->useManualInput;
+
+        if ($this->useManualInput) {
+            // Clear mapping selection when switching to manual
+            $this->selectedMapping = null;
+            $this->field = '';
+            $this->fieldType = null;
+        } else {
+            // Clear field when switching back to mapping mode
+            $this->field = '';
+            $this->fieldType = null;
+        }
     }
 
     public function render()
