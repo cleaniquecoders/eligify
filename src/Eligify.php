@@ -9,7 +9,7 @@ use CleaniqueCoders\Eligify\Engine\AdvancedRuleEngine;
 use CleaniqueCoders\Eligify\Engine\RuleEngine;
 use CleaniqueCoders\Eligify\Models\Criteria;
 use CleaniqueCoders\Eligify\Models\Evaluation;
-use CleaniqueCoders\Eligify\Support\EligifyCache;
+use CleaniqueCoders\Eligify\Support\Cache;
 
 class Eligify
 {
@@ -17,12 +17,12 @@ class Eligify
 
     protected ?AdvancedRuleEngine $advancedEngine = null;
 
-    protected EligifyCache $cache;
+    protected Cache $cache;
 
     public function __construct()
     {
         $this->ruleEngine = new RuleEngine;
-        $this->cache = new EligifyCache;
+        $this->cache = new Cache;
     }
 
     /**
@@ -452,7 +452,7 @@ class Eligify
     /**
      * Get the cache instance
      */
-    public function getCache(): EligifyCache
+    public function getCache(): Cache
     {
         return $this->cache;
     }

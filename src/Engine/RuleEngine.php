@@ -7,7 +7,7 @@ use CleaniqueCoders\Eligify\Enums\RuleOperator;
 use CleaniqueCoders\Eligify\Enums\ScoringMethod;
 use CleaniqueCoders\Eligify\Models\Criteria;
 use CleaniqueCoders\Eligify\Models\Rule;
-use CleaniqueCoders\Eligify\Support\EligifyCache;
+use CleaniqueCoders\Eligify\Support\Cache;
 use Illuminate\Support\Collection;
 
 class RuleEngine
@@ -16,12 +16,12 @@ class RuleEngine
 
     protected array $executionLog = [];
 
-    protected EligifyCache $cache;
+    protected Cache $cache;
 
     public function __construct()
     {
         $this->config = config('eligify');
-        $this->cache = new EligifyCache;
+        $this->cache = new Cache;
     }
 
     /**

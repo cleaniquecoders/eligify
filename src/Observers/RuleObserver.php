@@ -4,13 +4,13 @@ namespace CleaniqueCoders\Eligify\Observers;
 
 use CleaniqueCoders\Eligify\Audit\AuditLogger;
 use CleaniqueCoders\Eligify\Models\Rule;
-use CleaniqueCoders\Eligify\Support\EligifyCache;
+use CleaniqueCoders\Eligify\Support\Cache;
 
 class RuleObserver
 {
     protected AuditLogger $auditLogger;
 
-    protected EligifyCache $cache;
+    protected Cache $cache;
 
     // Store original attributes temporarily
     protected static array $originalAttributes = [];
@@ -20,7 +20,7 @@ class RuleObserver
     public function __construct(AuditLogger $auditLogger)
     {
         $this->auditLogger = $auditLogger;
-        $this->cache = new EligifyCache;
+        $this->cache = new Cache;
     }
 
     /**

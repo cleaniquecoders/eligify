@@ -4,7 +4,7 @@ namespace CleaniqueCoders\Eligify\Commands;
 
 use CleaniqueCoders\Eligify\Eligify;
 use CleaniqueCoders\Eligify\Models\Criteria;
-use CleaniqueCoders\Eligify\Support\EligifyCache;
+use CleaniqueCoders\Eligify\Support\Cache;
 use Illuminate\Console\Command;
 
 class CacheWarmupCommand extends Command
@@ -31,7 +31,7 @@ class CacheWarmupCommand extends Command
      */
     public function handle(): int
     {
-        $cache = new EligifyCache;
+        $cache = new Cache;
 
         // Check if caching is enabled
         if (! $cache->isEvaluationCacheEnabled()) {

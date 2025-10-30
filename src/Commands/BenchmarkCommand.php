@@ -2,7 +2,7 @@
 
 namespace CleaniqueCoders\Eligify\Commands;
 
-use CleaniqueCoders\Eligify\Support\EligifyBenchmark;
+use CleaniqueCoders\Eligify\Support\Benchmark;
 use Illuminate\Console\Command;
 
 class BenchmarkCommand extends Command
@@ -26,7 +26,7 @@ class BenchmarkCommand extends Command
             return self::FAILURE;
         }
 
-        $benchmark = new EligifyBenchmark;
+        $benchmark = new Benchmark;
         $benchmark->iterations = (int) $this->option('iterations');
         $type = $this->option('type');
         $format = $this->option('format');

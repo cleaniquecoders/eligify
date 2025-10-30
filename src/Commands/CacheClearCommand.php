@@ -2,7 +2,7 @@
 
 namespace CleaniqueCoders\Eligify\Commands;
 
-use CleaniqueCoders\Eligify\Support\EligifyCache;
+use CleaniqueCoders\Eligify\Support\Cache;
 use Illuminate\Console\Command;
 
 class CacheClearCommand extends Command
@@ -28,7 +28,7 @@ class CacheClearCommand extends Command
      */
     public function handle(): int
     {
-        $cache = new EligifyCache;
+        $cache = new Cache;
         $type = $this->option('type');
         $force = $this->option('force');
 
@@ -75,7 +75,7 @@ class CacheClearCommand extends Command
     /**
      * Clear evaluation cache
      */
-    protected function clearEvaluationCache(EligifyCache $cache): bool
+    protected function clearEvaluationCache(Cache $cache): bool
     {
         $this->info('Clearing evaluation cache...');
 
@@ -85,7 +85,7 @@ class CacheClearCommand extends Command
     /**
      * Clear compilation cache
      */
-    protected function clearCompilationCache(EligifyCache $cache): bool
+    protected function clearCompilationCache(Cache $cache): bool
     {
         $this->info('Clearing compilation cache...');
 
@@ -95,7 +95,7 @@ class CacheClearCommand extends Command
     /**
      * Clear all caches
      */
-    protected function clearAllCache(EligifyCache $cache): bool
+    protected function clearAllCache(Cache $cache): bool
     {
         $this->info('Clearing all Eligify caches...');
 

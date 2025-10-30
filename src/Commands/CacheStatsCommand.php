@@ -2,7 +2,7 @@
 
 namespace CleaniqueCoders\Eligify\Commands;
 
-use CleaniqueCoders\Eligify\Support\EligifyCache;
+use CleaniqueCoders\Eligify\Support\Cache;
 use Illuminate\Console\Command;
 
 class CacheStatsCommand extends Command
@@ -26,7 +26,7 @@ class CacheStatsCommand extends Command
      */
     public function handle(): int
     {
-        $cache = new EligifyCache;
+        $cache = new Cache;
 
         $this->info('Eligify Cache Statistics');
         $this->newLine();

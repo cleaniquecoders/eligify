@@ -3,7 +3,7 @@
 use CleaniqueCoders\Eligify\Eligify;
 use CleaniqueCoders\Eligify\Models\Criteria;
 use CleaniqueCoders\Eligify\Models\Rule;
-use CleaniqueCoders\Eligify\Support\EligifyCache;
+use CleaniqueCoders\Eligify\Support\Cache as EligifyCache;
 use Illuminate\Support\Facades\Cache;
 
 beforeEach(function () {
