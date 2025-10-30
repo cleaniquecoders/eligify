@@ -1,6 +1,6 @@
 <?php
 
-namespace CleaniqueCoders\Eligify\Mappings;
+namespace CleaniqueCoders\Eligify\Data\Mappings;
 
 /**
  * Default User model mapping

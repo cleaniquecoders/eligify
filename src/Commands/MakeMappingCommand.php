@@ -261,7 +261,7 @@ class MakeMappingCommand extends Command
         $mappingClassName = $modelName.'Mapping';
 
         // Check in package mappings
-        $packageMappingClass = "CleaniqueCoders\\Eligify\\Mappings\\{$mappingClassName}";
+        $packageMappingClass = "CleaniqueCoders\\Eligify\\Data\\Mappings\\{$mappingClassName}";
         if (class_exists($packageMappingClass)) {
             return true;
         }

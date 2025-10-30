@@ -27,7 +27,7 @@ php artisan eligify:make-mapping "App\Models\User"
 ### Basic Structure
 
 ```php
-use CleaniqueCoders\Eligify\Mappings\AbstractModelMapping;
+use CleaniqueCoders\Eligify\Data\Mappings\AbstractModelMapping;
 use CleaniqueCoders\Eligify\Data\Extractor;
 
 class UserMapping extends AbstractModelMapping

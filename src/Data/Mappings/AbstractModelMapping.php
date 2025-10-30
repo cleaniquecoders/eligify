@@ -1,8 +1,8 @@
 <?php
 
-namespace CleaniqueCoders\Eligify\Mappings;
+namespace CleaniqueCoders\Eligify\Data\Mappings;
 
-use CleaniqueCoders\Eligify\Contracts\ModelMapping;
+use CleaniqueCoders\Eligify\Data\Contracts\ModelMapping;
 use CleaniqueCoders\Eligify\Data\Extractor;
 
 /**

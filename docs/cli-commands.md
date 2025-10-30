@@ -502,7 +502,7 @@ The command automatically:
 ```php
 namespace App\Eligify\Mappings;
 
-use CleaniqueCoders\Eligify\Mappings\AbstractModelMapping;
+use CleaniqueCoders\Eligify\Data\Mappings\AbstractModelMapping;
 
 class UserMapping extends AbstractModelMapping
 {

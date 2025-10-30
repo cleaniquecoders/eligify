@@ -443,7 +443,7 @@ Configure extraction behavior in `config/eligify.php`:
 
     // Model mappings
     'model_mappings' => [
-        'App\Models\User' => \CleaniqueCoders\Eligify\Mappings\UserModelMapping::class,
+        'App\Models\User' => \CleaniqueCoders\Eligify\Data\Mappings\UserModelMapping::class,
     ],
 ],
 ```

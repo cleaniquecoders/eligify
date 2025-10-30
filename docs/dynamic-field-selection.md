@@ -76,7 +76,7 @@ Step 3: Configure Rule
 
 namespace App\Mappings;
 
-use CleaniqueCoders\Eligify\Mappings\AbstractModelMapping;
+use CleaniqueCoders\Eligify\Data\Mappings\AbstractModelMapping;
 
 class CustomerMapping extends AbstractModelMapping
 {

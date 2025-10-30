@@ -113,7 +113,7 @@ Here's what a generated mapping looks like:
 
 namespace App\Eligify\Mappings;
 
-use CleaniqueCoders\Eligify\Mappings\AbstractModelMapping;
+use CleaniqueCoders\Eligify\Data\Mappings\AbstractModelMapping;
 
 class ApplicantMapping extends AbstractModelMapping
 {
@@ -227,7 +227,7 @@ php artisan eligify:make-all-mappings --path=workbench/app/Models --namespace=Wo
 
 If the generator can't find a mapping for a related model:
 
-- Check that the mapping class exists in `App\Eligify\Mappings` or `CleaniqueCoders\Eligify\Mappings`
+- Check that the mapping class exists in `App\Eligify\Mappings` or `CleaniqueCoders\Eligify\Data\Mappings`
 - Ensure the mapping class follows the naming convention: `{ModelName}Mapping`
 
 ### Database Connection Issues

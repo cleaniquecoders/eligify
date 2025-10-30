@@ -11,7 +11,7 @@
 
 require_once __DIR__.'/bootstrap.php';
 
-use CleaniqueCoders\Eligify\Mappings\UserModelMapping;
+use CleaniqueCoders\Eligify\Data\Mappings\UserModelMapping;
 
 echo "=== Model Mapping Generation Examples ===\n\n";
 
@@ -24,7 +24,7 @@ echo "UserMapping prefix: '{$userMapping->getPrefix()}'\n";
 echo "This allows field references like: {$userMapping->getPrefix()}.name, {$userMapping->getPrefix()}.email\n\n";
 
 // Demonstrate multi-word model names
-$mockMapping = new class extends \CleaniqueCoders\Eligify\Mappings\AbstractModelMapping
+$mockMapping = new class extends \CleaniqueCoders\Eligify\Data\Mappings\AbstractModelMapping
 {
     public function getModelClass(): string
     {

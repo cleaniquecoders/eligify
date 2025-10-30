@@ -1,6 +1,6 @@
 <?php
 
-namespace CleaniqueCoders\Eligify\Contracts;
+namespace CleaniqueCoders\Eligify\Data\Contracts;
 
 use CleaniqueCoders\Eligify\Data\Extractor;
 

@@ -2,7 +2,7 @@
 
 namespace {{ namespace }};
 
-use CleaniqueCoders\Eligify\Mappings\AbstractModelMapping;
+use CleaniqueCoders\Eligify\Data\Mappings\AbstractModelMapping;
 
 /**
  * Model mapping for {{ modelClass }}

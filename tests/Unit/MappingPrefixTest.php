@@ -1,6 +1,6 @@
 <?php
 
-use CleaniqueCoders\Eligify\Mappings\UserModelMapping;
+use CleaniqueCoders\Eligify\Data\Mappings\UserModelMapping;
 
 it('can get prefix from user mapping', function () {
     $mapping = new UserModelMapping;
@@ -10,7 +10,7 @@ it('can get prefix from user mapping', function () {
 
 it('can get prefix from model name automatically', function () {
     // Create a mock mapping without explicit prefix
-    $mockMapping = new class extends \CleaniqueCoders\Eligify\Mappings\AbstractModelMapping
+    $mockMapping = new class extends \CleaniqueCoders\Eligify\Data\Mappings\AbstractModelMapping
     {
         public function getModelClass(): string
         {
@@ -32,7 +32,7 @@ it('can get prefix from model name automatically', function () {
 });
 
 it('handles multi-word model names in prefix generation', function () {
-    $mockMapping = new class extends \CleaniqueCoders\Eligify\Mappings\AbstractModelMapping
+    $mockMapping = new class extends \CleaniqueCoders\Eligify\Data\Mappings\AbstractModelMapping
     {
         public function getModelClass(): string
         {

@@ -2,7 +2,7 @@
 
 namespace CleaniqueCoders\Eligify\Support;
 
-use CleaniqueCoders\Eligify\Contracts\ModelMapping;
+use CleaniqueCoders\Eligify\Data\Contracts\ModelMapping;
 use Illuminate\Support\Facades\File;
 
 /**
@@ -101,7 +101,7 @@ class MappingRegistry
         }
 
         // 2. Auto-discover from package Mappings directory
-        $packageMappingsPath = __DIR__.'/../Mappings';
+        $packageMappingsPath = __DIR__.'/../Data/Mappings';
         if (File::exists($packageMappingsPath)) {
             $files = File::files($packageMappingsPath);
             foreach ($files as $file) {
@@ -110,7 +110,7 @@ class MappingRegistry
                     continue;
                 }
 
-                $class = 'CleaniqueCoders\\Eligify\\Mappings\\'.pathinfo($filename, PATHINFO_FILENAME);
+                $class = 'CleaniqueCoders\\Eligify\\Data\\Mappings\\'.pathinfo($filename, PATHINFO_FILENAME);
                 if (class_exists($class) && ! isset($mappings[$class])) {
                     try {
                         $mapping = new $class;

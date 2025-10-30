@@ -1,6 +1,6 @@
 <?php
 
-use CleaniqueCoders\Eligify\Mappings\UserModelMapping;
+use CleaniqueCoders\Eligify\Data\Mappings\UserModelMapping;
 use CleaniqueCoders\Eligify\Support\MappingRegistry;
 
 describe('MappingRegistry', function () {
