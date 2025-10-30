@@ -31,7 +31,7 @@ class Rule extends Model
     ];
 
     protected $casts = [
-        'value' => 'array',
+        'value' => 'json',
         'weight' => 'integer',
         'order' => 'integer',
         'is_active' => 'boolean',

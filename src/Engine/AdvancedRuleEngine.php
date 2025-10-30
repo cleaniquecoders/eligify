@@ -2,6 +2,7 @@
 
 namespace CleaniqueCoders\Eligify\Engine;
 
+use CleaniqueCoders\Eligify\Data\Snapshot;
 use CleaniqueCoders\Eligify\Models\Criteria;
 use CleaniqueCoders\Eligify\Models\Rule;
 
@@ -22,17 +23,20 @@ class AdvancedRuleEngine
     /**
      * Evaluate criteria with advanced rule logic
      */
-    public function evaluate(Criteria $criteria, array $data): array
+    public function evaluate(Criteria $criteria, array|Snapshot $data): array
     {
+        // Convert Snapshot to array if needed
+        $dataArray = $data instanceof Snapshot ? $data->toArray() : $data;
+
         // Store input data for threshold decisions
-        $this->inputData = $data;
+        $this->inputData = $dataArray;
         // Parse complex rule groups
         $ruleGroups = $this->parseRuleGroups($criteria);
 
         // Evaluate each group
         $groupResults = [];
         foreach ($ruleGroups as $group) {
-            $groupResults[] = $this->evaluateRuleGroup($group, $data);
+            $groupResults[] = $this->evaluateRuleGroup($group, $dataArray);
         }
 
         // Combine group results based on criteria logic
@@ -103,8 +107,11 @@ class AdvancedRuleEngine
     /**
      * Evaluate a single rule group
      */
-    protected function evaluateRuleGroup(array $group, array $data): array
+    protected function evaluateRuleGroup(array $group, array|Snapshot $data): array
     {
+        // Convert Snapshot to array if needed
+        $dataArray = $data instanceof Snapshot ? $data->toArray() : $data;
+
         $logic = $group['logic'] ?? 'AND';
         $rules = $group['rules'];
         $results = [];
@@ -114,7 +121,7 @@ class AdvancedRuleEngine
         $failedRules = [];
 
         foreach ($rules as $rule) {
-            $result = $this->evaluateRule($rule, $data);
+            $result = $this->evaluateRule($rule, $dataArray);
             $results[] = $result;
 
             // Skip counting skipped rules in pass/fail logic
@@ -153,10 +160,13 @@ class AdvancedRuleEngine
     /**
      * Evaluate a single rule with dependency checking
      */
-    protected function evaluateRule($rule, array $data): array
+    protected function evaluateRule($rule, array|Snapshot $data): array
     {
+        // Convert Snapshot to array if needed
+        $dataArray = $data instanceof Snapshot ? $data->toArray() : $data;
+
         // Check rule dependencies first
-        if (! $this->checkRuleDependencies($rule, $data)) {
+        if (! $this->checkRuleDependencies($rule, $dataArray)) {
             return [
                 'rule_id' => $rule->uuid ?? $rule['uuid'] ?? null,
                 'field' => $rule->field ?? $rule['field'],
@@ -169,18 +179,21 @@ class AdvancedRuleEngine
 
         // Use the base engine for actual evaluation
         if ($rule instanceof Rule) {
-            return $this->baseEngine->evaluateRule($rule, $data);
+            return $this->baseEngine->evaluateRule($rule, $dataArray);
         }
 
         // Handle array-based rule data
-        return $this->evaluateArrayRule($rule, $data);
+        return $this->evaluateArrayRule($rule, $dataArray);
     }
 
     /**
      * Check rule dependencies
      */
-    protected function checkRuleDependencies($rule, array $data): bool
+    protected function checkRuleDependencies($rule, array|Snapshot $data): bool
     {
+        // Convert Snapshot to array if needed
+        $dataArray = $data instanceof Snapshot ? $data->toArray() : $data;
+
         $dependencies = $rule->meta['dependencies'] ?? $rule['meta']['dependencies'] ?? [];
 
         if (empty($dependencies)) {
@@ -188,7 +201,7 @@ class AdvancedRuleEngine
         }
 
         foreach ($dependencies as $dependency) {
-            if (! $this->evaluateDependency($dependency, $data)) {
+            if (! $this->evaluateDependency($dependency, $dataArray)) {
                 return false;
             }
         }
@@ -199,30 +212,36 @@ class AdvancedRuleEngine
     /**
      * Evaluate a single dependency
      */
-    protected function evaluateDependency(array $dependency, array $data): bool
+    protected function evaluateDependency(array $dependency, array|Snapshot $data): bool
     {
+        // Convert Snapshot to array if needed
+        $dataArray = $data instanceof Snapshot ? $data->toArray() : $data;
+
         $field = $dependency['field'];
         $operator = $dependency['operator'];
         $value = $dependency['value'];
 
-        if (! isset($data[$field])) {
+        if (! isset($dataArray[$field])) {
             return false;
         }
 
-        return $this->baseEngine->compareValues($data[$field], $operator, $value);
+        return $this->baseEngine->compareValues($dataArray[$field], $operator, $value);
     }
 
     /**
      * Evaluate array-based rule
      */
-    protected function evaluateArrayRule(array $rule, array $data): array
+    protected function evaluateArrayRule(array $rule, array|Snapshot $data): array
     {
+        // Convert Snapshot to array if needed
+        $dataArray = $data instanceof Snapshot ? $data->toArray() : $data;
+
         $field = $rule['field'];
         $operator = $rule['operator'];
         $expected = $rule['value'];
         $weight = $rule['weight'] ?? 1;
 
-        $actual = $data[$field] ?? null;
+        $actual = $dataArray[$field] ?? null;
         $passed = $this->baseEngine->compareValues($actual, $operator, $expected);
 
         return [
