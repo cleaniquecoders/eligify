@@ -112,8 +112,8 @@ The Playground lets you:
     - CLI command usage
     - Custom field extractors
 
-14. **[ExtractedModelData Usage](14-extracted-model-data.php)** - Data Handling ⭐ **NEW**
-    - Type-safe data container
+14. **[Snapshot Usage](14-snapshot-usage.php)** - Data Handling ⭐ **NEW**
+    - Type-safe data snapshot container
     - Data filtering and transformation
     - Method chaining
     - Integration with evaluation

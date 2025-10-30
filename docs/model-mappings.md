@@ -80,10 +80,10 @@ Add your mapping to `config/eligify.php`:
 ### 3. Use It
 
 ```php
-use CleaniqueCoders\Eligify\Support\ModelDataExtractor;
+use CleaniqueCoders\Eligify\Data\Extractor;
 
 $customer = Customer::find(1);
-$extractor = ModelDataExtractor::forModel('App\Models\Customer');
+$extractor = Extractor::forModel('App\Models\Customer');
 $data = $extractor->extract($customer);
 
 // Now use this data in eligibility rules
@@ -255,7 +255,7 @@ class SaasUserMapping extends AbstractModelMapping
 use Tests\TestCase;
 use App\Models\Customer;
 use App\Eligify\Mappings\CustomerModelMapping;
-use CleaniqueCoders\Eligify\Support\ModelDataExtractor;
+use CleaniqueCoders\Eligify\Data\Extractor;
 
 class CustomerMappingTest extends TestCase
 {
@@ -265,7 +265,7 @@ class CustomerMappingTest extends TestCase
             ->has(Order::factory()->count(3))
             ->create();
 
-        $extractor = ModelDataExtractor::forModel('App\Models\Customer');
+        $extractor = Extractor::forModel('App\Models\Customer');
         $data = $extractor->extract($customer);
 
         $this->assertEquals(3, $data['order_count']);
@@ -302,7 +302,7 @@ class CustomerMappingTest extends TestCase
 You can also create mappings dynamically without config:
 
 ```php
-$extractor = new ModelDataExtractor();
+$extractor = new Extractor();
 $extractor->setFieldMappings(['old_field' => 'new_field'])
     ->setComputedFields([
         'computed' => fn($m) => $m->field * 2

@@ -19,7 +19,7 @@
 require_once __DIR__.'/bootstrap.php';
 
 use CleaniqueCoders\Eligify\Facades\Eligify;
-use CleaniqueCoders\Eligify\Support\ModelDataExtractor;
+use CleaniqueCoders\Eligify\Support\Extractor;
 use Illuminate\Database\Eloquent\Model;
 
 // ============================================================================
@@ -139,7 +139,7 @@ echo "🔍 Demonstrating UserModelMapping Data Extraction...\n";
 echo str_repeat('=', 80)."\n\n";
 
 // Extract data using UserModelMapping
-$extractor = ModelDataExtractor::forModel('User');
+$extractor = Extractor::forModel('User');
 $extractedData = $extractor->extract($verifiedUser);
 
 echo "📦 Extracted Data from User Model:\n";
@@ -186,7 +186,7 @@ foreach ($users as $description => $user) {
     echo str_repeat('-', 80)."\n";
 
     // Extract data using UserModelMapping
-    $extractor = ModelDataExtractor::forModel('User');
+    $extractor = Extractor::forModel('User');
     $data = $extractor->extract($user);
 
     // Evaluate using the extracted data
@@ -203,7 +203,7 @@ echo "\n📊 Detailed Evaluation Breakdown\n";
 echo str_repeat('=', 80)."\n\n";
 
 // Evaluate the eligible user and show details
-$extractor = ModelDataExtractor::forModel('User');
+$extractor = Extractor::forModel('User');
 $data = $extractor->extract($eligibleUser);
 $result = Eligify::evaluate('verified_user_access', $data);
 
@@ -249,7 +249,7 @@ $batchData = [];
 $userNames = [];
 
 foreach ($users as $description => $user) {
-    $extractor = ModelDataExtractor::forModel('User');
+    $extractor = Extractor::forModel('User');
     $batchData[] = $extractor->extract($user);
     $userNames[] = $user->name;
 }
@@ -292,7 +292,7 @@ echo "   ✓ Set appropriate weights and thresholds\n";
 echo "\n";
 
 echo "3. Flexible Evaluation:\n";
-echo "   ✓ Single user evaluation with ModelDataExtractor::forModel()\n";
+echo "   ✓ Single user evaluation with Extractor::forModel()\n";
 echo "   ✓ Batch evaluation for multiple users\n";
 echo "   ✓ Detailed rule-by-rule results\n";
 echo "\n";

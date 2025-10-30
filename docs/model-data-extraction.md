@@ -1,6 +1,6 @@
 # Model Data Extraction Guide
 
-The `ModelDataExtractor` class is responsible for transforming Laravel Eloquent models into flat arrays suitable for eligibility rule evaluation. This guide helps you choose the right approach for your use case.
+The `Extractor` class is responsible for transforming Laravel Eloquent models into flat arrays suitable for eligibility rule evaluation. This guide helps you choose the right approach for your use case.
 
 ## Quick Decision Guide
 
@@ -17,16 +17,16 @@ flowchart TD
     DevEnv -->|Yes| CreateMapping[Create ModelMapping classes<br/>+ Use forModel]
     DevEnv -->|No| UseForModel
 
-    OneTime -->|One-time| QuickExtract[✅ Use new ModelDataExtractor<br/>+ extract method]
+    OneTime -->|One-time| QuickExtract[✅ Use new Extractor<br/>+ extract method]
     OneTime -->|Repeated| NeedCustom{Need custom<br/>field mappings?}
 
     NeedCustom -->|Yes| SetMappings[✅ Use setter methods<br/>setFieldMappings, etc.]
     NeedCustom -->|No| QuickExtract
 
-    UseForModel --> Result1[ModelDataExtractor::forModel User::class<br/>->extract user]
+    UseForModel --> Result1[Extractor::forModel User::class<br/>->extract user]
     CreateMapping --> Result1
     SetMappings --> Result2[extractor->setFieldMappings...<br/>->extract model]
-    QuickExtract --> Result3[new ModelDataExtractor<br/>->extract model]
+    QuickExtract --> Result3[new Extractor<br/>->extract model]
 
     style UseForModel fill:#90EE90
     style CreateMapping fill:#90EE90
@@ -49,7 +49,7 @@ flowchart TD
 
 **Example:**
 ```php
-$extractor = new ModelDataExtractor();
+$extractor = new Extractor();
 $data = $extractor->extract($user);
 ```
 
@@ -75,7 +75,7 @@ $data = $extractor->extract($user);
 
 **Example:**
 ```php
-$extractor = new ModelDataExtractor([
+$extractor = new Extractor([
     'include_relationships' => true,
     'max_relationship_depth' => 3,
 ]);
@@ -131,11 +131,11 @@ $data = $extractor->extract($user);
 namespace App\Eligify\Mappings;
 
 use CleaniqueCoders\Eligify\Contracts\ModelMapping;
-use CleaniqueCoders\Eligify\Support\ModelDataExtractor;
+use CleaniqueCoders\Eligify\Data\Extractor;
 
 class UserMapping implements ModelMapping
 {
-    public function configure(ModelDataExtractor $extractor): ModelDataExtractor
+    public function configure(Extractor $extractor): Extractor
     {
         return $extractor
             ->setFieldMappings([
@@ -156,7 +156,7 @@ class UserMapping implements ModelMapping
 
 **Step 3: Use in code**
 ```php
-$data = ModelDataExtractor::forModel(User::class)->extract($user);
+$data = Extractor::forModel(User::class)->extract($user);
 ```
 
 **Pros:**
@@ -188,9 +188,9 @@ flowchart TD
     Q3 -->|Yes| Prod
     Q3 -->|No| Custom[Use Pattern 2:<br/>Custom configuration]
 
-    Prod --> ProdCode["ModelDataExtractor::forModel(User::class)<br/>->extract($user)"]
-    Custom --> CustomCode["(new ModelDataExtractor)<br/>->setFieldMappings(...)<br/>->extract($model)"]
-    Simple --> SimpleCode["(new ModelDataExtractor)<br/>->extract($model)"]
+    Prod --> ProdCode["Extractor::forModel(User::class)<br/>->extract($user)"]
+    Custom --> CustomCode["(new Extractor)<br/>->setFieldMappings(...)<br/>->extract($model)"]
+    Simple --> SimpleCode["(new Extractor)<br/>->extract($model)"]
 
     style Prod fill:#90EE90
     style Custom fill:#87CEEB
@@ -234,7 +234,7 @@ flowchart TB
 // app/Eligify/Mappings/LoanMapping.php
 class LoanMapping implements ModelMapping
 {
-    public function configure(ModelDataExtractor $extractor): ModelDataExtractor
+    public function configure(Extractor $extractor): Extractor
     {
         return $extractor->setFieldMappings([
             'requested_amount' => 'loan_amount',
@@ -249,7 +249,7 @@ class LoanMapping implements ModelMapping
 }
 
 // In your controller/service
-$data = ModelDataExtractor::forModel(LoanApplication::class)
+$data = Extractor::forModel(LoanApplication::class)
     ->extract($application);
 
 // Use $data in eligibility rules
@@ -259,7 +259,7 @@ $data = ModelDataExtractor::forModel(LoanApplication::class)
 
 ```php
 // Quick one-off extraction for testing
-$extractor = new ModelDataExtractor(['include_relationships' => false]);
+$extractor = new Extractor(['include_relationships' => false]);
 $data = $extractor->extract($user);
 
 // Inspect what data is available
@@ -270,7 +270,7 @@ dd($data);
 
 ```php
 // Generate a custom eligibility report with specific metrics
-$extractor = (new ModelDataExtractor)
+$extractor = (new Extractor)
     ->setComputedFields([
         'eligibility_score' => function($model, $data) {
             $score = 0;
@@ -295,7 +295,7 @@ $results = collect($users)->map(fn($user) => [
 1. **Use `forModel()` for production code**
    ```php
    // Good: Centralized, maintainable
-   ModelDataExtractor::forModel(User::class)->extract($user)
+   Extractor::forModel(User::class)->extract($user)
    ```
 
 2. **Create mapping classes for each model type**
@@ -323,7 +323,7 @@ $results = collect($users)->map(fn($user) => [
 1. **Don't duplicate extraction logic**
    ```php
    // Bad: Repeated in multiple places
-   $extractor = new ModelDataExtractor();
+   $extractor = new Extractor();
    $extractor->setFieldMappings(['annual_income' => 'income']);
    // ... repeated everywhere
    ```
@@ -340,14 +340,14 @@ $results = collect($users)->map(fn($user) => [
 3. **Don't ignore sensitive data filtering**
    ```php
    // Bad: Exposes sensitive data
-   new ModelDataExtractor(['exclude_sensitive_fields' => false])
+   new Extractor(['exclude_sensitive_fields' => false])
    ```
 
 4. **Don't nest extractors recursively**
    ```php
    // Bad: Can cause infinite loops
    'profile_data' => fn($model) =>
-       ModelDataExtractor::forModel(Profile::class)->extract($model->profile)
+       Extractor::forModel(Profile::class)->extract($model->profile)
    ```
 
 ## Summary Table

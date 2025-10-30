@@ -20,7 +20,7 @@ flowchart LR
 ### 🥉 Pattern 1: Quick & Simple
 
 ```php
-$data = (new ModelDataExtractor())->extract($user);
+$data = (new Extractor())->extract($user);
 ```
 
 **Use when:** Testing, prototyping, simple cases
@@ -28,7 +28,7 @@ $data = (new ModelDataExtractor())->extract($user);
 ### 🥈 Pattern 2: Custom Configuration
 
 ```php
-$data = (new ModelDataExtractor())
+$data = (new Extractor())
     ->setFieldMappings(['annual_income' => 'income'])
     ->setComputedFields(['risk' => fn($m) => $m->calculateRisk()])
     ->extract($user);
@@ -39,7 +39,7 @@ $data = (new ModelDataExtractor())
 ### 🥇 Pattern 3: Production (RECOMMENDED)
 
 ```php
-$data = ModelDataExtractor::forModel(User::class)->extract($user);
+$data = Extractor::forModel(User::class)->extract($user);
 ```
 
 **Use when:** Production, team projects, multiple model types
@@ -68,7 +68,7 @@ $data = ModelDataExtractor::forModel(User::class)->extract($user);
 
 ```php
 // Production approach
-$data = ModelDataExtractor::forModel(LoanApplication::class)
+$data = Extractor::forModel(LoanApplication::class)
     ->extract($application);
 
 // Returns array like:
@@ -85,7 +85,7 @@ $data = ModelDataExtractor::forModel(LoanApplication::class)
 
 ```php
 // Quick test
-$data = (new ModelDataExtractor())->extract($user);
+$data = (new Extractor())->extract($user);
 
 // Returns array like:
 [
@@ -100,7 +100,7 @@ $data = (new ModelDataExtractor())->extract($user);
 
 ```mermaid
 flowchart TB
-    Model[Your Model] --> E[ModelDataExtractor]
+    Model[Your Model] --> E[Extractor]
 
     E --> A[Basic Attributes<br/>id, email, name, etc.]
     E --> B[Computed Fields<br/>created_days_ago, account_age]
@@ -123,7 +123,7 @@ flowchart TB
 
 ```php
 // Bad - duplicated everywhere
-$extractor = new ModelDataExtractor();
+$extractor = new Extractor();
 $extractor->setFieldMappings(['annual_income' => 'income']);
 $data = $extractor->extract($user);
 ```
@@ -132,7 +132,7 @@ $data = $extractor->extract($user);
 
 ```php
 // Good - configured once
-$data = ModelDataExtractor::forModel(User::class)->extract($user);
+$data = Extractor::forModel(User::class)->extract($user);
 ```
 
 ## See Full Documentation

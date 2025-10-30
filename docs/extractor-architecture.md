@@ -1,6 +1,6 @@
-# ModelDataExtractor Architecture
+# Extractor Architecture
 
-This document explains how the `ModelDataExtractor` fits into the overall Eligify architecture and data flow.
+This document explains how the `Extractor` fits into the overall Eligify architecture and data flow.
 
 ## System Overview
 
@@ -11,7 +11,7 @@ flowchart TB
     end
 
     subgraph Extraction["🔄 Data Extraction Layer"]
-        MDE[ModelDataExtractor]
+        MDE[Extractor]
         Config[Config File<br/>eligify.php]
         Mapping[Mapping Classes<br/>UserMapping, etc.]
 
@@ -54,7 +54,7 @@ flowchart LR
     end
 
     subgraph "2. Extractor"
-        E[ModelDataExtractor<br/>Transforms & flattens]
+        E[Extractor<br/>Transforms & flattens]
     end
 
     subgraph "3. Flat Data"
@@ -81,21 +81,21 @@ flowchart LR
     style Result fill:#A5D6A7
 ```
 
-## Why ModelDataExtractor Exists
+## Why Extractor Exists
 
 ### Problem: Complex Model Structures
 
 ```mermaid
 flowchart TB
-    subgraph "❌ Without ModelDataExtractor"
+    subgraph "❌ Without Extractor"
         U1[User Model] --> R1[Rules Engine]
         R1 -.->|"How to access<br/>user->profile->income?"| Problem1[Complex nested access]
         R1 -.->|"How to get<br/>orders count?"| Problem2[Manual aggregations]
         R1 -.->|"How to calculate<br/>account age?"| Problem3[Computed fields logic]
     end
 
-    subgraph "✅ With ModelDataExtractor"
-        U2[User Model] --> MDE[ModelDataExtractor]
+    subgraph "✅ With Extractor"
+        U2[User Model] --> MDE[Extractor]
         MDE --> Flat[income: 5000<br/>orders_count: 12<br/>account_age_days: 365]
         Flat --> R2[Rules Engine]
         R2 --> Success[Simple field access]
@@ -137,12 +137,12 @@ flowchart TB
 ```mermaid
 flowchart TB
     subgraph "Pattern 1: Quick"
-        Q1[new ModelDataExtractor] --> Q2[extract model]
+        Q1[new Extractor] --> Q2[extract model]
         Q2 --> Q3[Uses defaults only]
     end
 
     subgraph "Pattern 2: Custom"
-        C1[new ModelDataExtractor] --> C2[setFieldMappings<br/>setComputedFields]
+        C1[new Extractor] --> C2[setFieldMappings<br/>setComputedFields]
         C2 --> C3[extract model]
         C3 --> C4[Uses custom config]
     end
@@ -161,13 +161,13 @@ flowchart TB
 
 ## Real-World Flow Example
 
-Here's how a complete loan approval flow works with ModelDataExtractor:
+Here's how a complete loan approval flow works with Extractor:
 
 ```mermaid
 sequenceDiagram
     participant C as Controller
     participant E as Eligify Facade
-    participant M as ModelDataExtractor
+    participant M as Extractor
     participant R as Rule Engine
     participant A as Audit Logger
     participant W as Workflow
@@ -207,7 +207,7 @@ flowchart LR
         I["User {<br/>  id: 1<br/>  email: 'user@example.com'<br/>  created_at: '2024-01-15'<br/>  profile: {<br/>    annual_income: 60000<br/>    employment_status: 'employed'<br/>  }<br/>  orders: [Order, Order, Order]<br/>}"]
     end
 
-    subgraph "ModelDataExtractor"
+    subgraph "Extractor"
         E[Extract<br/>Map<br/>Compute<br/>Flatten]
     end
 
@@ -227,7 +227,7 @@ flowchart LR
 
 ```mermaid
 mindmap
-  root((ModelDataExtractor))
+  root((Extractor))
     Simplification
       Flattens nested data
       Consistent field names
@@ -256,7 +256,7 @@ flowchart TB
     end
 
     subgraph "Eligify Core"
-        MDE[ModelDataExtractor]
+        MDE[Extractor]
         Engine[Rule Engine]
         Builder[Criteria Builder]
         Eval[Evaluator]
@@ -284,7 +284,7 @@ flowchart TB
 
 ## Summary
 
-The `ModelDataExtractor` is a critical bridge component that:
+The `Extractor` is a critical bridge component that:
 
 1. **Transforms** complex model structures into flat, rule-friendly arrays
 2. **Standardizes** data extraction across different model types

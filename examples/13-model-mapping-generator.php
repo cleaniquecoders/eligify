@@ -10,7 +10,7 @@
 require_once __DIR__.'/bootstrap.php';
 
 use CleaniqueCoders\Eligify\Eligify;
-use CleaniqueCoders\Eligify\Support\ModelDataExtractor;
+use CleaniqueCoders\Eligify\Support\Extractor;
 
 echo "=== Model Mapping Example ===\n\n";
 
@@ -103,13 +103,13 @@ echo "Step 5: Automatic Data Extraction\n";
 echo "----------------------------------\n\n";
 
 // In a real scenario, the extractor would use the registered mapping
-echo "The ModelDataExtractor automatically:\n";
+echo "The Extractor automatically:\n";
 echo "  1. Applies field mappings (created_at → registration_date)\n";
 echo "  2. Calculates computed fields (is_verified, is_premium)\n";
 echo "  3. Aggregates relationships (orders.count → orders_count)\n\n";
 
 // Manual extraction for demonstration
-$extractor = new ModelDataExtractor($mockUser);
+$extractor = new Extractor($mockUser);
 
 // Apply field mapping
 $extractor->mapField('created_at', 'registration_date');

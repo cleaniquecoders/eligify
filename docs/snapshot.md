@@ -1,10 +1,10 @@
-# ExtractedModelData Class
+# Snapshot Class
 
-The `ExtractedModelData` class is a powerful, type-safe container for data extracted from Eloquent models. It provides a rich API for accessing, filtering, transforming, and working with data in eligibility evaluation contexts.
+The `Snapshot` class is a powerful, type-safe container for data extracted from Eloquent models. It provides a rich API for accessing, filtering, transforming, and working with data in eligibility evaluation contexts.
 
 ## Overview
 
-Instead of working with plain arrays, `ExtractedModelData` wraps your data in an immutable object that provides:
+Instead of working with plain arrays, `Snapshot` wraps your data in an immutable object that provides:
 
 - ✅ **Type Safety** - Strong type hints for better IDE support
 - ✅ **Rich API** - Methods for filtering, transformation, and selection
@@ -18,18 +18,18 @@ Instead of working with plain arrays, `ExtractedModelData` wraps your data in an
 ### Creating Instances
 
 ```php
-use CleaniqueCoders\Eligify\Support\ExtractedModelData;
-use CleaniqueCoders\Eligify\Support\ModelDataExtractor;
+use CleaniqueCoders\Eligify\Data\Snapshot;
+use CleaniqueCoders\Eligify\Data\Extractor;
 
 // Option 1: Direct instantiation
-$extracted = new ExtractedModelData([
+$extracted = new Snapshot([
     'income' => 50000,
     'credit_score' => 720,
     'age' => 35,
 ]);
 
-// Option 2: Via ModelDataExtractor (recommended)
-$extractor = ModelDataExtractor::forModel(User::class);
+// Option 2: Via Extractor (recommended)
+$extractor = Extractor::forModel(User::class);
 $extracted = $extractor->extract($user);
 ```
 
@@ -168,7 +168,7 @@ $processedData = $extracted
 
 ## Metadata
 
-Every `ExtractedModelData` instance tracks metadata about the extraction:
+Every `Snapshot` instance tracks metadata about the extraction:
 
 ```php
 // Access metadata
@@ -189,9 +189,9 @@ $config = $extracted->metadata('extractor_config');
 use CleaniqueCoders\Eligify\Facades\Eligify;
 
 // Extract data from model
-$extracted = ModelDataExtractor::forModel(User::class)->extract($user);
+$extracted = Extractor::forModel(User::class)->extract($user);
 
-// Evaluate directly (accepts ExtractedModelData)
+// Evaluate directly (accepts Snapshot)
 $result = app('eligify')->evaluate('loan_approval', $extracted);
 ```
 
@@ -199,7 +199,7 @@ $result = app('eligify')->evaluate('loan_approval', $extracted);
 
 ```php
 // Extract and filter for specific evaluation
-$financialData = ModelDataExtractor::forModel(User::class)
+$financialData = Extractor::forModel(User::class)
     ->extract($user)
     ->only(['income', 'credit_score', 'debt_ratio']);
 
@@ -209,7 +209,7 @@ $result = app('eligify')->evaluate('quick_prescreen', $financialData);
 
 ### Backward Compatibility
 
-The engine accepts both `ExtractedModelData` and plain arrays:
+The engine accepts both `Snapshot` and plain arrays:
 
 ```php
 // Both work identically
@@ -220,10 +220,10 @@ $result3 = app('eligify')->evaluate('criteria', ['income' => 50000]);
 
 ## Immutability
 
-`ExtractedModelData` is immutable. All transformation methods return new instances:
+`Snapshot` is immutable. All transformation methods return new instances:
 
 ```php
-$original = new ExtractedModelData(['income' => 50000]);
+$original = new Snapshot(['income' => 50000]);
 $filtered = $original->only(['income']);
 
 // Original is unchanged
@@ -280,7 +280,7 @@ echo $extracted; // Pretty-printed JSON
 
 ## Interfaces Implemented
 
-`ExtractedModelData` implements standard PHP and Laravel interfaces:
+`Snapshot` implements standard PHP and Laravel interfaces:
 
 - `Illuminate\Contracts\Support\Arrayable`
 - `Illuminate\Contracts\Support\Jsonable`
@@ -294,7 +294,7 @@ This ensures compatibility with Laravel collections, JSON responses, and array f
 
 ### Memory
 
-`ExtractedModelData` adds minimal overhead:
+`Snapshot` adds minimal overhead:
 
 - Object wrapper: ~1KB
 - Metadata array: ~0.5KB
@@ -310,9 +310,9 @@ Performance difference is negligible:
 
 **For typical use (1-100 evaluations per request), the difference is unmeasurable.**
 
-## When to Use ExtractedModelData
+## When to Use Snapshot
 
-### ✅ Use ExtractedModelData when
+### ✅ Use Snapshot when
 
 - Extracting data from Eloquent models
 - Building evaluation pipelines with transformations
@@ -371,7 +371,7 @@ $processed = $extracted->transform(function ($value, $key) {
 $users = User::with('profile')->get();
 
 $results = $users->map(function ($user) {
-    return ModelDataExtractor::forModel(User::class)
+    return Extractor::forModel(User::class)
         ->extract($user)
         ->only(['income', 'credit_score'])
         ->numericFields();
@@ -382,7 +382,8 @@ $results = $users->map(function ($user) {
 
 ## See Also
 
-- [ModelDataExtractor Documentation](model-data-extraction.md)
+- [Extractor Documentation](model-data-extraction.md)
+- [Extractor Architecture](extractor-architecture.md)
 - [Usage Guide](usage-guide.md)
-- [Example 14: ExtractedModelData Usage](../examples/14-extracted-model-data.php)
+- [Example 14: Snapshot Usage](../examples/14-snapshot-usage.php)
 - [Quick Reference](quick-reference-model-extraction.md)

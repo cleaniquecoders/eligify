@@ -301,11 +301,11 @@ The Model Data Extractor:
 ### Quick Example
 
 ```php
-use CleaniqueCoders\Eligify\Support\ModelDataExtractor;
+use CleaniqueCoders\Eligify\Data\Extractor;
 
 // Extract data from a User model
 $user = User::with(['orders', 'subscriptions'])->find(1);
-$extractor = ModelDataExtractor::forModel('App\Models\User');
+$extractor = Extractor::forModel('App\Models\User');
 $data = $extractor->extract($user);
 
 // Now evaluate with extracted data
@@ -332,7 +332,7 @@ Eligify includes a default **UserModelMapping** that provides:
 #### Basic Usage
 
 ```php
-$extractor = new ModelDataExtractor();
+$extractor = new Extractor();
 $data = $extractor->extract($user);
 
 // Extracted data includes:
@@ -346,7 +346,7 @@ $data = $extractor->extract($user);
 
 ```php
 // Use preconfigured extractor for User models
-$extractor = ModelDataExtractor::forModel('App\Models\User');
+$extractor = Extractor::forModel('App\Models\User');
 $data = $extractor->extract($user);
 
 // Results include UserModelMapping computed fields:
@@ -451,7 +451,7 @@ Add your mapping to `config/eligify.php`:
 
 ```php
 $customer = Customer::with('orders')->find(1);
-$extractor = ModelDataExtractor::forModel('App\Models\Customer');
+$extractor = Extractor::forModel('App\Models\Customer');
 $data = $extractor->extract($customer);
 
 // Evaluate with extracted data
@@ -558,7 +558,7 @@ Eligify::criteria('vip_customer_program')
 
 // Evaluate customer
 $customer = Customer::with('orders')->find(1);
-$extractor = ModelDataExtractor::forModel('App\Models\Customer');
+$extractor = Extractor::forModel('App\Models\Customer');
 $data = $extractor->extract($customer);
 
 $result = Eligify::evaluate('vip_customer_program', $data);
@@ -861,7 +861,7 @@ $result = $user->evaluateEligibility('premium_membership');
 $result = Eligify::evaluateModel($user, 'premium_membership');
 
 // Manual extraction for more control
-$extractor = ModelDataExtractor::forModel('App\Models\User');
+$extractor = Extractor::forModel('App\Models\User');
 $data = $extractor->extract($user);
 $result = Eligify::evaluate('premium_membership', $data);
 ```
@@ -1332,7 +1332,7 @@ The `examples/` directory contains 11 comprehensive real-world examples:
 This example demonstrates the power of **UserModelMapping** for automatic data extraction:
 
 ```php
-use CleaniqueCoders\Eligify\Support\ModelDataExtractor;
+use CleaniqueCoders\Eligify\Data\Extractor;
 
 // Create criteria using UserModelMapping computed fields
 $criteria = Eligify::criteria('verified_user_access')
@@ -1344,7 +1344,7 @@ $criteria = Eligify::criteria('verified_user_access')
 
 // Extract data automatically using UserModelMapping
 $user = User::find(1);
-$extractor = ModelDataExtractor::forModel('App\Models\User');
+$extractor = Extractor::forModel('App\Models\User');
 $data = $extractor->extract($user);
 
 // Evaluate with extracted data

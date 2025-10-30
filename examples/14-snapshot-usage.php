@@ -1,13 +1,13 @@
 <?php
 
 /**
- * Example 14: ExtractedModelData Usage
+ * Example 14: Snapshot Usage
  *
- * Use Case: Demonstrates the power of the ExtractedModelData class for
+ * Use Case: Demonstrates the power of the Snapshot class for
  * flexible data extraction, transformation, and evaluation.
  *
  * Features Demonstrated:
- * - Creating ExtractedModelData instances
+ * - Creating Snapshot instances
  * - Property and array access patterns
  * - Data filtering and transformation
  * - Metadata tracking
@@ -15,17 +15,17 @@
  * - Immutability benefits
  * - Method chaining
  *
- * This example shows how ExtractedModelData provides type safety, rich APIs,
+ * This example shows how Snapshot provides type safety, rich APIs,
  * and better developer experience compared to plain arrays.
  */
 
 require_once __DIR__.'/bootstrap.php';
 
+use CleaniqueCoders\Eligify\Data\Snapshot;
 use CleaniqueCoders\Eligify\Facades\Eligify;
-use CleaniqueCoders\Eligify\Support\ExtractedModelData;
 
 echo '='.str_repeat('=', 70)."\n";
-echo "  EXTRACTEDMODELDATA USAGE EXAMPLE\n";
+echo "  SNAPSHOT USAGE EXAMPLE\n";
 echo '='.str_repeat('=', 70)."\n\n";
 
 // ============================================================================
@@ -35,7 +35,7 @@ echo '='.str_repeat('=', 70)."\n\n";
 echo "📦 STEP 1: Basic Usage\n";
 echo str_repeat('-', 70)."\n\n";
 
-// Create an ExtractedModelData instance
+// Create an Snapshot instance
 $rawData = [
     'name' => 'John Doe',
     'email' => 'john@example.com',
@@ -50,13 +50,13 @@ $rawData = [
     'account_number' => 'ACC123456',
 ];
 
-$extracted = new ExtractedModelData($rawData, [
+$extracted = new Snapshot($rawData, [
     'model_class' => 'App\Models\User',
     'model_key' => 123,
     'extracted_at' => now()->toIso8601String(),
 ]);
 
-echo '✓ Created ExtractedModelData with '.count($extracted)." fields\n\n";
+echo '✓ Created Snapshot with '.count($extracted)." fields\n\n";
 
 // Access data using different methods
 echo "Access Patterns:\n";
@@ -193,7 +193,7 @@ echo str_repeat('-', 70)."\n\n";
 
 // Create criteria
 $criteria = Eligify::criteria('extracted_data_evaluation')
-    ->description('Demonstrate ExtractedModelData integration')
+    ->description('Demonstrate Snapshot integration')
     ->addRule('annual_income', '>=', 50000, 30)
     ->addRule('credit_score', '>=', 680, 40)
     ->addRule('active_loans', '<=', 3, 20)
@@ -203,8 +203,8 @@ $criteria = Eligify::criteria('extracted_data_evaluation')
 
 echo "✓ Criteria created with 4 rules\n\n";
 
-// Evaluate using ExtractedModelData directly
-echo "Evaluating with ExtractedModelData object:\n";
+// Evaluate using Snapshot directly
+echo "Evaluating with Snapshot object:\n";
 $result1 = app('eligify')->evaluate($criteria->getCriteria(), $extracted);
 echo '  Result: '.($result1['passed'] ? '✅ PASSED' : '❌ FAILED')."\n";
 echo "  Score: {$result1['score']}%\n\n";
@@ -234,7 +234,7 @@ echo "  Score: {$result4['score']}%\n\n";
 echo "🔒 STEP 6: Immutability\n";
 echo str_repeat('-', 70)."\n\n";
 
-echo "ExtractedModelData is immutable - transformations create new instances:\n";
+echo "Snapshot is immutable - transformations create new instances:\n";
 echo '  Original count: '.count($extracted)."\n";
 echo '  Filtered count: '.count($safeData)."\n";
 echo '  Original still has '.count($extracted)." fields\n\n";
@@ -305,7 +305,7 @@ if ($preScreenResult['passed']) {
 // ============================================================================
 
 echo str_repeat('=', 70)."\n";
-echo "  SUMMARY: ExtractedModelData Benefits\n";
+echo "  SUMMARY: Snapshot Benefits\n";
 echo str_repeat('=', 70)."\n\n";
 
 echo "✅ Benefits Demonstrated:\n";
@@ -320,7 +320,7 @@ echo "   • Backward compatible with plain arrays\n";
 echo "   • Specialized filters (numeric, string, boolean, pattern)\n";
 echo "   • JSON serialization with metadata\n\n";
 
-echo "💡 Use ExtractedModelData when:\n";
+echo "💡 Use Snapshot when:\n";
 echo "   • Extracting data from Eloquent models\n";
 echo "   • Building complex evaluation pipelines\n";
 echo "   • Need data transformation/filtering\n";
