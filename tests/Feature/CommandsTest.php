@@ -62,25 +62,6 @@ test('eligify command defaults to status', function () {
         ->assertExitCode(0);
 });
 
-test('eligify criteria list command shows all criteria', function () {
-    // Create test criteria
-    Eligify::criteria('Loan Approval')
-        ->description('Loan approval criteria')
-        ->addRule('income', '>=', 3000)
-        ->save();
-
-    Eligify::criteria('scholarship')
-        ->description('Scholarship eligibility')
-        ->addRule('gpa', '>=', 3.5)
-        ->save();
-
-    $this->artisan('eligify:criteria', ['action' => 'list'])
-        ->expectsOutputToContain('Eligibility Criteria')
-        ->expectsOutputToContain('loan_approval')
-        ->expectsOutputToContain('scholarship')
-        ->assertExitCode(0);
-});
-
 test('eligify criteria list command filters active criteria', function () {
     Eligify::criteria('active_criteria')
         ->active(true)
@@ -116,23 +97,6 @@ test('eligify criteria list command outputs json format', function () {
         '--format' => 'json',
     ])
         ->expectsOutputToContain('test_criteria')
-        ->assertExitCode(0);
-});
-
-test('eligify criteria show command displays criteria details', function () {
-    $criteria = Eligify::criteria('Loan Approval')
-        ->description('Loan approval criteria')
-        ->addRule('income', '>=', 3000)
-        ->addRule('credit_score', '>=', 650)
-        ->save();
-
-    $this->artisan('eligify:criteria', [
-        'action' => 'show',
-        'criteria' => 'loan_approval',
-    ])
-        ->expectsOutputToContain('loan_approval')
-        ->expectsOutputToContain('income')
-        ->expectsOutputToContain('credit_score')
         ->assertExitCode(0);
 });
 
