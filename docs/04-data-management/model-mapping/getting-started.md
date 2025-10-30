@@ -382,12 +382,14 @@ php examples/17-relationship-mapping-usage.php
 ### ✅ Do
 
 1. **Reference OUTPUT field names**
+
    ```php
    // ProfileMapping outputs 'biography'
    'profile' => ['biography' => 'user_bio']  // ✅
    ```
 
 2. **Use spread operator for dynamic inclusion**
+
    ```php
    $extractor->setRelationshipMappings([
        'profile' => $profileMapping->getFieldMappings(),
@@ -395,11 +397,13 @@ php examples/17-relationship-mapping-usage.php
    ```
 
 3. **Eager load relationships**
+
    ```php
    $user = User::with('profile', 'company')->find($id);
    ```
 
 4. **Use helper methods in computed fields**
+
    ```php
    'total_orders' => fn($m) => $this->safeRelationshipCount($m, 'orders')
    ```
@@ -407,11 +411,13 @@ php examples/17-relationship-mapping-usage.php
 ### ❌ Don't
 
 1. **Don't reference database columns**
+
    ```php
    'profile' => ['bio' => 'user_bio']  // ❌ 'bio' is DB column
    ```
 
 2. **Don't duplicate mapping logic**
+
    ```php
    // ❌ Bad: Remapping what ProfileMapping already does
    protected array $fieldMappings = [
@@ -420,6 +426,7 @@ php examples/17-relationship-mapping-usage.php
    ```
 
 3. **Don't forget to check relationship loaded**
+
    ```php
    // ❌ Bad: Can cause errors
    'has_company' => fn($m) => $m->company->exists()

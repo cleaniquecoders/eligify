@@ -1,19 +1,23 @@
 # Playground Guide
 
 ## Overview
+
 The Playground is an interactive testing environment where you can evaluate criteria against sample data in real-time.
 
 ## Features
 
 ### 🎯 Smart Sample Data Generation
+
 When you select a criteria, the playground can automatically generate appropriate test data based on your rules.
 
 **Example:** If your criteria has rules like:
+
 - `applicant.income >= 3000`
 - `applicant.age >= 18`
 - `applicant.not_bankrupt == true`
 
 Click **"✨ Generate from Rules"** and it will create:
+
 ```json
 {
   "applicant": {
@@ -25,9 +29,11 @@ Click **"✨ Generate from Rules"** and it will create:
 ```
 
 ### 📝 Manual Data Entry
+
 You can also manually enter test data. The system supports both:
 
 **Flat structure with dot notation:**
+
 ```json
 {
   "applicant.income": 2500,
@@ -37,6 +43,7 @@ You can also manually enter test data. The system supports both:
 ```
 
 **Nested object structure:**
+
 ```json
 {
   "applicant": {
@@ -50,13 +57,16 @@ You can also manually enter test data. The system supports both:
 Both formats work identically!
 
 ### 🚀 Quick Examples
+
 For generic testing, use the pre-filled examples:
+
 - **Numeric** - Fields with numbers (age, income, scores)
 - **String** - Text fields (status, names, emails)
 - **Boolean** - True/false fields
 - **Mixed** - Combination of all types
 
 ### ✅ Evaluation Results
+
 After clicking "Evaluate", you'll see:
 
 1. **Pass/Fail Status** - Visual indicator with color coding
@@ -71,6 +81,7 @@ After clicking "Evaluate", you'll see:
    - Execution time in milliseconds
 
 ### 🛠️ Helper Buttons
+
 - **✨ Generate from Rules** - Auto-creates sample data from your criteria
 - **Format** - Prettifies your JSON for better readability
 - **Clear** - Resets the entire playground
@@ -79,6 +90,7 @@ After clicking "Evaluate", you'll see:
 ## Use Cases
 
 ### Testing Loan Approval Criteria
+
 ```json
 {
   "applicant": {
@@ -93,6 +105,7 @@ After clicking "Evaluate", you'll see:
 ```
 
 ### Testing Scholarship Eligibility
+
 ```json
 {
   "student": {
@@ -106,6 +119,7 @@ After clicking "Evaluate", you'll see:
 ```
 
 ### Testing Job Candidate Screening
+
 ```json
 {
   "candidate": {
@@ -127,19 +141,24 @@ After clicking "Evaluate", you'll see:
 5. **Link to criteria details** - Click "View details →" to see the full rule configuration
 
 ## Keyboard Shortcuts
+
 - **Format JSON** - Clean up your JSON structure
 - **Tab in textarea** - Indents properly (browser dependent)
 
 ## Troubleshooting
 
 ### "Invalid JSON" Error
+
 Make sure your JSON is properly formatted:
+
 - Use double quotes for keys and string values
 - No trailing commas
 - Properly closed brackets
 
 ### "Please select a criteria first"
+
 Choose a criteria from the dropdown before evaluating.
 
 ### Rules not generating expected data
+
 Check that your rules have proper field types and operators configured.

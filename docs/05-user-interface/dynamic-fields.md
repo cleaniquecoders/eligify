@@ -174,6 +174,7 @@ protected array $fieldMappings = [
 Mappings are automatically discovered from:
 
 1. **Config File** - `config/eligify.php`:
+
    ```php
    'model_mappings' => [
        \App\Models\User::class => \App\Mappings\UserMapping::class,
@@ -241,6 +242,7 @@ class UserModelMapping extends AbstractModelMapping
 ```
 
 **Result:** This mapping exposes 3 fields in the UI:
+
 - `email_verified_timestamp` (attribute - renamed from `email_verified_at`)
 - `registration_date` (attribute - renamed from `created_at`)
 - `is_verified` (computed field)
@@ -410,6 +412,7 @@ updatedField()
 ### Type Auto-Population
 
 When you select a field from a mapping:
+
 1. Field type is automatically populated
 2. Available operators are filtered
 3. Value input adapts (number, date, checkbox, etc.)

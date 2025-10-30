@@ -403,6 +403,7 @@ If you discover a security vulnerability, please follow these steps:
 ### Security Advisories
 
 Security advisories will be published:
+
 - On GitHub Security Advisories
 - In release notes
 - In CHANGELOG.md
@@ -410,6 +411,7 @@ Security advisories will be published:
 ### Hall of Fame
 
 Contributors who responsibly disclose security issues will be credited (with permission) in:
+
 - SECURITY.md
 - Release notes
 - Project README

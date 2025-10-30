@@ -4,7 +4,7 @@ This guide covers advanced features and patterns for power users of Eligify.
 
 ## Table of Contents
 
-- [Advanced Rule Engine](#advanced-rule-engine)
+- [Rule Engine](#rule-engine)
 - [Custom Operators](#custom-operators)
 - [Custom Scoring Methods](#custom-scoring-methods)
 - [Dynamic Criteria](#dynamic-criteria)
@@ -15,7 +15,7 @@ This guide covers advanced features and patterns for power users of Eligify.
 - [Performance Optimization](#performance-optimization)
 - [Multi-Tenancy](#multi-tenancy)
 
-## Advanced Rule Engine
+## Rule Engine
 
 Eligify includes two rule engines:
 

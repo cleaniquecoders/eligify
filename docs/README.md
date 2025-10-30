@@ -1,392 +1,765 @@
-# Eligify Documentation
+# Eligify Documentation# Eligify Documentation
 
-**Tagline:** "Define criteria. Enforce rules. Decide eligibility."
+**Tagline:** "Define criteria. Enforce rules. Decide eligibility."**Tagline:** "Define criteria. Enforce rules. Decide eligibility."
 
-Eligify is a Laravel package that provides a flexible rule and criteria engine for determining entity eligibility. It makes eligibility decisions **data-driven**, **traceable**, and **automatable**.
+Eligify is a Laravel package that provides a flexible rule and criteria engine for determining entity eligibility. It makes eligibility decisions **data-driven**, **traceable**, and **automatable**.Eligify is a Laravel package that provides a flexible rule and criteria engine for determining entity eligibility. It makes eligibility decisions **data-driven**, **traceable**, and **automatable**.
 
-## Table of Contents
+---## Table of Contents
 
-- [Installation](#installation)
+## 📚 Documentation Structure- [Installation](#installation)
+
 - [Quick Start](#quick-start)
-- [Core Concepts](#core-concepts)
+
+This documentation is organized into 15 sections, designed to take you from beginner to expert:- [Core Concepts](#core-concepts)
+
 - [UI Dashboard](ui-setup-guide.md) 🎨
-  - [Dynamic Field Selection](dynamic-field-selection.md) 🎯
+
+### 🚀 Getting Started  - [Dynamic Field Selection](dynamic-field-selection.md) 🎯
+
 - [Model Mapping & Data Extraction](#model-mapping--data-extraction)
-  - [**Model Mapping Guide**](model-mapping-guide.md) � **START HERE**
-  - [Relationship Mapping Cheatsheet](relationship-mapping-cheatsheet.md) 🔴 **MUST READ**
-  - [Mapper Generation Guide](mapper-generation-guide.md) 🔨 Auto-generate mappings
-  - [Snapshot Data Object](snapshot.md) 📦 Data snapshots
-- [Configuration](#configuration)
-  - [Configuration Guide](configuration.md) ⚙️
-  - [Environment Variables](environment-variables.md) 🔧
-- [Database Structure](#database-structure)
+
+**[01. Getting Started](01-getting-started/)** - Installation, quick start, and core concepts  - [**Model Mapping Guide**](model-mapping-guide.md) � **START HERE**
+
+- [Relationship Mapping Cheatsheet](relationship-mapping-cheatsheet.md) 🔴 **MUST READ**
+
+### 🏗️ Understanding Eligify  - [Mapper Generation Guide](mapper-generation-guide.md) 🔨 Auto-generate mappings
+
+- [Snapshot Data Object](snapshot.md) 📦 Data snapshots
+
+**[02. Architecture](02-architecture/)** - Design patterns and package structure  - [Configuration](#configuration)
+
+**[03. Core Features](03-core-features/)** - Criteria builder, rules engine, evaluation, and workflows  - [Configuration Guide](configuration.md) ⚙️
+
+- [Environment Variables](environment-variables.md) 🔧
+
+### 📊 Working with Data- [Database Structure](#database-structure)
+
 - [Usage Guide](#usage-guide)
-- [Advanced Features](#advanced-features)
+
+**[04. Data Management](04-data-management/)** - Model mapping, snapshots, data extraction- [Advanced Features](#advanced-features)
+
 - [CLI Commands](#cli-commands)
-- [Policy Integration](#policy-integration)
-- [Testing](#testing)
+
+- [Model Mapping](04-data-management/model-mapping/) - Transform models for evaluation- [Policy Integration](#policy-integration)
+
+- [Snapshots](04-data-management/snapshot/) - Point-in-time data capture- [Testing](#testing)
+
 - [Real-World Examples](#real-world-examples)
+
+### 🎨 User Interface
 
 ## Installation
 
+**[05. User Interface](05-user-interface/)** - Web dashboard, playground, and dynamic fields
+
 Install the package via Composer:
 
+### ⚙️ Configuration
+
 ```bash
-composer require cleaniquecoders/eligify
+
+**[06. Configuration](06-configuration/)** - Settings, operators, environment variablescomposer require cleaniquecoders/eligify
+
 ```
+
+### 🔥 Advanced Topics
 
 Publish and run migrations:
 
-```bash
-php artisan vendor:publish --tag="eligify-migrations"
+**[07. Advanced Features](07-advanced-features/)** - Caching, custom operators, policy integration
+
+**[08. CLI Commands](08-cli/)** - Command-line tools and automation  ```bash
+
+**[09. Testing](09-testing/)** - Unit tests, integration tests, performance benchmarksphp artisan vendor:publish --tag="eligify-migrations"
+
 php artisan migrate
-```
 
-Publish configuration file:
+### 🚀 Production```
 
-```bash
+**[10. Deployment](10-deployment/)** - Production setup and optimization  Publish configuration file:
+
+**[11. Security](11-security/)** - Best practices and authorization
+
+**[12. Migration](12-migration/)** - Upgrade guides and breaking changes```bash
+
 php artisan vendor:publish --tag="eligify-config"
-```
 
-## Quick Start
+### 📖 Learning & Reference```
 
-Here's a simple loan approval example to get you started:
+**[13. Examples](13-examples/)** - Real-world use cases and patterns  ## Quick Start
 
-```php
+**[14. API Reference](14-reference/)** - Complete API documentation
+
+**[15. Appendix](15-appendix/)** - Glossary, FAQ, and resourcesHere's a simple loan approval example to get you started:
+
+---```php
+
 use CleaniqueCoders\Eligify\Facades\Eligify;
 
+## 🎯 Quick Navigation
+
 // Step 1: Define criteria
-$criteria = Eligify::criteria('loan_approval')
+
+### I want to...$criteria = Eligify::criteria('loan_approval')
+
     ->description('Standard Personal Loan Approval')
-    ->addRule('credit_score', '>=', 650, 30)      // 30% weight
-    ->addRule('annual_income', '>=', 30000, 25)   // 25% weight
-    ->addRule('debt_to_income_ratio', '<=', 43, 20) // 20% weight
-    ->addRule('employment_status', 'in', ['employed', 'self-employed'], 15)
-    ->addRule('active_loans', '<=', 3, 10)
-    ->passThreshold(70)
-    ->onPass(function($applicant, $result) {
-        echo "✅ Loan Approved! Score: {$result['score']}%";
-    })
+
+- **Get started quickly** → [Quick Start Guide](01-getting-started/README.md)    ->addRule('credit_score', '>=', 650, 30)      // 30% weight
+
+- **Understand the architecture** → [Architecture Overview](02-architecture/README.md)    ->addRule('annual_income', '>=', 30000, 25)   // 25% weight
+
+- **Build my first criteria** → [Core Features](03-core-features/README.md)    ->addRule('debt_to_income_ratio', '<=', 43, 20) // 20% weight
+
+- **Map my models** → [Model Mapping Guide](04-data-management/model-mapping/getting-started.md)    ->addRule('employment_status', 'in', ['employed', 'self-employed'], 15)
+
+- **Use the web interface** → [UI Setup](05-user-interface/setup.md)    ->addRule('active_loans', '<=', 3, 10)
+
+- **Configure advanced features** → [Advanced Features](07-advanced-features/README.md)    ->passThreshold(70)
+
+- **Deploy to production** → [Production Guide](10-deployment/production.md)    ->onPass(function($applicant, $result) {
+
+- **See real examples** → [Examples](13-examples/README.md)        echo "✅ Loan Approved! Score: {$result['score']}%";
+
+- **Look up an API** → [API Reference](14-reference/README.md)    })
+
     ->onFail(function($applicant, $result) {
-        echo "❌ Loan Denied. Score: {$result['score']}%";
+
+---        echo "❌ Loan Denied. Score: {$result['score']}%";
+
     })
-    ->save();
 
-// Step 2: Evaluate applicant
-$result = Eligify::evaluate('loan_approval', [
+## ⚡ Quick Example    ->save()
+
+```php// Step 2: Evaluate applicant
+
+use CleaniqueCoders\Eligify\Facades\Eligify;$result = Eligify::evaluate('loan_approval', [
+
     'credit_score' => 720,
-    'annual_income' => 55000,
-    'employment_status' => 'employed',
-    'debt_to_income_ratio' => 35,
-    'active_loans' => 2,
-]);
-```
 
-**Result structure:**
+// Define eligibility criteria    'annual_income' => 55000,
+
+$result = Eligify::criteria('loan_approval')    'employment_status' => 'employed',
+
+    ->addRule('income', '>=', 3000)    'debt_to_income_ratio' => 35,
+
+    ->addRule('credit_score', '>=', 650)    'active_loans' => 2,
+
+    ->addRule('employment_months', '>=', 6)]);
+
+    ->scoringMethod('weighted')```
+
+    ->onPass(fn($applicant) => $applicant->approveLoan())
+
+    ->onFail(fn($applicant) => $applicant->rejectLoan())**Result structure:**
+
+    ->evaluate($applicant);
 
 ```php
-[
-    'passed' => true,
-    'score' => 85,
-    'decision' => 'Approved',
-    'failed_rules' => [],
+
+// Check results[
+
+if ($result->passed()) {    'passed' => true,
+
+    echo "Loan approved! Score: {$result->score()}";    'score' => 85,
+
+}    'decision' => 'Approved',
+
+```    'failed_rules' => [],
+
     'criteria_id' => 1,
-    'evaluation_id' => 123,
+
+---    'evaluation_id' => 123,
+
 ]
-```
 
-### Using the Web UI (Optional)
+## 🎓 Learning Paths```
 
-Eligify includes an optional dashboard for visual management:
 
-```bash
-# Enable in .env
+
+### For New Users### Using the Web UI (Optional)
+
+
+
+1. [Installation & Setup](01-getting-started/README.md)Eligify includes an optional dashboard for visual management:
+
+2. [Core Concepts](03-core-features/README.md)
+
+3. [Basic Examples](13-examples/README.md)```bash
+
+4. [Model Mapping](04-data-management/model-mapping/)# Enable in .env
+
 ELIGIFY_UI_ENABLED=true
 
+### For Integrators
+
 # Access at
-http://your-app.test/eligify
-```
 
-![Dashboard Preview](../screenshots/01-dashboard-overview.png)
+1. [Architecture Overview](02-architecture/README.md)http://your-app.test/eligify
 
-**Features:**
+2. [Data Management](04-data-management/README.md)```
+
+3. [Configuration](06-configuration/README.md)
+
+4. [Advanced Features](07-advanced-features/README.md)![Dashboard Preview](../screenshots/01-dashboard-overview.png)
+
+
+
+### For Operations**Features:**
+
 - 📊 Visual criteria builder
-- 🎮 Interactive testing playground
-- 🔍 Audit log explorer
-- ⚖️ Rule library management
+
+1. [Testing Guide](09-testing/README.md)- 🎮 Interactive testing playground
+
+2. [Deployment](10-deployment/README.md)- 🔍 Audit log explorer
+
+3. [Security](11-security/README.md)- ⚖️ Rule library management
+
+4. [Migration & Upgrades](12-migration/README.md)
 
 > 📖 **Complete setup guide:** [UI Setup Guide](ui-setup-guide.md)
 
+---
+
 ## Core Concepts
+
+## 📦 Installation
 
 ### 1. Criteria
 
+Install the package via Composer:
+
 A **Criteria** is a named collection of rules that define eligibility requirements for a specific use case (e.g., "loan_approval", "scholarship_eligibility").
 
-**Key properties:**
+```bash
+
+composer require cleaniquecoders/eligify**Key properties:**
+
+```
 
 - `name` - Human-readable name
-- `slug` - Unique identifier (auto-generated from name)
+
+Publish and run migrations:- `slug` - Unique identifier (auto-generated from name)
+
 - `description` - Detailed explanation of the criteria
-- `is_active` - Enable/disable criteria
-- `pass_threshold` - Minimum score required (0-100, default: 65)
-- `meta` - Additional metadata (JSON)
+
+```bash- `is_active` - Enable/disable criteria
+
+php artisan vendor:publish --tag="eligify-migrations"- `pass_threshold` - Minimum score required (0-100, default: 65)
+
+php artisan migrate- `meta` - Additional metadata (JSON)
+
+```
 
 **Example:**
 
+Publish configuration file:
+
 ```php
-$criteria = Eligify::criteria('scholarship_eligibility')
-    ->description('Merit-based scholarship qualification')
-    ->passThreshold(80)
+
+```bash$criteria = Eligify::criteria('scholarship_eligibility')
+
+php artisan vendor:publish --tag="eligify-config"    ->description('Merit-based scholarship qualification')
+
+```    ->passThreshold(80)
+
     ->save();
-```
 
-### 2. Rules
+For complete installation instructions, see the [Getting Started Guide](01-getting-started/README.md).```
 
-A **Rule** is a single condition that evaluates a field against a value using an operator.
 
-**Components:**
 
-- `field` - Data field to evaluate (e.g., 'credit_score')
-- `operator` - Comparison operator (>=, <=, ==, !=, in, between, etc.)
-- `value` - Expected value or threshold
-- `weight` - Importance factor (default: 1, range: 1-10)
-- `order` - Execution priority (default: 0)
-- `is_active` - Enable/disable rule
+---### 2. Rules
 
-**Example:**
 
-```php
+
+## 🎯 Key FeaturesA **Rule** is a single condition that evaluates a field against a value using an operator.
+
+
+
+- 🧱 **Criteria Builder** - Define what makes something eligible**Components:**
+
+- ⚖️ **Rule Engine** - Apply logic and conditions dynamically
+
+- 🎯 **Evaluator** - Run real-time eligibility checks- `field` - Data field to evaluate (e.g., 'credit_score')
+
+- 🔄 **Workflow Manager** - Trigger actions when eligibility passes or fails- `operator` - Comparison operator (>=, <=, ==, !=, in, between, etc.)
+
+- 🧾 **Audit Log** - Record every decision for transparency- `value` - Expected value or threshold
+
+- 🧩 **Integrations** - Works with Laravel models, policies, and events- `weight` - Importance factor (default: 1, range: 1-10)
+
+- 📦 **Snapshots** - Preserve state at evaluation time- `order` - Execution priority (default: 0)
+
+- 🗺️ **Model Mapping** - Transform complex data structures- `is_active` - Enable/disable rule
+
+- 🎨 **UI Dashboard** - Visual criteria management
+
+- ⚡ **Performance** - Built-in caching and optimization**Example:**
+
+
+
+---```php
+
 $criteria->addRule('gpa', '>=', 3.5, 8)           // Weight: 8
-         ->addRule('age', 'between', [16, 25], 5)  // Weight: 5
+
+## 🏢 Use Cases         ->addRule('age', 'between', [16, 25], 5)  // Weight: 5
+
          ->addRule('country', 'in', ['US', 'CA'], 3); // Weight: 3
-```
 
-### 3. Evaluation
+- **Finance**: Loan approval, credit scoring```
 
-An **Evaluation** is a recorded assessment of an entity against criteria.
+- **Education**: Scholarship/admission eligibility
 
-**Stored data:**
+- **HR**: Candidate screening, promotion qualification### 3. Evaluation
+
+- **Government**: Aid distribution, program qualification
+
+- **E-commerce**: Discount/loyalty eligibilityAn **Evaluation** is a recorded assessment of an entity against criteria.
+
+- **Insurance**: Policy underwriting
+
+- **SaaS**: Plan upgrade eligibility**Stored data:**
+
+- **Real Estate**: Rental application screening
 
 - `criteria_id` - Which criteria was evaluated
-- `evaluable_type/id` - Polymorphic relation to the entity
+
+See the [Examples section](13-examples/README.md) for detailed implementations.- `evaluable_type/id` - Polymorphic relation to the entity
+
 - `passed` - Boolean result
-- `score` - Calculated score (0-100)
+
+---- `score` - Calculated score (0-100)
+
 - `failed_rules` - Array of failed rule IDs
-- `rule_results` - Detailed results per rule
+
+## 📖 Complete Table of Contents- `rule_results` - Detailed results per rule
+
 - `decision` - Human-readable decision
-- `context` - Input data provided
-- `evaluated_at` - Timestamp
 
-**Example:**
+<details>- `context` - Input data provided
 
-```php
-// Automatic evaluation recording
-$result = Eligify::evaluate('loan_approval', $data);
+<summary><strong>01. Getting Started</strong></summary>- `evaluated_at` - Timestamp
 
-// Or evaluate against a model
+
+
+- [Overview](01-getting-started/README.md)**Example:**
+
+- [Installation](01-getting-started/installation.md)
+
+- [Quick Start](01-getting-started/quick-start.md)```php
+
+- [Usage Guide](01-getting-started/usage-guide.md)// Automatic evaluation recording
+
+- [Core Concepts](01-getting-started/core-concepts.md)$result = Eligify::evaluate('loan_approval', $data);
+
+
+
+</details>// Or evaluate against a model
+
 $user = User::find(1);
-$result = Eligify::evaluateModel($user, 'premium_membership');
-```
 
-### 4. Operators
+<details>$result = Eligify::evaluateModel($user, 'premium_membership');
 
-Eligify supports 16 operators across different data types:
+<summary><strong>02. Architecture</strong></summary>```
 
-#### Numeric Comparisons
 
-| Operator | Description | Example |
+
+- [Overview](02-architecture/README.md)### 4. Operators
+
+- [Design Patterns](02-architecture/design-patterns.md)
+
+- [Package Structure](02-architecture/package-structure.md)Eligify supports 16 operators across different data types:
+
+- [Request Lifecycle](02-architecture/request-lifecycle.md)
+
+- [Extensibility](02-architecture/extensibility.md)#### Numeric Comparisons
+
+
+
+</details>| Operator | Description | Example |
+
 |----------|-------------|---------|
-| `==` | Equal to | `->addRule('status', '==', 'active')` |
-| `!=` | Not equal to | `->addRule('status', '!=', 'banned')` |
+
+<details>| `==` | Equal to | `->addRule('status', '==', 'active')` |
+
+<summary><strong>03. Core Features</strong></summary>| `!=` | Not equal to | `->addRule('status', '!=', 'banned')` |
+
 | `>` | Greater than | `->addRule('age', '>', 18)` |
-| `>=` | Greater than or equal | `->addRule('score', '>=', 70)` |
-| `<` | Less than | `->addRule('debt', '<', 10000)` |
-| `<=` | Less than or equal | `->addRule('ratio', '<=', 0.43)` |
 
-#### Array Operations
+- [Overview](03-core-features/README.md)| `>=` | Greater than or equal | `->addRule('score', '>=', 70)` |
+
+- [Criteria Builder](03-core-features/criteria-builder.md)| `<` | Less than | `->addRule('debt', '<', 10000)` |
+
+- [Rule Engine](03-core-features/rule-engine.md)| `<=` | Less than or equal | `->addRule('ratio', '<=', 0.43)` |
+
+- [Scoring Methods](03-core-features/scoring-methods.md)
+
+- [Evaluation Engine](03-core-features/evaluation-engine.md)#### Array Operations
+
+- [Workflow Callbacks](03-core-features/workflow-callbacks.md)
 
 | Operator | Description | Example |
-|----------|-------------|---------|
+
+</details>|----------|-------------|---------|
+
 | `in` | Value in array | `->addRule('tier', 'in', ['gold', 'platinum'])` |
-| `not_in` | Value not in array | `->addRule('status', 'not_in', ['banned', 'suspended'])` |
+
+<details>| `not_in` | Value not in array | `->addRule('status', 'not_in', ['banned', 'suspended'])` |
+
+<summary><strong>04. Data Management</strong></summary>
 
 #### Range Operations
 
-| Operator | Description | Example |
-|----------|-------------|---------|
-| `between` | Within range (inclusive) | `->addRule('age', 'between', [18, 65])` |
-| `not_between` | Outside range | `->addRule('risk_score', 'not_between', [80, 100])` |
+- [Overview](04-data-management/README.md)
 
-#### String Operations
+- [Model Mapping](04-data-management/model-mapping/)| Operator | Description | Example |
 
-| Operator | Description | Example |
-|----------|-------------|---------|
-| `contains` | String contains substring | `->addRule('email', 'contains', '@company.com')` |
+  - [Getting Started](04-data-management/model-mapping/getting-started.md)|----------|-------------|---------|
+
+  - [Patterns](04-data-management/model-mapping/patterns.md)| `between` | Within range (inclusive) | `->addRule('age', 'between', [18, 65])` |
+
+  - [Relationship Mapping](04-data-management/model-mapping/relationship-mapping.md)| `not_between` | Outside range | `->addRule('risk_score', 'not_between', [80, 100])` |
+
+  - [Generator](04-data-management/model-mapping/generator.md)
+
+- [Snapshots](04-data-management/snapshot/)#### String Operations
+
+  - [Usage](04-data-management/snapshot/usage.md)
+
+  - [Data Structure](04-data-management/snapshot/data-structure.md)| Operator | Description | Example |
+
+- [Data Extractor](04-data-management/extractor.md)|----------|-------------|---------|
+
+- [Dynamic Values](04-data-management/dynamic-values.md)| `contains` | String contains substring | `->addRule('email', 'contains', '@company.com')` |
+
 | `starts_with` | String starts with | `->addRule('code', 'starts_with', 'ACC')` |
-| `ends_with` | String ends with | `->addRule('email', 'ends_with', '.edu')` |
 
-#### Existence Operations
+</details>| `ends_with` | String ends with | `->addRule('email', 'ends_with', '.edu')` |
 
-| Operator | Description | Example |
-|----------|-------------|---------|
-| `exists` | Field has a value | `->addRule('profile_photo', 'exists', true)` |
-| `not_exists` | Field is null/empty | `->addRule('deleted_at', 'not_exists', true)` |
 
-#### Pattern Matching
+
+<details>#### Existence Operations
+
+<summary><strong>05. User Interface</strong></summary>
 
 | Operator | Description | Example |
-|----------|-------------|---------|
+
+- [Overview](05-user-interface/README.md)|----------|-------------|---------|
+
+- [Setup Guide](05-user-interface/setup.md)| `exists` | Field has a value | `->addRule('profile_photo', 'exists', true)` |
+
+- [Features](05-user-interface/features.md)| `not_exists` | Field is null/empty | `->addRule('deleted_at', 'not_exists', true)` |
+
+- [Dynamic Fields](05-user-interface/dynamic-fields.md)
+
+- [Playground](05-user-interface/playground.md)#### Pattern Matching
+
+- [Customization](05-user-interface/customization.md)
+
+| Operator | Description | Example |
+
+</details>|----------|-------------|---------|
+
 | `regex` | Regex pattern match | `->addRule('phone', 'regex', '/^\+?[1-9]\d{1,14}$/')` |
 
-### 5. Scoring Methods
+<details>
 
-Configure how scores are calculated using the `ScoringMethod` enum:
+<summary><strong>06. Configuration</strong></summary>### 5. Scoring Methods
 
-```php
-use CleaniqueCoders\Eligify\Enums\ScoringMethod;
 
-// Weighted average based on rule weights (default)
+
+- [Overview](06-configuration/README.md)Configure how scores are calculated using the `ScoringMethod` enum:
+
+- [Reference Guide](06-configuration/reference.md)
+
+- [Environment Variables](06-configuration/environment-variables.md)```php
+
+- [Operators](06-configuration/operators.md)use CleaniqueCoders\Eligify\Enums\ScoringMethod;
+
+- [Presets](06-configuration/presets.md)
+
+- [Environments](06-configuration/environments.md)// Weighted average based on rule weights (default)
+
 $criteria->scoringMethod(ScoringMethod::WEIGHTED);
 
+</details>
+
 // Binary pass/fail (100 if all pass, 0 if any fail)
-$criteria->scoringMethod(ScoringMethod::PASS_FAIL);
+
+<details>$criteria->scoringMethod(ScoringMethod::PASS_FAIL);
+
+<summary><strong>07. Advanced Features</strong></summary>
 
 // Sum of weights for passed rules
-$criteria->scoringMethod(ScoringMethod::SUM);
 
-// Simple average (all rules equal weight)
-$criteria->scoringMethod(ScoringMethod::AVERAGE);
+- [Overview](07-advanced-features/README.md)$criteria->scoringMethod(ScoringMethod::SUM);
 
-// Percentage of passed rules
-$criteria->scoringMethod(ScoringMethod::PERCENTAGE);
-```
+- [Caching](07-advanced-features/caching/)
 
-### 6. Workflow Callbacks
+  - [Implementation](07-advanced-features/caching/implementation.md)// Simple average (all rules equal weight)
 
-Define actions to execute based on evaluation results:
+  - [Strategies](07-advanced-features/caching/strategies.md)$criteria->scoringMethod(ScoringMethod::AVERAGE);
 
-```php
-$criteria->onPass(function($data, $result) {
+  - [Redis Setup](07-advanced-features/caching/redis-setup.md)
+
+- [Policy Integration](07-advanced-features/policy-integration.md)// Percentage of passed rules
+
+- [Custom Operators](07-advanced-features/custom-operators.md)$criteria->scoringMethod(ScoringMethod::PERCENTAGE);
+
+- [Custom Scoring](07-advanced-features/custom-scoring.md)```
+
+- [Events & Listeners](07-advanced-features/events-listeners.md)
+
+- [Audit Logging](07-advanced-features/audit-logging.md)### 6. Workflow Callbacks
+
+
+
+</details>Define actions to execute based on evaluation results:
+
+
+
+<details>```php
+
+<summary><strong>08. CLI Commands</strong></summary>$criteria->onPass(function($data, $result) {
+
     // Execute when evaluation passes
-    SendApprovalEmail::dispatch($data);
-})
-->onFail(function($data, $result) {
-    // Execute when evaluation fails
+
+- [Overview](08-cli/README.md)    SendApprovalEmail::dispatch($data);
+
+- [Commands Reference](08-cli/commands.md)})
+
+- [Playground CLI](08-cli/playground-cli.md)->onFail(function($data, $result) {
+
+- [Cache Management](08-cli/cache-management.md)    // Execute when evaluation fails
+
     SendRejectionEmail::dispatch($data, $result['failed_rules']);
-})
+
+</details>})
+
 ->onExcellent(function($data, $result) {
-    // Execute when score >= 90
-    OfferPremiumBenefits::dispatch($data);
+
+<details>    // Execute when score >= 90
+
+<summary><strong>09. Testing</strong></summary>    OfferPremiumBenefits::dispatch($data);
+
 })
-->onGood(function($data, $result) {
-    // Execute when 70 <= score < 90
-    OfferStandardBenefits::dispatch($data);
-});
-```
 
-## Model Mapping & Data Extraction
+- [Overview](09-testing/README.md)->onGood(function($data, $result) {
 
-Eligify provides a powerful system to extract and transform data from Eloquent models for eligibility evaluation.
+- [Unit Testing](09-testing/unit-testing.md)    // Execute when 70 <= score < 90
+
+- [Integration Testing](09-testing/integration-testing.md)    OfferStandardBenefits::dispatch($data);
+
+- [Performance Testing](09-testing/performance-testing.md)});
+
+- [Test Helpers](09-testing/test-helpers.md)```
+
+
+
+</details>## Model Mapping & Data Extraction
+
+
+
+<details>Eligify provides a powerful system to extract and transform data from Eloquent models for eligibility evaluation.
+
+<summary><strong>10. Deployment</strong></summary>
 
 ### Quick Example
 
-```php
-use CleaniqueCoders\Eligify\Data\Extractor;
+- [Overview](10-deployment/README.md)
 
-// Extract data from a model
+- [Production Guide](10-deployment/production.md)```php
+
+- [Optimization](10-deployment/optimization.md)use CleaniqueCoders\Eligify\Data\Extractor;
+
+- [Monitoring](10-deployment/monitoring.md)
+
+- [Troubleshooting](10-deployment/troubleshooting.md)// Extract data from a model
+
 $user = User::with('profile')->find(1);
-$extractor = Extractor::forModel(User::class);
+
+</details>$extractor = Extractor::forModel(User::class);
+
 $data = $extractor->extract($user);
 
-// Evaluate with extracted data
+<details>
+
+<summary><strong>11. Security</strong></summary>// Evaluate with extracted data
+
 $result = Eligify::evaluate('premium_membership', $data);
-```
 
-### Creating Model Mappings
+- [Overview](11-security/README.md)```
 
-The model mapping system supports 4 powerful patterns for handling relationships and data transformation:
+- [Best Practices](11-security/best-practices.md)
 
-#### Pattern 1: Direct Field Reference
+- [Authorization](11-security/authorization.md)### Creating Model Mappings
 
-```php
-class UserMapping extends AbstractModelMapping
+- [Input Validation](11-security/input-validation.md)
+
+- [Vulnerability Reporting](11-security/vulnerability-reporting.md)The model mapping system supports 4 powerful patterns for handling relationships and data transformation:
+
+
+
+</details>#### Pattern 1: Direct Field Reference
+
+
+
+<details>```php
+
+<summary><strong>12. Migration</strong></summary>class UserMapping extends AbstractModelMapping
+
 {
-    public function configure(Extractor $extractor): Extractor
-    {
-        $extractor = parent::configure($extractor);
 
-        // Reference OUTPUT fields from ProfileMapping
+- [Overview](12-migration/README.md)    public function configure(Extractor $extractor): Extractor
+
+- [Upgrade Guide](12-migration/upgrade-guide.md)    {
+
+- [Model Mapping Migration](12-migration/model-mapping-migration.md)        $extractor = parent::configure($extractor);
+
+- [Breaking Changes](12-migration/breaking-changes.md)
+
+- [API Stability](12-migration/api-stability.md)        // Reference OUTPUT fields from ProfileMapping
+
         $extractor->setRelationshipMappings([
-            'profile' => [
+
+</details>            'profile' => [
+
                 'biography' => 'user_bio',     // ProfileMapping outputs 'biography'
-                'employed' => 'is_employed',   // ProfileMapping outputs 'employed'
-            ],
+
+<details>                'employed' => 'is_employed',   // ProfileMapping outputs 'employed'
+
+<summary><strong>13. Examples</strong></summary>            ],
+
         ]);
 
-        return $extractor;
-    }
-}
-```
+- [Overview](13-examples/README.md)
 
-#### Pattern 2: Spread Operator (All Fields)
+- Basic Examples        return $extractor;
+
+  - [Loan Approval](13-examples/basic/loan-approval.md)    }
+
+  - [Scholarship](13-examples/basic/scholarship.md)}
+
+  - [Job Screening](13-examples/basic/job-screening.md)```
+
+- Intermediate Examples
+
+  - [Insurance](13-examples/intermediate/insurance.md)#### Pattern 2: Spread Operator (All Fields)
+
+  - [E-commerce](13-examples/intermediate/e-commerce.md)
+
+  - [Government Aid](13-examples/intermediate/government-aid.md)```php
+
+- Advanced Examples// Include ALL fields from ProfileMapping automatically
+
+  - [Membership Tiers](13-examples/advanced/membership-tiers.md)$profileMapping = app(ProfileMapping::class);
+
+  - [Credit Card](13-examples/advanced/credit-card.md)$extractor->setRelationshipMappings([
+
+  - [Rental Screening](13-examples/advanced/rental-screening.md)    'profile' => $profileMapping->getFieldMappings(),
+
+  - [SaaS Upgrade](13-examples/advanced/saas-upgrade.md)]);
+
+- Real-World Examples```
+
+  - [Multi-Tenant](13-examples/real-world/multi-tenant.md)
+
+  - [High Traffic](13-examples/real-world/high-traffic.md)#### Pattern 3: Nested Relationships
+
+  - [Complex Workflows](13-examples/real-world/complex-workflows.md)
 
 ```php
-// Include ALL fields from ProfileMapping automatically
-$profileMapping = app(ProfileMapping::class);
+
+</details>// Multi-level: Order → Customer → Address
+
 $extractor->setRelationshipMappings([
-    'profile' => $profileMapping->getFieldMappings(),
+
+<details>    'customer' => ['email_address' => 'customer_email'],
+
+<summary><strong>14. API Reference</strong></summary>    'customer.address' => ['street_address' => 'shipping_street'],
+
 ]);
-```
 
-#### Pattern 3: Nested Relationships
+- [Overview](14-reference/README.md)```
 
-```php
-// Multi-level: Order → Customer → Address
-$extractor->setRelationshipMappings([
-    'customer' => ['email_address' => 'customer_email'],
-    'customer.address' => ['street_address' => 'shipping_street'],
-]);
-```
+- API Documentation
 
-#### Pattern 4: Computed Fields with Relationships
+  - [Eligify Facade](14-reference/api/eligify-facade.md)#### Pattern 4: Computed Fields with Relationships
 
-```php
-$this->computedFields = [
-    'works_at_large_company' => function ($model) {
-        return ($model->company->employee_count ?? 0) > 100;
-    },
-];
-```
+  - [Criteria Builder](14-reference/api/criteria-builder.md)
 
-### 📖 Complete Documentation
+  - [Evaluation Result](14-reference/api/evaluation-result.md)```php
 
-For complete guides on all 4 patterns with working examples:
+  - [Models](14-reference/api/models.md)$this->computedFields = [
+
+- Reference Guides    'works_at_large_company' => function ($model) {
+
+  - [Operators](14-reference/operators.md)        return ($model->company->employee_count ?? 0) > 100;
+
+  - [Enums](14-reference/enums.md)    },
+
+  - [Events](14-reference/events.md)];
+
+  - [Database Schema](14-reference/database-schema.md)```
+
+
+
+</details>### 📖 Complete Documentation
+
+
+
+<details>For complete guides on all 4 patterns with working examples:
+
+<summary><strong>15. Appendix</strong></summary>
 
 - **[Model Mapping Guide](model-mapping-guide.md)** - Complete guide with all patterns
-- **[Relationship Mapping Cheatsheet](relationship-mapping-cheatsheet.md)** - Quick reference
-- **[Mapper Generation Guide](mapper-generation-guide.md)** - Auto-generate mappings
-- **[Example 17](../examples/17-relationship-mapping-usage.php)** - Working code for all patterns
 
-### Generate Mappings Automatically
+- [Overview](15-appendix/README.md)- **[Relationship Mapping Cheatsheet](relationship-mapping-cheatsheet.md)** - Quick reference
 
-```bash
+- [Glossary](15-appendix/glossary.md)- **[Mapper Generation Guide](mapper-generation-guide.md)** - Auto-generate mappings
+
+- [FAQ](15-appendix/faq.md)- **[Example 17](../examples/17-relationship-mapping-usage.php)** - Working code for all patterns
+
+- [Comparison](15-appendix/comparison.md)
+
+- [Roadmap](15-appendix/roadmap.md)### Generate Mappings Automatically
+
+
+
+</details>```bash
+
 # Generate single mapping
-php artisan eligify:make-mapping "App\Models\User"
 
-# Generate all mappings
+---php artisan eligify:make-mapping "App\Models\User"
+
+
+
+## 🤝 Contributing# Generate all mappings
+
 php artisan eligify:make-all-mappings
-```
 
-#### 3. Use Your Mapping
+Contributions are welcome! Please see [CONTRIBUTING.md](../CONTRIBUTING.md) for details.```
 
-```php
+
+
+## 📝 License#### 3. Use Your Mapping
+
+
+
+The MIT License (MIT). Please see [License File](../LICENSE.md) for more information.```php
+
 $customer = Customer::with('orders')->find(1);
-$extractor = Extractor::forModel('App\Models\Customer');
+
+## 🔗 Links$extractor = Extractor::forModel('App\Models\Customer');
+
 $data = $extractor->extract($customer);
 
-// Evaluate with extracted data
-$result = Eligify::evaluate('vip_program', $data);
+- [GitHub Repository](https://github.com/cleaniquecoders/eligify)
+
+- [Issue Tracker](https://github.com/cleaniquecoders/eligify/issues)// Evaluate with extracted data
+
+- [Changelog](../CHANGELOG.md)$result = Eligify::evaluate('vip_program', $data);
+
 ```
 
 ### Available Helper Methods
@@ -1283,6 +1656,7 @@ $result = Eligify::evaluate('verified_user_access', $data);
 ```
 
 The example shows:
+
 - ✅ Automatic field mapping (`created_at` → `registration_date`)
 - ✅ Computed fields (`is_verified`, `account_age_days`)
 - ✅ Single and batch user evaluation

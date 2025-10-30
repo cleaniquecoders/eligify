@@ -29,9 +29,11 @@ The model mapping documentation has been **completely restructured** for clarity
 ## 🎯 New Structure
 
 ### 1. Main Guide
+
 **File**: `model-mapping-guide.md`
 
 **Covers**:
+
 - All 4 relationship patterns
 - Complete examples
 - Best practices
@@ -40,9 +42,11 @@ The model mapping documentation has been **completely restructured** for clarity
 **Read this first!**
 
 ### 2. Quick Reference
+
 **File**: `relationship-mapping-cheatsheet.md`
 
 **Covers**:
+
 - Visual guide
 - Common mistakes
 - Quick pattern lookup
@@ -51,9 +55,11 @@ The model mapping documentation has been **completely restructured** for clarity
 **Keep this open while coding!**
 
 ### 3. Generator Guide
+
 **File**: `mapper-generation-guide.md`
 
 **Covers**:
+
 - CLI commands
 - Auto-generation
 - Bulk operations
@@ -61,9 +67,11 @@ The model mapping documentation has been **completely restructured** for clarity
 **Use this to save time!**
 
 ### 4. Example Code
+
 **File**: `examples/17-relationship-mapping-usage.php`
 
 **Covers**:
+
 - Working implementation
 - All 4 patterns in action
 - Copy-paste ready code
@@ -104,33 +112,38 @@ $extractor->setRelationshipMappings([
 
 ## 📖 Where to Find Information
 
-### Old Documentation Said...
+### Old Documentation Said
 
 **"Create field mappings for relationships"**
 
-### New Documentation Says...
+### New Documentation Says
 
 **Pattern 1: Direct Field Reference**
+
 - See `model-mapping-guide.md` → Pattern 1 section
 - Reference OUTPUT fields from related mappings
 - Select specific fields only
 
 **Pattern 1B: Spread Operator**
+
 - See `model-mapping-guide.md` → Pattern 1B section
 - Include ALL fields dynamically
 - Auto-updates when related mapping changes
 
 **Pattern 2: Merge with Prefix**
+
 - See `model-mapping-guide.md` → Pattern 2 section
 - Custom prefix for fields
 - Remap and rename related fields
 
 **Pattern 3: Computed Fields**
+
 - See `model-mapping-guide.md` → Pattern 3 section
 - Use relationship data in calculations
 - Access raw model properties
 
 **Pattern 4: Nested Relationships**
+
 - See `model-mapping-guide.md` → Pattern 4 section
 - Multi-level relationships
 - Deep data access
@@ -142,11 +155,13 @@ $extractor->setRelationshipMappings([
 ### Step 1: Update Bookmarks
 
 Remove bookmarks to:
+
 - ❌ `model-mappings.md`
 - ❌ `model-data-extraction.md`
 - ❌ `quick-reference-*.md`
 
 Add bookmarks to:
+
 - ✅ `model-mapping-guide.md`
 - ✅ `relationship-mapping-cheatsheet.md`
 
@@ -160,6 +175,7 @@ grep -r "setRelationshipMappings" app/
 ```
 
 For each usage:
+
 1. Identify the related mapping class
 2. Check its `$fieldMappings` array
 3. Verify you're using VALUES (right side), not KEYS (left side)
@@ -177,6 +193,7 @@ php examples/17-relationship-mapping-usage.php
 ### Step 4: Update Team
 
 Share this migration guide with your team:
+
 ```bash
 # Copy to your project
 cp vendor/cleaniquecoders/eligify/docs/migration-guide.md docs/
@@ -197,6 +214,7 @@ cp vendor/cleaniquecoders/eligify/docs/migration-guide.md docs/
 ### Q: Can I still use old patterns?
 
 **A**: If your code works, it works. But we recommend updating to the new patterns for:
+
 - Better maintainability
 - Clearer intent
 - Future compatibility
@@ -214,6 +232,7 @@ cp vendor/cleaniquecoders/eligify/docs/migration-guide.md docs/
 ## 📞 Support
 
 If you have questions:
+
 1. Check [model-mapping-guide.md](model-mapping-guide.md) first
 2. Look at [relationship-mapping-cheatsheet.md](relationship-mapping-cheatsheet.md)
 3. Run the example: `php examples/17-relationship-mapping-usage.php`
