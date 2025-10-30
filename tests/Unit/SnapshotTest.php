@@ -1,69 +1,69 @@
 <?php
 
-use CleaniqueCoders\Eligify\Support\ExtractedModelData;
+use CleaniqueCoders\Eligify\Data\Snapshot;
 
-test('can create extracted model data instance', function () {
+test('can create snapshot instance', function () {
     $data = ['income' => 50000, 'credit_score' => 720];
-    $extracted = new ExtractedModelData($data);
+    $snapshot = new Snapshot($data);
 
-    expect($extracted)->toBeInstanceOf(ExtractedModelData::class)
-        ->and($extracted->toArray())->toBe($data);
+    expect($snapshot)->toBeInstanceOf(Snapshot::class)
+        ->and($snapshot->toArray())->toBe($data);
 });
 
 test('can access data via property syntax', function () {
-    $extracted = new ExtractedModelData([
+    $snapshot = new Snapshot([
         'income' => 50000,
         'credit_score' => 720,
     ]);
 
-    expect($extracted->income)->toBe(50000)
-        ->and($extracted->credit_score)->toBe(720);
+    expect($snapshot->income)->toBe(50000)
+        ->and($snapshot->credit_score)->toBe(720);
 });
 
 test('can access data via array syntax', function () {
-    $extracted = new ExtractedModelData([
+    $snapshot = new Snapshot([
         'income' => 50000,
         'credit_score' => 720,
     ]);
 
-    expect($extracted['income'])->toBe(50000)
-        ->and($extracted['credit_score'])->toBe(720);
+    expect($snapshot['income'])->toBe(50000)
+        ->and($snapshot['credit_score'])->toBe(720);
 });
 
 test('can get data with default value', function () {
-    $extracted = new ExtractedModelData(['income' => 50000]);
+    $snapshot = new Snapshot(['income' => 50000]);
 
-    expect($extracted->get('credit_score', 650))->toBe(650)
-        ->and($extracted->get('income', 0))->toBe(50000);
+    expect($snapshot->get('credit_score', 650))->toBe(650)
+        ->and($snapshot->get('income', 0))->toBe(50000);
 });
 
 test('can check if key exists', function () {
-    $extracted = new ExtractedModelData(['income' => 50000]);
+    $snapshot = new Snapshot(['income' => 50000]);
 
-    expect($extracted->has('income'))->toBeTrue()
-        ->and($extracted->has('credit_score'))->toBeFalse()
-        ->and(isset($extracted->income))->toBeTrue()
-        ->and(isset($extracted->credit_score))->toBeFalse();
+    expect($snapshot->has('income'))->toBeTrue()
+        ->and($snapshot->has('credit_score'))->toBeFalse()
+        ->and(isset($snapshot->income))->toBeTrue()
+        ->and(isset($snapshot->credit_score))->toBeFalse();
 });
 
 test('can get all data', function () {
     $data = ['income' => 50000, 'credit_score' => 720];
-    $extracted = new ExtractedModelData($data);
+    $snapshot = new Snapshot($data);
 
-    expect($extracted->all())->toBe($data);
+    expect($snapshot->all())->toBe($data);
 });
 
 test('can get only specified keys', function () {
-    $extracted = new ExtractedModelData([
+    $snapshot = new Snapshot([
         'income' => 50000,
         'credit_score' => 720,
         'age' => 30,
         'name' => 'John',
     ]);
 
-    $subset = $extracted->only(['income', 'credit_score']);
+    $subset = $snapshot->only(['income', 'credit_score']);
 
-    expect($subset)->toBeInstanceOf(ExtractedModelData::class)
+    expect($subset)->toBeInstanceOf(Snapshot::class)
         ->and($subset->toArray())->toBe([
             'income' => 50000,
             'credit_score' => 720,
@@ -71,14 +71,14 @@ test('can get only specified keys', function () {
 });
 
 test('can get all except specified keys', function () {
-    $extracted = new ExtractedModelData([
+    $snapshot = new Snapshot([
         'income' => 50000,
         'credit_score' => 720,
         'ssn' => '123-45-6789',
         'account_number' => 'ACC123',
     ]);
 
-    $safe = $extracted->except(['ssn', 'account_number']);
+    $safe = $snapshot->except(['ssn', 'account_number']);
 
     expect($safe->toArray())->toBe([
         'income' => 50000,
@@ -87,14 +87,14 @@ test('can get all except specified keys', function () {
 });
 
 test('can filter data with callback', function () {
-    $extracted = new ExtractedModelData([
+    $snapshot = new Snapshot([
         'income' => 50000,
         'credit_score' => 720,
         'age' => 30,
         'name' => 'John',
     ]);
 
-    $numeric = $extracted->filter(fn ($value) => is_numeric($value));
+    $numeric = $snapshot->filter(fn ($value) => is_numeric($value));
 
     expect($numeric->toArray())->toBe([
         'income' => 50000,
@@ -104,12 +104,12 @@ test('can filter data with callback', function () {
 });
 
 test('can transform data with callback', function () {
-    $extracted = new ExtractedModelData([
+    $snapshot = new Snapshot([
         'income' => 50000.4,
         'credit_score' => 720.6,
     ]);
 
-    $rounded = $extracted->transform(fn ($value) => is_numeric($value) ? (int) round($value) : $value);
+    $rounded = $snapshot->transform(fn ($value) => is_numeric($value) ? (int) round($value) : $value);
 
     expect($rounded->toArray())->toBe([
         'income' => 50000,
@@ -118,8 +118,8 @@ test('can transform data with callback', function () {
 });
 
 test('can merge additional data', function () {
-    $extracted = new ExtractedModelData(['income' => 50000]);
-    $merged = $extracted->merge(['credit_score' => 720]);
+    $snapshot = new Snapshot(['income' => 50000]);
+    $merged = $snapshot->merge(['credit_score' => 720]);
 
     expect($merged->toArray())->toBe([
         'income' => 50000,
@@ -128,25 +128,25 @@ test('can merge additional data', function () {
 });
 
 test('has metadata tracking', function () {
-    $extracted = new ExtractedModelData(
+    $snapshot = new Snapshot(
         ['income' => 50000],
         ['model_class' => 'App\Models\User']
     );
 
-    expect($extracted->metadata('model_class'))->toBe('App\Models\User')
-        ->and($extracted->metadata('field_count'))->toBe(1)
-        ->and($extracted->metadata('extracted_at'))->toBeString();
+    expect($snapshot->metadata('model_class'))->toBe('App\Models\User')
+        ->and($snapshot->metadata('field_count'))->toBe(1)
+        ->and($snapshot->metadata('captured_at'))->toBeString();
 });
 
 test('can get fields matching pattern', function () {
-    $extracted = new ExtractedModelData([
+    $snapshot = new Snapshot([
         'loans_count' => 2,
         'loans_total' => 10000,
         'income' => 50000,
         'credit_score' => 720,
     ]);
 
-    $loanFields = $extracted->whereKeyMatches('/^loans_/');
+    $loanFields = $snapshot->whereKeyMatches('/^loans_/');
 
     expect($loanFields->toArray())->toBe([
         'loans_count' => 2,
@@ -155,14 +155,14 @@ test('can get fields matching pattern', function () {
 });
 
 test('can filter numeric fields only', function () {
-    $extracted = new ExtractedModelData([
+    $snapshot = new Snapshot([
         'income' => 50000,
         'name' => 'John',
         'age' => 30,
         'is_verified' => true,
     ]);
 
-    $numeric = $extracted->numericFields();
+    $numeric = $snapshot->numericFields();
 
     expect($numeric->toArray())->toBe([
         'income' => 50000,
@@ -171,14 +171,14 @@ test('can filter numeric fields only', function () {
 });
 
 test('can filter string fields only', function () {
-    $extracted = new ExtractedModelData([
+    $snapshot = new Snapshot([
         'income' => 50000,
         'name' => 'John',
         'email' => 'john@example.com',
         'is_verified' => true,
     ]);
 
-    $strings = $extracted->stringFields();
+    $strings = $snapshot->stringFields();
 
     expect($strings->toArray())->toBe([
         'name' => 'John',
@@ -187,14 +187,14 @@ test('can filter string fields only', function () {
 });
 
 test('can filter boolean fields only', function () {
-    $extracted = new ExtractedModelData([
+    $snapshot = new Snapshot([
         'income' => 50000,
         'is_verified' => true,
         'has_loan' => false,
         'name' => 'John',
     ]);
 
-    $booleans = $extracted->booleanFields();
+    $booleans = $snapshot->booleanFields();
 
     expect($booleans->toArray())->toBe([
         'is_verified' => true,
@@ -203,8 +203,8 @@ test('can filter boolean fields only', function () {
 });
 
 test('can convert to json', function () {
-    $extracted = new ExtractedModelData(['income' => 50000]);
-    $json = $extracted->toJson();
+    $snapshot = new Snapshot(['income' => 50000]);
+    $json = $snapshot->toJson();
 
     expect($json)->toBeString()
         ->and(json_decode($json, true))->toHaveKey('data')
@@ -212,35 +212,35 @@ test('can convert to json', function () {
 });
 
 test('can count fields', function () {
-    $extracted = new ExtractedModelData([
+    $snapshot = new Snapshot([
         'income' => 50000,
         'credit_score' => 720,
         'age' => 30,
     ]);
 
-    expect($extracted->count())->toBe(3)
-        ->and(count($extracted))->toBe(3);
+    expect($snapshot->count())->toBe(3)
+        ->and(count($snapshot))->toBe(3);
 });
 
 test('is immutable when setting properties', function () {
-    $extracted = new ExtractedModelData(['income' => 50000]);
+    $snapshot = new Snapshot(['income' => 50000]);
 
-    expect(fn () => $extracted->income = 60000)
+    expect(fn () => $snapshot->income = 60000)
         ->toThrow(\BadMethodCallException::class);
 });
 
 test('is immutable when setting array offsets', function () {
-    $extracted = new ExtractedModelData(['income' => 50000]);
+    $snapshot = new Snapshot(['income' => 50000]);
 
-    expect(fn () => $extracted['income'] = 60000)
+    expect(fn () => $snapshot['income'] = 60000)
         ->toThrow(\BadMethodCallException::class);
 });
 
 test('is immutable when unsetting array offsets', function () {
-    $extracted = new ExtractedModelData(['income' => 50000]);
+    $snapshot = new Snapshot(['income' => 50000]);
 
     try {
-        unset($extracted['income']);
+        unset($snapshot['income']);
         expect(false)->toBeTrue('Expected exception was not thrown');
     } catch (\BadMethodCallException $e) {
         expect($e)->toBeInstanceOf(\BadMethodCallException::class);
@@ -248,8 +248,8 @@ test('is immutable when unsetting array offsets', function () {
 });
 
 test('can convert to string', function () {
-    $extracted = new ExtractedModelData(['income' => 50000]);
-    $string = (string) $extracted;
+    $snapshot = new Snapshot(['income' => 50000]);
+    $string = (string) $snapshot;
 
     expect($string)->toBeString()
         ->and($string)->toContain('income')
@@ -257,37 +257,37 @@ test('can convert to string', function () {
 });
 
 test('implements arrayable interface', function () {
-    $extracted = new ExtractedModelData(['income' => 50000]);
+    $snapshot = new Snapshot(['income' => 50000]);
 
-    expect($extracted)->toBeInstanceOf(\Illuminate\Contracts\Support\Arrayable::class);
+    expect($snapshot)->toBeInstanceOf(\Illuminate\Contracts\Support\Arrayable::class);
 });
 
 test('implements jsonable interface', function () {
-    $extracted = new ExtractedModelData(['income' => 50000]);
+    $snapshot = new Snapshot(['income' => 50000]);
 
-    expect($extracted)->toBeInstanceOf(\Illuminate\Contracts\Support\Jsonable::class);
+    expect($snapshot)->toBeInstanceOf(\Illuminate\Contracts\Support\Jsonable::class);
 });
 
 test('implements json serializable', function () {
-    $extracted = new ExtractedModelData(['income' => 50000]);
+    $snapshot = new Snapshot(['income' => 50000]);
 
-    expect($extracted)->toBeInstanceOf(\JsonSerializable::class);
+    expect($snapshot)->toBeInstanceOf(\JsonSerializable::class);
 });
 
 test('implements array access', function () {
-    $extracted = new ExtractedModelData(['income' => 50000]);
+    $snapshot = new Snapshot(['income' => 50000]);
 
-    expect($extracted)->toBeInstanceOf(\ArrayAccess::class);
+    expect($snapshot)->toBeInstanceOf(\ArrayAccess::class);
 });
 
 test('implements countable', function () {
-    $extracted = new ExtractedModelData(['income' => 50000]);
+    $snapshot = new Snapshot(['income' => 50000]);
 
-    expect($extracted)->toBeInstanceOf(\Countable::class);
+    expect($snapshot)->toBeInstanceOf(\Countable::class);
 });
 
 test('can chain multiple operations', function () {
-    $extracted = new ExtractedModelData([
+    $snapshot = new Snapshot([
         'income' => 50000.4,
         'credit_score' => 720.3,
         'age' => 30,
@@ -295,7 +295,7 @@ test('can chain multiple operations', function () {
         'ssn' => '123-45-6789',
     ]);
 
-    $result = $extracted
+    $result = $snapshot
         ->except(['ssn'])
         ->numericFields()
         ->transform(fn ($value) => (int) round($value));
@@ -308,12 +308,12 @@ test('can chain multiple operations', function () {
 });
 
 test('preserves metadata through transformations', function () {
-    $extracted = new ExtractedModelData(
+    $snapshot = new Snapshot(
         ['income' => 50000],
         ['model_class' => 'App\Models\User']
     );
 
-    $filtered = $extracted->only(['income']);
+    $filtered = $snapshot->only(['income']);
 
     expect($filtered->metadata('model_class'))->toBe('App\Models\User');
 });

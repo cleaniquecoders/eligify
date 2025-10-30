@@ -3,7 +3,7 @@
 namespace CleaniqueCoders\Eligify\Mappings;
 
 use CleaniqueCoders\Eligify\Contracts\ModelMapping;
-use CleaniqueCoders\Eligify\Support\ModelDataExtractor;
+use CleaniqueCoders\Eligify\Data\Extractor;
 
 /**
  * Abstract base class for model mappings
@@ -30,7 +30,7 @@ abstract class AbstractModelMapping implements ModelMapping
     /**
      * Configure the extractor with all mappings
      */
-    public function configure(ModelDataExtractor $extractor): ModelDataExtractor
+    public function configure(Extractor $extractor): Extractor
     {
         if (! empty($this->fieldMappings)) {
             $extractor->setFieldMappings($this->fieldMappings);

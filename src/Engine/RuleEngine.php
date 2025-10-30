@@ -2,11 +2,11 @@
 
 namespace CleaniqueCoders\Eligify\Engine;
 
+use CleaniqueCoders\Eligify\Data\Snapshot;
 use CleaniqueCoders\Eligify\Enums\RuleOperator;
 use CleaniqueCoders\Eligify\Enums\ScoringMethod;
 use CleaniqueCoders\Eligify\Models\Criteria;
 use CleaniqueCoders\Eligify\Models\Rule;
-use CleaniqueCoders\Eligify\Support\ExtractedModelData;
 use Illuminate\Support\Collection;
 
 class RuleEngine
@@ -24,15 +24,15 @@ class RuleEngine
      * Evaluate all rules for a given criteria against provided data
      *
      * @param  Criteria  $criteria  The criteria containing rules to evaluate
-     * @param  array|ExtractedModelData  $data  The data to evaluate against (accepts both formats)
+     * @param  array|Snapshot  $data  The data to evaluate against (accepts both formats)
      * @return array Evaluation result with passed status, score, and failed rules
      */
-    public function evaluate(Criteria $criteria, array|ExtractedModelData $data): array
+    public function evaluate(Criteria $criteria, array|Snapshot $data): array
     {
         $this->executionLog = [];
 
-        // Convert ExtractedModelData to array if needed
-        $dataArray = $data instanceof ExtractedModelData ? $data->toArray() : $data;
+        // Convert Snapshot to array if needed
+        $dataArray = $data instanceof Snapshot ? $data->toArray() : $data;
 
         $rules = $criteria->rules()->where('is_active', true)->orderBy('order')->get();
 

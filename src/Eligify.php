@@ -4,11 +4,11 @@ namespace CleaniqueCoders\Eligify;
 
 use CleaniqueCoders\Eligify\Audit\AuditLogger;
 use CleaniqueCoders\Eligify\Builder\CriteriaBuilder;
+use CleaniqueCoders\Eligify\Data\Snapshot;
 use CleaniqueCoders\Eligify\Engine\AdvancedRuleEngine;
 use CleaniqueCoders\Eligify\Engine\RuleEngine;
 use CleaniqueCoders\Eligify\Models\Criteria;
 use CleaniqueCoders\Eligify\Models\Evaluation;
-use CleaniqueCoders\Eligify\Support\ExtractedModelData;
 
 class Eligify
 {
@@ -33,11 +33,11 @@ class Eligify
      * Evaluate a criteria against provided data
      *
      * @param  string|Criteria  $criteria  The criteria name or model
-     * @param  array|ExtractedModelData  $data  The data to evaluate (accepts both formats)
+     * @param  array|Snapshot  $data  The data to evaluate (accepts both formats)
      * @param  bool  $saveEvaluation  Whether to save the evaluation result
      * @return array Evaluation result with passed status, score, and details
      */
-    public function evaluate(string|Criteria $criteria, array|ExtractedModelData $data, bool $saveEvaluation = true): array
+    public function evaluate(string|Criteria $criteria, array|Snapshot $data, bool $saveEvaluation = true): array
     {
         // Get criteria model if string provided
         if (is_string($criteria)) {
@@ -50,8 +50,8 @@ class Eligify
             $criteriaModel = $criteria;
         }
 
-        // Convert ExtractedModelData to array for storage operations
-        $dataArray = $data instanceof ExtractedModelData ? $data->toArray() : $data;
+        // Convert Snapshot to array for storage operations
+        $dataArray = $data instanceof Snapshot ? $data->toArray() : $data;
 
         // Run the evaluation using appropriate engine
         $engine = $this->getEngineForCriteria($criteriaModel);
@@ -72,10 +72,10 @@ class Eligify
      * Evaluate with callback execution
      *
      * @param  CriteriaBuilder  $builder  The criteria builder with rules and callbacks
-     * @param  array|ExtractedModelData  $data  The data to evaluate
+     * @param  array|Snapshot  $data  The data to evaluate
      * @return array Evaluation result
      */
-    public function evaluateWithCallbacks(CriteriaBuilder $builder, array|ExtractedModelData $data): array
+    public function evaluateWithCallbacks(CriteriaBuilder $builder, array|Snapshot $data): array
     {
         // Save pending rules first
         $builder->save();
@@ -83,8 +83,8 @@ class Eligify
         $criteria = $builder->getCriteria();
         $workflowManager = $builder->getWorkflowManager();
 
-        // Convert ExtractedModelData to array for callbacks
-        $dataArray = $data instanceof ExtractedModelData ? $data->toArray() : $data;
+        // Convert Snapshot to array for callbacks
+        $dataArray = $data instanceof Snapshot ? $data->toArray() : $data;
 
         // Run evaluation
         $result = $this->evaluate($criteria, $data, false); // Don't save evaluation twice

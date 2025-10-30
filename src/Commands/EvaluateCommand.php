@@ -2,9 +2,9 @@
 
 namespace CleaniqueCoders\Eligify\Commands;
 
+use CleaniqueCoders\Eligify\Data\Extractor;
 use CleaniqueCoders\Eligify\Eligify;
 use CleaniqueCoders\Eligify\Models\Criteria;
-use CleaniqueCoders\Eligify\Support\ModelDataExtractor;
 use Illuminate\Console\Command;
 
 class EvaluateCommand extends Command
@@ -93,16 +93,16 @@ class EvaluateCommand extends Command
 
         try {
             $model = $modelClass::findOrFail($id);
-            $extractor = new ModelDataExtractor;
-            $data = $extractor->extract($model);
+            $extractor = new Extractor;
+            $snapshot = $extractor->extract($model);
 
             if ($this->option('verbose-output')) {
                 $this->info("Extracted data from {$modelClass}#{$id}:");
-                $this->line(json_encode($data, JSON_PRETTY_PRINT));
+                $this->line(json_encode($snapshot->toArray(), JSON_PRETTY_PRINT));
                 $this->newLine();
             }
 
-            return $data;
+            return $snapshot->toArray();
         } catch (\Exception $e) {
             $this->error("Failed to load model: {$e->getMessage()}");
 

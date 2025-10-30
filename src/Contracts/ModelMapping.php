@@ -2,23 +2,21 @@
 
 namespace CleaniqueCoders\Eligify\Contracts;
 
-use CleaniqueCoders\Eligify\Support\ModelDataExtractor;
+use CleaniqueCoders\Eligify\Data\Extractor;
 
 /**
- * Contract for model mapping classes that configure data extraction
+ * Interface for custom model mappings
+ *
+ * Implement this interface to define how a model's data should be extracted
+ * and mapped for eligibility evaluations.
  */
 interface ModelMapping
 {
     /**
-     * Configure the extractor with field mappings, computed fields, etc.
+     * Configure the extractor with custom field mappings, relationships, and computed fields
      *
-     * @param  ModelDataExtractor  $extractor  The extractor instance to configure
-     * @return ModelDataExtractor The configured extractor
+     * @param  Extractor  $extractor  The extractor instance to configure
+     * @return Extractor The configured extractor
      */
-    public function configure(ModelDataExtractor $extractor): ModelDataExtractor;
-
-    /**
-     * Get the fully qualified class name of the model this mapping is for
-     */
-    public function getModelClass(): string;
+    public function configure(Extractor $extractor): Extractor;
 }

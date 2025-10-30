@@ -1,6 +1,6 @@
 <?php
 
-use CleaniqueCoders\Eligify\Support\ModelDataExtractor;
+use CleaniqueCoders\Eligify\Data\Extractor;
 use Illuminate\Database\Eloquent\Model;
 
 class TestModelForExtraction extends Model
@@ -78,7 +78,7 @@ test('model data extractor extracts basic attributes', function () {
         'status' => 'active',
     ]);
 
-    $extractor = new ModelDataExtractor;
+    $extractor = new Extractor;
     $data = $extractor->extract($model);
 
     expect($data)->toHaveKey('name');
@@ -102,7 +102,7 @@ test('model data extractor includes computed timestamp fields', function () {
     $model->created_at = now()->subDays(30);
     $model->updated_at = now()->subDays(5);
 
-    $extractor = new ModelDataExtractor;
+    $extractor = new Extractor;
     $data = $extractor->extract($model);
 
     expect($data)->toHaveKey('created_days_ago');
@@ -124,7 +124,7 @@ test('model data extractor excludes sensitive fields', function () {
         'api_token' => 'api123',
     ]);
 
-    $extractor = new ModelDataExtractor;
+    $extractor = new Extractor;
     $data = $extractor->extract($model);
 
     expect($data)->toHaveKey('name');
@@ -141,7 +141,7 @@ test('model data extractor can apply custom field mappings', function () {
         'age' => 30,
     ]);
 
-    $extractor = new ModelDataExtractor;
+    $extractor = new Extractor;
     $extractor->setFieldMappings([
         'name' => 'full_name',
         'email' => 'email_address',
@@ -165,7 +165,7 @@ test('model data extractor can apply custom computed fields', function () {
         'income' => 50000,
     ]);
 
-    $extractor = new ModelDataExtractor;
+    $extractor = new Extractor;
     $extractor->setComputedFields([
         'income_category' => function ($model, $data) {
             return match (true) {
@@ -205,7 +205,7 @@ test('model data extractor can be preconfigured for specific models', function (
     // Set created_at so it will be mapped to registration_date
     $model->created_at = now()->subDays(30);
 
-    $extractor = ModelDataExtractor::forModel('App\Models\User');
+    $extractor = Extractor::forModel('App\Models\User');
     $data = $extractor->extract($model);
 
     // The forModel method should have configured User-specific fields
@@ -223,7 +223,7 @@ test('model data extractor handles configuration options', function () {
     $model->created_at = now()->subDays(10);
 
     // Test with timestamps disabled
-    $extractor = new ModelDataExtractor([
+    $extractor = new Extractor([
         'include_timestamps' => false,
         'include_computed_fields' => false,
         'exclude_sensitive_fields' => false,
@@ -256,7 +256,7 @@ test('model data extractor handles relationship data extraction', function () {
     $model->setRelation('orders', $orders);
     $model->setRelation('profile', $profile);
 
-    $extractor = new ModelDataExtractor;
+    $extractor = new Extractor;
     $data = $extractor->extract($model);
 
     expect($data)->toHaveKey('orders_count');
@@ -280,7 +280,7 @@ test('model data extractor provides collection summaries for numeric fields', fu
 
     $model->setRelation('orders', $orders);
 
-    $extractor = new ModelDataExtractor;
+    $extractor = new Extractor;
     $data = $extractor->extract($model);
 
     expect($data)->toHaveKey('orders_total_sum');

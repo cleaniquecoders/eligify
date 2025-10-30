@@ -2,9 +2,10 @@
 
 namespace CleaniqueCoders\Eligify\Concerns;
 
+use CleaniqueCoders\Eligify\Data\Extractor;
+use CleaniqueCoders\Eligify\Data\Snapshot;
 use CleaniqueCoders\Eligify\Eligify;
 use CleaniqueCoders\Eligify\Models\Criteria;
-use CleaniqueCoders\Eligify\Support\ModelDataExtractor;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -12,15 +13,15 @@ use Illuminate\Database\Eloquent\Model;
  */
 trait HasEligibility
 {
-    protected ?ModelDataExtractor $dataExtractor = null;
+    protected ?Extractor $dataExtractor = null;
 
     /**
      * Get or create the data extractor instance
      */
-    protected function getDataExtractor(): ModelDataExtractor
+    protected function getDataExtractor(): Extractor
     {
         if ($this->dataExtractor === null) {
-            $this->dataExtractor = new ModelDataExtractor(
+            $this->dataExtractor = new Extractor(
                 config('eligify.model_extraction', [])
             );
         }
@@ -31,7 +32,7 @@ trait HasEligibility
     /**
      * Set a custom data extractor
      */
-    protected function setDataExtractor(ModelDataExtractor $extractor): self
+    protected function setDataExtractor(Extractor $extractor): self
     {
         $this->dataExtractor = $extractor;
 
@@ -179,8 +180,8 @@ trait HasEligibility
         // Allow for additional customization in subclasses
         $customized = $this->customizeExtractedData($model, $extracted);
 
-        // Convert to array if ExtractedModelData was returned
-        return $customized instanceof \CleaniqueCoders\Eligify\Support\ExtractedModelData
+        // Convert to array if Snapshot was returned
+        return $customized instanceof Snapshot
             ? $customized->toArray()
             : $customized;
     }
@@ -189,14 +190,14 @@ trait HasEligibility
      * Customize extracted data - override this method for additional customization
      *
      * @param  Model  $model  The source model
-     * @param  \CleaniqueCoders\Eligify\Support\ExtractedModelData  $data  The extracted data
-     * @return array|\CleaniqueCoders\Eligify\Support\ExtractedModelData Either format is accepted
+     * @param  Snapshot  $data  The extracted data snapshot
+     * @return array|Snapshot Either format is accepted
      */
-    protected function customizeExtractedData(Model $model, \CleaniqueCoders\Eligify\Support\ExtractedModelData $data): array|\CleaniqueCoders\Eligify\Support\ExtractedModelData
+    protected function customizeExtractedData(Model $model, Snapshot $data): array|Snapshot
     {
         // Default implementation - return data as array for backward compatibility
         // Override this method in your policy for custom field mappings
-        // You can return either ExtractedModelData or array
+        // You can return either Snapshot or array
         return $data->toArray();
     }
 
