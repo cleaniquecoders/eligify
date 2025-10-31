@@ -333,6 +333,28 @@ class RuleEditor extends Component
     }
 
     /**
+     * Should the value input show as an array textarea?
+     * True if operator requires multiple values or field type is array.
+     */
+    public function getShowsArrayInputProperty(): bool
+    {
+        $isArrayType = $this->fieldType && FieldType::tryFrom($this->fieldType) === FieldType::ARRAY;
+
+        return $this->requiresMultipleValues || $isArrayType;
+    }
+
+    /**
+     * React when operator changes to ensure UI toggles promptly and value resets appropriately.
+     */
+    public function updatedOperator(): void
+    {
+        // If the operator now needs multiple values, clear scalar input so the textarea shows helpful placeholder
+        if ($this->requiresMultipleValues) {
+            $this->value = is_array($this->value) ? $this->value : '';
+        }
+    }
+
+    /**
      * Get step attribute for numeric inputs
      */
     public function getNumericStepProperty(): string

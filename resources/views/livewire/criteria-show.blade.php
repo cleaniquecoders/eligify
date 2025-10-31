@@ -22,6 +22,38 @@
                         {{ $criteria->is_active ? 'Active' : 'Inactive' }}
                     </span>
                 </div>
+                <div class="mb-2">Type:
+                    @if(!empty($criteria->type))
+                        <span class="inline-flex items-center px-2 py-0.5 text-xs rounded bg-sky-50 text-sky-700 border border-sky-200">{{ $criteria->type }}</span>
+                    @else
+                        <span class="text-gray-400 text-xs">-</span>
+                    @endif
+                </div>
+                <div class="mb-2">Group:
+                    @if(!empty($criteria->group))
+                        <span class="inline-flex items-center px-2 py-0.5 text-xs rounded bg-amber-50 text-amber-700 border border-amber-200">{{ $criteria->group }}</span>
+                    @else
+                        <span class="text-gray-400 text-xs">-</span>
+                    @endif
+                </div>
+                <div class="mb-2">Category:
+                    @if(!empty($criteria->category))
+                        <span class="inline-flex items-center px-2 py-0.5 text-xs rounded bg-emerald-50 text-emerald-700 border border-emerald-200">{{ $criteria->category }}</span>
+                    @else
+                        <span class="text-gray-400 text-xs">-</span>
+                    @endif
+                </div>
+                <div class="mb-2">Tags:
+                    @if(is_array($criteria->tags) && count($criteria->tags))
+                        <span class="inline-flex flex-wrap gap-1">
+                            @foreach($criteria->tags as $tag)
+                                <span class="inline-flex items-center px-2 py-0.5 text-[10px] rounded bg-gray-100 text-gray-700 border border-gray-200">#{{ $tag }}</span>
+                            @endforeach
+                        </span>
+                    @else
+                        <span class="text-gray-400 text-xs">-</span>
+                    @endif
+                </div>
                 <div class="mb-2">Rules: <span class="font-semibold">{{ $criteria->rules_count }}</span></div>
                 <div class="mb-2">Evaluations: <span class="font-semibold">{{ $criteria->evaluations_count }}</span></div>
                 <div class="mb-2">Created: <span class="text-gray-500">{{ optional($criteria->created_at)->toDayDateTimeString() }}</span></div>

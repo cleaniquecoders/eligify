@@ -200,7 +200,7 @@
             <label for="operator" class="block text-sm font-medium text-gray-700 mb-1">Operator</label>
             <select
                 id="operator"
-                wire:model="operator"
+                wire:model.live="operator"
                 class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                 required
             >
@@ -240,7 +240,7 @@
                         <span class="ml-2 text-sm">False</span>
                     </label>
                 </div>
-            @elseif($this->requiresMultipleValues || $fieldType === 'array')
+            @elseif($this->showsArrayInput)
                 <!-- Array/Multiple Values Input -->
                 <textarea
                     id="value"

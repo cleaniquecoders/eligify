@@ -33,6 +33,56 @@
         </div>
     </div>
 
+    {{-- Filters Row: Type, Group, Category, Tag --}}
+    <div class="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
+        <div class="grid grid-cols-1 md:grid-cols-5 gap-3">
+            <div>
+                <label class="block text-xs font-medium text-gray-600 mb-1">Type</label>
+                <select class="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm bg-white focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all" wire:model.live="type">
+                    <option value="">All types</option>
+                    @foreach ($typeOptions as $opt)
+                        <option value="{{ $opt }}">{{ $opt }}</option>
+                    @endforeach
+                </select>
+            </div>
+            <div>
+                <label class="block text-xs font-medium text-gray-600 mb-1">Group</label>
+                <select class="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm bg-white focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all" wire:model.live="group">
+                    <option value="">All groups</option>
+                    @foreach ($groupOptions as $opt)
+                        <option value="{{ $opt }}">{{ $opt }}</option>
+                    @endforeach
+                </select>
+            </div>
+            <div>
+                <label class="block text-xs font-medium text-gray-600 mb-1">Category</label>
+                <select class="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm bg-white focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all" wire:model.live="category">
+                    <option value="">All categories</option>
+                    @foreach ($categoryOptions as $opt)
+                        <option value="{{ $opt }}">{{ $opt }}</option>
+                    @endforeach
+                </select>
+            </div>
+            <div>
+                <label class="block text-xs font-medium text-gray-600 mb-1">Tag</label>
+                <select class="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm bg-white focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all" wire:model.live="tag">
+                    <option value="">All tags</option>
+                    @foreach ($tagOptions as $opt)
+                        <option value="{{ $opt }}">#{{ $opt }}</option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="flex items-end">
+                <button type="button" wire:click="clearFilters" class="w-full md:w-auto inline-flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-medium rounded-lg border border-gray-300 text-gray-700 bg-white hover:bg-gray-50 transition-colors">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                    Clear
+                </button>
+            </div>
+        </div>
+    </div>
+
     <div class="bg-white border border-gray-100 rounded-xl shadow-sm overflow-hidden">
         @if ($items->count() === 0)
             <div class="text-center py-16">
@@ -48,7 +98,7 @@
             @if ($view === 'list')
                 <div class="overflow-x-auto">
                     <table class="min-w-full text-sm">
-                        <thead class="bg-gradient-to-r from-gray-50 to-slate-50 border-b border-gray-200">
+                        <thead class="bg-linear-to-r from-gray-50 to-slate-50 border-b border-gray-200">
                             <tr>
                                 <th class="text-left px-6 py-4 font-semibold text-gray-700">Name</th>
                                 <th class="text-left px-6 py-4 font-semibold text-gray-700">Status</th>
@@ -63,6 +113,25 @@
                                     <td class="px-6 py-4">
                                         <a class="text-primary-600 hover:text-primary-700 font-medium hover:underline transition-colors" href="{{ route('eligify.criteria.show', $criteria->id) }}">{{ $criteria->name }}</a>
                                         <div class="text-xs text-gray-500 mt-1">{{ $criteria->description }}</div>
+
+                                        {{-- Context badges: type, group, category, tags --}}
+                                        <div class="mt-2 flex flex-wrap items-center gap-1">
+                                            @if(!empty($criteria->type))
+                                                <span class="inline-flex items-center px-2 py-0.5 text-[10px] font-medium rounded bg-sky-50 text-sky-700 border border-sky-200" title="Type">{{ $criteria->type }}</span>
+                                            @endif
+                                            @if(!empty($criteria->group))
+                                                <span class="inline-flex items-center px-2 py-0.5 text-[10px] font-medium rounded bg-amber-50 text-amber-700 border border-amber-200" title="Group">{{ $criteria->group }}</span>
+                                            @endif
+                                            @if(!empty($criteria->category))
+                                                <span class="inline-flex items-center px-2 py-0.5 text-[10px] font-medium rounded bg-emerald-50 text-emerald-700 border border-emerald-200" title="Category">{{ $criteria->category }}</span>
+                                            @endif
+                                            @if(is_array($criteria->tags) && count($criteria->tags))
+                                                @foreach($criteria->tags as $tag)
+                                                    <span class="inline-flex items-center px-2 py-0.5 text-[10px] rounded bg-gray-100 text-gray-700 border border-gray-200">#{{ $tag }}</span>
+                                                @endforeach
+                                            @endif
+                                        </div>
+
                                         <div class="mt-2 opacity-0 group-hover:opacity-100 transition-opacity">
                                             <a class="text-xs text-primary-600 hover:text-primary-700 font-medium inline-flex items-center gap-1" href="{{ route('eligify.criteria.edit', $criteria->id) }}">
                                                 <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -103,6 +172,23 @@
                                     <span class="w-1.5 h-1.5 rounded-full mr-1.5 {{ $criteria->is_active ? 'bg-green-600' : 'bg-gray-600' }}"></span>
                                     {{ $criteria->is_active ? 'Active' : 'Inactive' }}
                                 </span>
+                            </div>
+                            {{-- Context badges: type, group, category, tags --}}
+                            <div class="flex flex-wrap items-center gap-1 mb-4">
+                                @if(!empty($criteria->type))
+                                    <span class="inline-flex items-center px-2 py-0.5 text-[10px] font-medium rounded bg-sky-50 text-sky-700 border border-sky-200" title="Type">{{ $criteria->type }}</span>
+                                @endif
+                                @if(!empty($criteria->group))
+                                    <span class="inline-flex items-center px-2 py-0.5 text-[10px] font-medium rounded bg-amber-50 text-amber-700 border border-amber-200" title="Group">{{ $criteria->group }}</span>
+                                @endif
+                                @if(!empty($criteria->category))
+                                    <span class="inline-flex items-center px-2 py-0.5 text-[10px] font-medium rounded bg-emerald-50 text-emerald-700 border border-emerald-200" title="Category">{{ $criteria->category }}</span>
+                                @endif
+                                @if(is_array($criteria->tags) && count($criteria->tags))
+                                    @foreach($criteria->tags as $tag)
+                                        <span class="inline-flex items-center px-2 py-0.5 text-[10px] rounded bg-gray-100 text-gray-700 border border-gray-200">#{{ $tag }}</span>
+                                    @endforeach
+                                @endif
                             </div>
                             <div class="flex items-center gap-4 mb-4">
                                 <div class="flex items-center gap-2 text-sm">

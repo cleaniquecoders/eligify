@@ -16,6 +16,31 @@
             @error('description') <div class="text-sm text-red-600 mt-1">{{ $message }}</div> @enderror
         </div>
 
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+            <div>
+                <label class="block text-sm font-medium mb-1">Type</label>
+                <input type="text" class="w-full border rounded px-3 py-2" wire:model.blur="type" placeholder="e.g. subscription, feature, policy">
+                @error('type') <div class="text-sm text-red-600 mt-1">{{ $message }}</div> @enderror
+            </div>
+            <div>
+                <label class="block text-sm font-medium mb-1">Group</label>
+                <input type="text" class="w-full border rounded px-3 py-2" wire:model.blur="group" placeholder="e.g. billing, access-control">
+                @error('group') <div class="text-sm text-red-600 mt-1">{{ $message }}</div> @enderror
+            </div>
+            <div>
+                <label class="block text-sm font-medium mb-1">Category</label>
+                <input type="text" class="w-full border rounded px-3 py-2" wire:model.blur="category" placeholder="e.g. basic, premium, enterprise">
+                @error('category') <div class="text-sm text-red-600 mt-1">{{ $message }}</div> @enderror
+            </div>
+        </div>
+
+        <div>
+            <label class="block text-sm font-medium mb-1">Tags</label>
+            <input type="text" class="w-full border rounded px-3 py-2" wire:model.blur="tags" placeholder="comma,separated,tags">
+            <p class="text-xs text-gray-500 mt-1">Enter comma-separated values. Tags are normalized to lowercase.</p>
+            @error('tags') <div class="text-sm text-red-600 mt-1">{{ $message }}</div> @enderror
+        </div>
+
         <div class="flex items-center gap-2">
             <input type="checkbox" class="rounded" wire:model.blur="is_active">
             <label class="text-sm">Active</label>

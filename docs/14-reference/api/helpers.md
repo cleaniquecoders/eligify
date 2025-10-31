@@ -25,7 +25,7 @@ eligify_snapshot(string $model, Model $data): Snapshot
 
 **Throws:**
 
-- `Exception` - If the provided model class doesn't exist
+- `InvalidArgumentException` - If the provided model class doesn't exist
 
 **Usage Example:**
 
@@ -55,7 +55,7 @@ Evaluates a criteria against a data snapshot to determine eligibility.
 **Signature:**
 
 ```php
-eligify_evaluate(string|Criteria $criteria, Snapshot $snapshot): mixed
+eligify_evaluate(string|Criteria $criteria, Snapshot $snapshot, bool $saveEvaluation = false, bool $useCache = false): mixed
 ```
 
 **Parameters:**
@@ -69,8 +69,8 @@ eligify_evaluate(string|Criteria $criteria, Snapshot $snapshot): mixed
 
 **Behavior:**
 
-- When using string: internally calls `eligify_find_criteria()` which uses `firstOrNew()`
-- Returns new unsaved Criteria instance if not found (graceful handling)
+- When using string: internally calls `eligify_find_criteria()` which searches by slug first, then by exact name
+- If not found, returns a new unsaved Criteria instance (graceful handling)
 
 **Usage Example:**
 
@@ -89,10 +89,10 @@ $criteria = Criteria::where('name', 'Loan Approval')->first();
 $result = eligify_evaluate($criteria, $snapshot);
 ```
 
-**Configuration:**
+**Flags:**
 
-- `saveEvaluation: false` - Evaluations are not persisted to database
-- `useCache: false` - Results are not cached
+- `saveEvaluation` (bool) - Persist evaluations for audit (default: false)
+- `useCache` (bool) - Cache evaluation results (default: false)
 
 **Use Cases:**
 
@@ -104,33 +104,31 @@ $result = eligify_evaluate($criteria, $snapshot);
 
 ### `eligify_find_criteria()`
 
-Finds or creates a new criteria instance by searching a specific field.
+Smart criteria finder that prefers slug, then falls back to exact name.
 
 **Signature:**
 
 ```php
-eligify_find_criteria(string $keyword, string $field = 'name'): Criteria
+eligify_find_criteria(string $keyword, bool $createIfMissing = false): Criteria
 ```
 
 **Parameters:**
 
-- `$keyword` (string) - The value to search for
-- `$field` (string) - The field to search in (defaults to 'name')
+- `$keyword` (string) - Slug or exact name to search for
+- `$createIfMissing` (bool) - When true, returns a new (unsaved) instance prefilled if not found
 
 **Returns:**
 
-- `Criteria` - Existing criteria instance or new unsaved instance if not found
+- `Criteria` - Existing instance or a new unsaved instance if not found
 
 **Usage Example:**
 
 ```php
 use CleaniqueCoders\Eligify\Models\Criteria;
 
-// Find criteria by name (default field)
+// Find by slug or exact name
+$criteria = eligify_find_criteria('loan-approval');
 $criteria = eligify_find_criteria('Loan Approval');
-
-// Find criteria by custom field
-$criteria = eligify_find_criteria('LOAN-001', 'code');
 
 // Returns a new instance if not found (not saved to database)
 if (!$criteria->exists) {
@@ -149,8 +147,8 @@ if (!$criteria->exists) {
 
 **Notes:**
 
-- Uses `firstOrNew()` - returns new instance if not found (not persisted)
-- Does not throw exceptions if criteria doesn't exist
+- Searches slug first, then exact name
+- Returns a new (unsaved) Criteria when not found (non-throwing)
 - Useful for graceful degradation in evaluation workflows
 
 ---
@@ -246,24 +244,16 @@ $result = (new Eligify)->evaluate(
 
 ## Additional Examples
 
-### Finding Criteria by Different Fields
+### Smart finding by slug or name
 
 ```php
-// Find by name (default)
+// Slug or name both work
+$criteria = eligify_find_criteria('premium-membership');
 $criteria = eligify_find_criteria('Premium Membership');
 
-// Find by code
-$criteria = eligify_find_criteria('PREM-001', 'code');
-
-// Find by slug
-$criteria = eligify_find_criteria('premium-membership', 'slug');
-
-// Check if criteria was found
-if ($criteria->exists) {
-    echo "Found: {$criteria->name}";
-} else {
-    echo "Creating new criteria";
-    $criteria->name = 'Premium Membership';
+if (! $criteria->exists) {
+    // Create and persist on demand
+    $criteria->description = 'Auto-created';
     $criteria->save();
 }
 ```
@@ -305,7 +295,7 @@ if ($criteria->exists) {
 | Persistence | ❌ No | ✅ Optional |
 | Caching | ❌ No | ✅ Optional |
 | Customization | ⭐⭐ Limited | ⭐⭐⭐⭐⭐ Full control |
-| Exception Handling | Graceful (firstOrNew) | Explicit (firstOrFail) |
+| Exception Handling | Graceful (non-throwing finder) | Explicit (firstOrFail) |
 | Use Case | Quick checks | Production systems |
 
 ---
@@ -348,3 +338,50 @@ $user->criteriaTagged(['beta'])->get();
 ```
 
 See the full model reference: [Models API](models.md).
+
+---
+
+## Additional convenience helpers
+
+### `eligify_criteria_of()`
+
+Query a model's attached criteria (requires the model to use HasCriteria). Supports optional filters: type, group, category, tags.
+
+**Signature:**
+
+```php
+eligify_criteria_of(Model $model, array $filters = []): \Illuminate\Database\Eloquent\Relations\MorphToMany
+```
+
+**Usage:**
+
+```php
+// All criteria
+$query = eligify_criteria_of($user);
+
+// Filtered
+$query = eligify_criteria_of($user, [
+    'type' => ['subscription', 'feature'],
+    'tags' => ['beta'],
+]);
+
+$criteria = $query->get();
+```
+
+### `eligify_attach_criteria()`
+
+Attach criteria to a model without detaching existing. Accepts IDs, slugs/names, or Criteria instances.
+
+**Signature:**
+
+```php
+eligify_attach_criteria(Model $model, array|string|int|Criteria $criteria): void
+```
+
+**Usage:**
+
+```php
+eligify_attach_criteria($user, [$criteriaId]);
+eligify_attach_criteria($user, 'loan-approval');
+eligify_attach_criteria($user, Criteria::first());
+```
