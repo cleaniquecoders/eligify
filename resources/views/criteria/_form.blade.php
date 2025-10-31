@@ -10,30 +10,30 @@
 
     <div>
         <label class="block text-sm font-medium mb-1">Name</label>
-        <input type="text" name="name" value="{{ old('name', $criteria->name) }}" class="w-full border rounded px-3 py-2" required>
+        <x-eligify::ui.input type="text" name="name" value="{{ old('name', $criteria->name) }}" required />
         @error('name') <div class="text-sm text-red-600 mt-1">{{ $message }}</div> @enderror
     </div>
 
     <div>
         <label class="block text-sm font-medium mb-1">Description</label>
-        <textarea name="description" rows="4" class="w-full border rounded px-3 py-2">{{ old('description', $criteria->description) }}</textarea>
+        <x-eligify::ui.textarea name="description" rows="4">{{ old('description', $criteria->description) }}</x-eligify::ui.textarea>
         @error('description') <div class="text-sm text-red-600 mt-1">{{ $message }}</div> @enderror
     </div>
 
     <div class="flex items-center gap-2">
-        <input type="checkbox" name="is_active" value="1" id="is_active" class="rounded" {{ old('is_active', $criteria->is_active) ? 'checked' : '' }}>
+        <x-eligify::ui.checkbox name="is_active" value="1" id="is_active" {{ old('is_active', $criteria->is_active) ? 'checked' : '' }} />
         <label for="is_active" class="text-sm">Active</label>
         @error('is_active') <div class="text-sm text-red-600 mt-1">{{ $message }}</div> @enderror
     </div>
 
     <div>
         <label class="block text-sm font-medium mb-1">Meta (JSON)</label>
-        <textarea name="meta_json" rows="4" class="w-full border rounded px-3 py-2" placeholder="{\n  &quot;category&quot;: &quot;finance&quot;\n}">{{ old('meta_json', isset($criteria->meta) ? json_encode($criteria->meta, JSON_PRETTY_PRINT) : '') }}</textarea>
+        <x-eligify::ui.textarea name="meta_json" rows="4" placeholder="{&#10;  &quot;category&quot;: &quot;finance&quot;&#10;}">{{ old('meta_json', isset($criteria->meta) ? json_encode($criteria->meta, JSON_PRETTY_PRINT) : '') }}</x-eligify::ui.textarea>
         <p class="text-xs text-gray-500 mt-1">Optional additional metadata for this criteria.</p>
     </div>
 
     <div class="flex items-center gap-2">
-        <a href="{{ route('eligify.criteria.index') }}" class="px-4 py-2 border rounded">Cancel</a>
-        <button type="submit" class="px-4 py-2 bg-gray-900 text-white rounded">Save</button>
+        <x-eligify::ui.button as="a" href="{{ route('eligify.criteria.index') }}" variant="secondary">Cancel</x-eligify::ui.button>
+        <x-eligify::ui.button type="submit">Save</x-eligify::ui.button>
     </div>
 </form>

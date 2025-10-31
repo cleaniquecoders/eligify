@@ -5,9 +5,9 @@
             <div class="text-xs text-gray-500">Slug: {{ $criteria->slug }}</div>
         </div>
         <div class="flex items-center gap-2">
-            <a href="{{ route('eligify.criteria.edit', $criteria->id) }}" class="px-3 py-2 text-sm border rounded">Edit</a>
-            <button type="button" wire:click="delete" class="px-3 py-2 text-sm border rounded text-red-700 border-red-300" onclick="return confirm('Delete this criteria?')">Delete</button>
-            <a href="{{ route('eligify.criteria.index') }}" class="px-3 py-2 text-sm border rounded">Back</a>
+            <x-eligify::ui.button as="a" href="{{ route('eligify.criteria.edit', $criteria->id) }}" variant="secondary">Edit</x-eligify::ui.button>
+            <x-eligify::ui.button type="button" variant="secondary" wire:click="delete" onclick="return confirm('Delete this criteria?')">Delete</x-eligify::ui.button>
+            <x-eligify::ui.button as="a" href="{{ route('eligify.criteria.index') }}" variant="secondary">Back</x-eligify::ui.button>
         </div>
     </div>
 
@@ -66,9 +66,7 @@
     <div class="bg-white border rounded p-4">
         <div class="flex items-center justify-between mb-4">
             <h3 class="font-semibold text-lg">Rules</h3>
-            <a href="{{ route('eligify.rules.create', ['criteria_id' => $criteria->id]) }}" class="px-4 py-2 text-sm bg-blue-600 text-white rounded hover:bg-blue-700">
-                Add Rule
-            </a>
+            <x-eligify::ui.button as="a" href="{{ route('eligify.rules.create', ['criteria_id' => $criteria->id]) }}">Add Rule</x-eligify::ui.button>
         </div>
 
         @if(session()->has('rule_status'))
@@ -186,9 +184,7 @@
         @else
             <div class="text-center py-8 text-gray-500">
                 <p class="mb-4">No rules defined yet.</p>
-                <a href="{{ route('eligify.rules.create', ['criteria_id' => $criteria->id]) }}" class="inline-flex items-center px-4 py-2 text-sm bg-blue-600 text-white rounded hover:bg-blue-700">
-                    Create First Rule
-                </a>
+                <x-eligify::ui.button as="a" href="{{ route('eligify.rules.create', ['criteria_id' => $criteria->id]) }}">Create First Rule</x-eligify::ui.button>
             </div>
         @endif
     </div>

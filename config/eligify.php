@@ -18,6 +18,8 @@ return [
     |
     */
     'ui' => [
+        // NEW: Theme selection
+        'theme' => env('ELIGIFY_UI_THEME', 'tailwindcss'), // 'tailwindcss' | 'bootstrap'
         // Turn the Eligify Dashboard on/off
         'enabled' => env('ELIGIFY_UI_ENABLED', false),
 
@@ -48,6 +50,15 @@ return [
             'use_cdn' => env('ELIGIFY_UI_ASSETS_USE_CDN', true),
             'tailwind_cdn' => env('ELIGIFY_UI_TAILWIND_CDN', 'https://cdn.tailwindcss.com'),
             'alpine_cdn' => env('ELIGIFY_UI_ALPINE_CDN', 'https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js'),
+        ],
+
+        // Asset CDNs
+        'assets' => [
+            'use_cdn' => env('ELIGIFY_UI_ASSETS_USE_CDN', true),
+            'tailwind_cdn' => env('ELIGIFY_UI_TAILWIND_CDN', 'https://cdn.tailwindcss.com'),
+            'alpine_cdn' => env('ELIGIFY_UI_ALPINE_CDN', 'https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js'),
+            'bootstrap_css_cdn' => env('ELIGIFY_UI_BOOTSTRAP_CSS', 'https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css'),
+            'bootstrap_js_cdn' => env('ELIGIFY_UI_BOOTSTRAP_JS', 'https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js'),
         ],
     ],
 

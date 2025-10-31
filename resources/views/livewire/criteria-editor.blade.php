@@ -6,50 +6,50 @@
 
         <div>
             <label class="block text-sm font-medium mb-1">Name</label>
-            <input type="text" class="w-full border rounded px-3 py-2" wire:model.blur="name" required>
+            <x-eligify::ui.input type="text" wire:model.blur="name" required />
             @error('name') <div class="text-sm text-red-600 mt-1">{{ $message }}</div> @enderror
         </div>
 
         <div>
             <label class="block text-sm font-medium mb-1">Description</label>
-            <textarea rows="4" class="w-full border rounded px-3 py-2" wire:model.blur="description"></textarea>
+            <x-eligify::ui.textarea rows="4" wire:model.blur="description" />
             @error('description') <div class="text-sm text-red-600 mt-1">{{ $message }}</div> @enderror
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
             <div>
                 <label class="block text-sm font-medium mb-1">Type</label>
-                <input type="text" class="w-full border rounded px-3 py-2" wire:model.blur="type" placeholder="e.g. subscription, feature, policy">
+                <x-eligify::ui.input type="text" wire:model.blur="type" placeholder="e.g. subscription, feature, policy" />
                 @error('type') <div class="text-sm text-red-600 mt-1">{{ $message }}</div> @enderror
             </div>
             <div>
                 <label class="block text-sm font-medium mb-1">Group</label>
-                <input type="text" class="w-full border rounded px-3 py-2" wire:model.blur="group" placeholder="e.g. billing, access-control">
+                <x-eligify::ui.input type="text" wire:model.blur="group" placeholder="e.g. billing, access-control" />
                 @error('group') <div class="text-sm text-red-600 mt-1">{{ $message }}</div> @enderror
             </div>
             <div>
                 <label class="block text-sm font-medium mb-1">Category</label>
-                <input type="text" class="w-full border rounded px-3 py-2" wire:model.blur="category" placeholder="e.g. basic, premium, enterprise">
+                <x-eligify::ui.input type="text" wire:model.blur="category" placeholder="e.g. basic, premium, enterprise" />
                 @error('category') <div class="text-sm text-red-600 mt-1">{{ $message }}</div> @enderror
             </div>
         </div>
 
         <div>
             <label class="block text-sm font-medium mb-1">Tags</label>
-            <input type="text" class="w-full border rounded px-3 py-2" wire:model.blur="tags" placeholder="comma,separated,tags">
+            <x-eligify::ui.input type="text" wire:model.blur="tags" placeholder="comma,separated,tags" />
             <p class="text-xs text-gray-500 mt-1">Enter comma-separated values. Tags are normalized to lowercase.</p>
             @error('tags') <div class="text-sm text-red-600 mt-1">{{ $message }}</div> @enderror
         </div>
 
         <div class="flex items-center gap-2">
-            <input type="checkbox" class="rounded" wire:model.blur="is_active">
+            <x-eligify::ui.checkbox wire:model.blur="is_active" />
             <label class="text-sm">Active</label>
             @error('is_active') <div class="text-sm text-red-600 mt-1">{{ $message }}</div> @enderror
         </div>
 
         <div class="flex items-center gap-2">
-            <a href="{{ route('eligify.criteria.index') }}" class="px-4 py-2 border rounded">Cancel</a>
-            <button type="submit" class="px-4 py-2 bg-gray-900 text-white rounded">Save</button>
+            <x-eligify::ui.button as="a" href="{{ route('eligify.criteria.index') }}" variant="secondary">Cancel</x-eligify::ui.button>
+            <x-eligify::ui.button type="submit">Save</x-eligify::ui.button>
         </div>
     </form>
 </div>

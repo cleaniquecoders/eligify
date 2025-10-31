@@ -17,6 +17,7 @@ class WorkbenchServiceProvider extends ServiceProvider
             'eligify.ui.enabled' => true,
             'eligify.ui.route_prefix' => 'eligify',
             'eligify.ui.middleware' => ['web'],
+            // 'eligify.ui.theme' => 'bootstrap',
             'eligify.ui.auth' => function ($request) {
                 return app()->environment('local');
             },

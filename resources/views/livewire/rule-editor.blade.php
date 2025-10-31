@@ -6,7 +6,7 @@
                 <p class="text-sm text-gray-600">For criteria: {{ $criteria->name }}</p>
             @endif
         </div>
-        <a href="{{ route('eligify.criteria.show', $criteriaId) }}" class="px-3 py-2 text-sm border rounded">Cancel</a>
+    <x-eligify::ui.button as="a" href="{{ route('eligify.criteria.show', $criteriaId) }}" variant="secondary">Cancel</x-eligify::ui.button>
     </div>
 
     <form wire:submit.prevent="save" class="space-y-4 bg-white border rounded p-4">
@@ -29,16 +29,12 @@
                     <label for="selectedMapping" class="block text-sm font-medium text-gray-700 mb-1">
                         1. Select Model Mapping <span class="text-gray-400">(Optional)</span>
                     </label>
-                    <select
-                        id="selectedMapping"
-                        wire:model.live="selectedMapping"
-                        class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    >
+                    <x-eligify::ui.select id="selectedMapping" wire:model.live="selectedMapping">
                         <option value="">-- Select a mapping or use manual input --</option>
                         @foreach($this->mappingClasses as $class => $meta)
                             <option value="{{ $class }}">{{ $meta['name'] }} ({{ $meta['model'] }})</option>
                         @endforeach
-                    </select>
+                    </x-eligify::ui.select>
                     @if($selectedMapping)
                         <p class="text-xs text-gray-600 mt-1">
                             📋 {{ $this->mappingClasses[$selectedMapping]['description'] ?? 'No description available' }}
@@ -52,12 +48,7 @@
                         <label for="field" class="block text-sm font-medium text-gray-700 mb-1">
                             2. Select Field from Mapping
                         </label>
-                        <select
-                            id="field"
-                            wire:model.live="field"
-                            class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            required
-                        >
+                        <x-eligify::ui.select id="field" wire:model.live="field" required>
                             <option value="">-- Select a field --</option>
                             @php
                                 $fields = $this->availableFields;
@@ -77,7 +68,7 @@
                                     </optgroup>
                                 @endif
                             @endforeach
-                        </select>
+                        </x-eligify::ui.select>
                         @error('field') <span class="text-xs text-red-600">{{ $message }}</span> @enderror
                         @if($field && isset($this->availableFields[$field]))
                             <p class="text-xs text-gray-600 mt-1">
@@ -94,14 +85,7 @@
                     <label for="field_manual" class="block text-sm font-medium text-gray-700 mb-1">
                         {{ $useManualInput ? 'Field Name' : '2. Or Enter Field Manually' }}
                     </label>
-                    <input
-                        type="text"
-                        id="field_manual"
-                        wire:model="field"
-                        class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        placeholder="e.g., income, age, credit_score"
-                        required
-                    >
+                    <x-eligify::ui.input type="text" id="field_manual" wire:model="field" placeholder="e.g., income, age, credit_score" required />
                     @error('field') <span class="text-xs text-red-600">{{ $message }}</span> @enderror
                     <p class="text-xs text-gray-500 mt-1">Enter the field name to evaluate (e.g., model attribute or data key)</p>
                 </div>
@@ -114,16 +98,12 @@
                 <label for="fieldType" class="block text-sm font-medium text-gray-700 mb-1">
                     Field Type <span class="text-gray-400">(Optional)</span>
                 </label>
-                <select
-                    id="fieldType"
-                    wire:model.live="fieldType"
-                    class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                >
+                <x-eligify::ui.select id="fieldType" wire:model.live="fieldType">
                     <option value="">-- Select Type --</option>
                     @foreach($this->fieldTypes as $value => $label)
                         <option value="{{ $value }}">{{ $label }}</option>
                     @endforeach
-                </select>
+                </x-eligify::ui.select>
                 @error('fieldType') <span class="text-xs text-red-600">{{ $message }}</span> @enderror
                 <p class="text-xs text-gray-500 mt-1">
                     @if($fieldType)
@@ -142,16 +122,12 @@
             <!-- Priority -->
             <div>
                 <label for="priority" class="block text-sm font-medium text-gray-700 mb-1">Priority <span class="text-gray-400">(Optional)</span></label>
-                <select
-                    id="priority"
-                    wire:model="priority"
-                    class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                >
+                <x-eligify::ui.select id="priority" wire:model="priority">
                     <option value="">-- Select Priority --</option>
                     @foreach($this->priorities as $value => $label)
                         <option value="{{ $value }}">{{ $label }}</option>
                     @endforeach
-                </select>
+                </x-eligify::ui.select>
                 @error('priority') <span class="text-xs text-red-600">{{ $message }}</span> @enderror
                 <p class="text-xs text-gray-500 mt-1">Auto-sets weight based on importance</p>
             </div>
@@ -198,16 +174,11 @@
         <!-- Operator -->
         <div>
             <label for="operator" class="block text-sm font-medium text-gray-700 mb-1">Operator</label>
-            <select
-                id="operator"
-                wire:model.live="operator"
-                class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                required
-            >
+            <x-eligify::ui.select id="operator" wire:model.live="operator" required>
                 @foreach($this->availableOperators as $op => $label)
                     <option value="{{ $op }}">{{ $label }}</option>
                 @endforeach
-            </select>
+            </x-eligify::ui.select>
             @error('operator') <span class="text-xs text-red-600">{{ $message }}</span> @enderror
             @if($fieldType)
                 <p class="text-xs text-gray-500 mt-1">Operators filtered for {{ $this->fieldTypes[$fieldType] ?? 'selected' }} type</p>
@@ -222,47 +193,20 @@
                 <!-- Boolean Input -->
                 <div class="flex items-center gap-4 py-2">
                     <label class="inline-flex items-center">
-                        <input
-                            type="radio"
-                            wire:model="value"
-                            value="true"
-                            class="rounded-full border-gray-300 text-blue-600 focus:ring-blue-500"
-                        >
+                        <x-eligify::ui.radio wire:model="value" value="true" />
                         <span class="ml-2 text-sm">True</span>
                     </label>
                     <label class="inline-flex items-center">
-                        <input
-                            type="radio"
-                            wire:model="value"
-                            value="false"
-                            class="rounded-full border-gray-300 text-blue-600 focus:ring-blue-500"
-                        >
+                        <x-eligify::ui.radio wire:model="value" value="false" />
                         <span class="ml-2 text-sm">False</span>
                     </label>
                 </div>
             @elseif($this->showsArrayInput)
                 <!-- Array/Multiple Values Input -->
-                <textarea
-                    id="value"
-                    wire:model="value"
-                    rows="3"
-                    class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono"
-                    placeholder="{{ $this->valuePlaceholder }}"
-                    required
-                ></textarea>
+                <x-eligify::ui.textarea id="value" wire:model="value" rows="3" placeholder="{{ $this->valuePlaceholder }}" required />
             @else
                 <!-- Standard Input (Text, Number, Date) -->
-                <input
-                    type="{{ $this->valueInputType }}"
-                    id="value"
-                    wire:model="value"
-                    @if($this->valueInputType === 'number')
-                        step="{{ $this->numericStep }}"
-                    @endif
-                    class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="{{ $this->valuePlaceholder }}"
-                    required
-                >
+                <x-eligify::ui.input type="{{ $this->valueInputType }}" id="value" wire:model="value" @if($this->valueInputType === 'number') step="{{ $this->numericStep }}" @endif placeholder="{{ $this->valuePlaceholder }}" required />
             @endif
 
             @error('value') <span class="text-xs text-red-600">{{ $message }}</span> @enderror
@@ -275,15 +219,7 @@
             <!-- Weight -->
             <div>
                 <label for="weight" class="block text-sm font-medium text-gray-700 mb-1">Weight</label>
-                <input
-                    type="number"
-                    id="weight"
-                    wire:model="weight"
-                    min="0"
-                    max="100"
-                    class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    required
-                >
+                <x-eligify::ui.input type="number" id="weight" wire:model="weight" min="0" max="100" required />
                 @error('weight') <span class="text-xs text-red-600">{{ $message }}</span> @enderror
                 <p class="text-xs text-gray-500 mt-1">Importance of this rule (0-100){{ $priority ? ' - Auto-set from priority' : '' }}</p>
             </div>
@@ -291,14 +227,7 @@
             <!-- Order -->
             <div>
                 <label for="order" class="block text-sm font-medium text-gray-700 mb-1">Order</label>
-                <input
-                    type="number"
-                    id="order"
-                    wire:model="order"
-                    min="0"
-                    class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    required
-                >
+                <x-eligify::ui.input type="number" id="order" wire:model="order" min="0" required />
                 @error('order') <span class="text-xs text-red-600">{{ $message }}</span> @enderror
                 <p class="text-xs text-gray-500 mt-1">Execution order (lower executes first)</p>
             </div>
@@ -306,25 +235,15 @@
 
         <!-- Is Active -->
         <div class="flex items-center gap-2">
-            <input
-                type="checkbox"
-                id="is_active"
-                wire:model="is_active"
-                class="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-            >
+            <x-eligify::ui.checkbox id="is_active" wire:model="is_active" />
             <label for="is_active" class="text-sm font-medium text-gray-700">Active</label>
             @error('is_active') <span class="text-xs text-red-600">{{ $message }}</span> @enderror
         </div>
 
         <!-- Submit Button -->
         <div class="flex items-center justify-end gap-2 pt-4 border-t">
-            <a href="{{ route('eligify.criteria.show', $criteriaId) }}" class="px-4 py-2 text-sm border rounded">Cancel</a>
-            <button
-                type="submit"
-                class="px-4 py-2 text-sm bg-blue-600 text-white rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-                {{ $mode === 'edit' ? 'Update Rule' : 'Create Rule' }}
-            </button>
+            <x-eligify::ui.button as="a" href="{{ route('eligify.criteria.show', $criteriaId) }}" variant="secondary">Cancel</x-eligify::ui.button>
+            <x-eligify::ui.button type="submit">{{ $mode === 'edit' ? 'Update Rule' : 'Create Rule' }}</x-eligify::ui.button>
         </div>
     </form>
 </div>

@@ -5,19 +5,19 @@
                 <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                 </svg>
-                <input type="text" placeholder="Search rules (field/operator/value)..." class="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all" wire:model.live.debounce.300ms="search">
+                <x-eligify::ui.input type="text" placeholder="Search rules (field/operator/value)..." class="pl-10" wire:model.live.debounce.300ms="search" />
             </div>
             <label class="inline-flex items-center gap-2 text-sm text-gray-700 bg-gray-50 px-4 py-2.5 border border-gray-200 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer">
-                <input type="checkbox" class="rounded text-primary-600 focus:ring-primary-500 border-gray-300" wire:model.live="onlyActive">
+                <x-eligify::ui.checkbox wire:model.live="onlyActive" />
                 <span class="font-medium">Active only</span>
             </label>
         </div>
         <div class="flex items-center gap-3">
-            <select class="px-3 py-2.5 border border-gray-300 rounded-lg text-sm font-medium bg-white focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all" wire:model.live="perPage">
+            <x-eligify::ui.select wire:model.live="perPage">
                 <option value="10">10 per page</option>
                 <option value="25">25 per page</option>
                 <option value="50">50 per page</option>
-            </select>
+            </x-eligify::ui.select>
             <div class="inline-flex rounded-lg overflow-hidden border border-gray-300 shadow-sm">
                 <button type="button" wire:click="setView('list')" class="px-4 py-2.5 text-sm font-medium transition-colors {{ $view==='list' ? 'bg-primary-600 text-white' : 'bg-white text-gray-700 hover:bg-gray-50' }}">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -48,7 +48,7 @@
             @if ($view === 'list')
                 <div class="overflow-x-auto">
                     <table class="min-w-full text-sm">
-                        <thead class="bg-gradient-to-r from-gray-50 to-slate-50 border-b border-gray-200">
+                        <thead class="bg-linear-to-r from-gray-50 to-slate-50 border-b border-gray-200">
                             <tr>
                                 <th class="text-left px-6 py-4 font-semibold text-gray-700">Criteria</th>
                                 <th class="text-left px-6 py-4 font-semibold text-gray-700">Field</th>
