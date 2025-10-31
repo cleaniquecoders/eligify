@@ -22,7 +22,20 @@ Future features and development plans for Eligify.
   - Visual rule testing
   - Playground for testing
   - Audit log viewer
-- Complete documentation
+- Criteria classification for context management
+  - New fields on `eligify_criteria`: type, group, category, tags
+  - Query helpers/scopes on `Criteria`: `type()`, `group()`, `category()`, `tagged()`
+- Polymorphic criteria attachments to any model
+  - Pivot table `eligify_criteriables` and `HasCriteria` trait
+  - Instance relation `$model->criteria()` with filters: type/group/category/tags
+- Criteria Builder enhancements
+  - New chainable methods: `type()`, `group()`, `category()`, `tags()`, `addTags()`, `removeTags()`, `clearTags()`
+- Migrations and testing
+  - New migration stubs for classification fields and pivot
+  - Provider publishes migrations; tests bootstrap all stubs deterministically
+- Documentation updates
+  - Database schema, Models API, Builder API
+  - Core features: Criteria Attachments; Getting Started; Migration guide; Examples
 
 ## Version 1.x (In Progress)
 
