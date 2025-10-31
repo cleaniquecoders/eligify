@@ -23,6 +23,10 @@ Comprehensive reference for developers integrating Eligify.
 - **[Events](events.md)** - Event system reference
 - **[Database Schema](database-schema.md)** - Complete schema documentation
 
+### Related Guides
+
+- See [Core Features: Criteria Attachments](../03-core-features/criteria-attachments.md) for attaching criteria to models and querying by type/group/category/tags.
+
 ## Quick Reference
 
 ### Eligify Facade

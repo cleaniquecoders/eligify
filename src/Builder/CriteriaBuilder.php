@@ -234,6 +234,87 @@ class CriteriaBuilder
     }
 
     /**
+     * Set type for this criteria (e.g., 'subscription', 'feature', 'policy')
+     */
+    public function type(string $type): self
+    {
+        $this->criteria->update(['type' => $type]);
+
+        return $this;
+    }
+
+    /**
+     * Set group for this criteria (e.g., 'billing', 'access-control')
+     */
+    public function group(string $group): self
+    {
+        $this->criteria->update(['group' => $group]);
+
+        return $this;
+    }
+
+    /**
+     * Set category for this criteria (e.g., 'basic', 'premium', 'enterprise')
+     */
+    public function category(string $category): self
+    {
+        $this->criteria->update(['category' => $category]);
+
+        return $this;
+    }
+
+    /**
+     * Replace all tags for this criteria
+     */
+    public function tags(array $tags): self
+    {
+        $normalized = $this->normalizeTags($tags);
+
+        $this->criteria->update(['tags' => $normalized]);
+
+        return $this;
+    }
+
+    /**
+     * Add one or more tags (keeps existing, ensures uniqueness)
+     */
+    public function addTags(string|array ...$tags): self
+    {
+        $current = $this->currentTags();
+        $incoming = $this->normalizeTags($this->flatten($tags));
+        $merged = $this->normalizeTags(array_merge($current, $incoming));
+
+        $this->criteria->update(['tags' => $merged]);
+
+        return $this;
+    }
+
+    /**
+     * Remove one or more tags (no-op for missing tags)
+     */
+    public function removeTags(string|array ...$tags): self
+    {
+        $current = $this->currentTags();
+        $toRemove = $this->normalizeTags($this->flatten($tags));
+
+        $filtered = array_values(array_diff($current, $toRemove));
+
+        $this->criteria->update(['tags' => $filtered]);
+
+        return $this;
+    }
+
+    /**
+     * Clear all tags
+     */
+    public function clearTags(): self
+    {
+        $this->criteria->update(['tags' => []]);
+
+        return $this;
+    }
+
+    /**
      * Activate or deactivate this criteria
      */
     public function active(bool $active = true): self
@@ -257,6 +338,45 @@ class CriteriaBuilder
     public function getPendingRules(): Collection
     {
         return $this->pendingRules;
+    }
+
+    /**
+     * Get current tags as an array
+     */
+    protected function currentTags(): array
+    {
+        $tags = $this->criteria->tags ?? [];
+
+        return is_array($tags) ? $tags : [];
+    }
+
+    /**
+     * Normalize tags: trim, lowercase, remove empties, make unique
+     */
+    protected function normalizeTags(array $tags): array
+    {
+        $normalized = array_map(function ($t) {
+            $t = is_string($t) ? trim($t) : $t;
+
+            return is_string($t) ? strtolower($t) : $t;
+        }, $tags);
+
+        $normalized = array_values(array_filter($normalized, fn ($t) => is_string($t) && $t !== ''));
+
+        return array_values(array_unique($normalized));
+    }
+
+    /**
+     * Flatten nested arrays from variadic inputs
+     */
+    protected function flatten(array $items): array
+    {
+        $result = [];
+        array_walk_recursive($items, function ($v) use (&$result) {
+            $result[] = $v;
+        });
+
+        return $result;
     }
 
     /**

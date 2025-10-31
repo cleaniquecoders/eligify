@@ -106,6 +106,22 @@ $criteria = Eligify::load('Insurance Eligibility');
 $result = $criteria->evaluate($person);
 ```
 
+## Attaching Criteria to Models (optional)
+
+```php
+use CleaniqueCoders\Eligify\Concerns\HasCriteria;
+use CleaniqueCoders\Eligify\Models\Criteria;
+
+class User extends Model
+{
+    use HasCriteria;
+}
+
+$criteria = Criteria::factory()->create(['type' => 'feature']);
+$user->attachCriteria([$criteria->id]);
+$features = $user->criteriaOfType('feature')->get();
+```
+
 ## Using the Playground
 
 Test your criteria interactively:

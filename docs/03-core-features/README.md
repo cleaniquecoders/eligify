@@ -9,6 +9,7 @@ Eligify provides a complete system for defining, evaluating, and acting upon eli
 ## Documentation in this Section
 
 - **[Criteria Builder](criteria-builder.md)** - Building criteria definitions
+- **[Criteria Attachments](criteria-attachments.md)** - Attach criteria to models
 - **[Rule Engine](rule-engine.md)** - Rule definitions and operators
 - **[Scoring Methods](scoring-methods.md)** - Weighted, Pass/Fail, Sum, Average scoring
 - **[Evaluation Engine](evaluation-engine.md)** - How evaluations work

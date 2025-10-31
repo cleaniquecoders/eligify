@@ -325,3 +325,26 @@ if ($criteria->exists) {
 - Available globally without importing
 - Ideal for prototyping and simple use cases
 - For production systems, consider using the full API for better control over persistence and caching
+
+---
+
+## Related Eloquent helper trait
+
+While not a global helper, Eligify ships a small Eloquent trait to attach criteria to any model:
+
+```php
+use CleaniqueCoders\Eligify\Concerns\HasCriteria;
+
+class User extends Model {
+    use HasCriteria;
+}
+
+// Attach criteria IDs
+$user->attachCriteria([$criteriaId]);
+
+// Query by type or tags
+$user->criteriaOfType(['subscription', 'feature'])->get();
+$user->criteriaTagged(['beta'])->get();
+```
+
+See the full model reference: [Models API](models.md).

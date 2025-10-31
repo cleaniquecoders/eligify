@@ -51,3 +51,13 @@ function determineMembershipTier($customer): string
 
 - [E-commerce Discount](../intermediate/e-commerce.md)
 - [SaaS Upgrade](saas-upgrade.md)
+
+## Tip: Organize criteria by type
+
+Classify your membership criteria with `type = 'subscription'` to query all tier-related criteria easily:
+
+```php
+use CleaniqueCoders\Eligify\Models\Criteria;
+
+$tierCriteria = Criteria::query()->type('subscription')->get();
+```

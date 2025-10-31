@@ -1,101 +1,173 @@
 # Database Schema
 
-Complete database schema documentation for Eligify tables.
+Canonical database schema for Eligify. This reflects the current migration stubs shipped by the package.
 
-## eligify_criteria
+## Tables
 
-Stores criteria definitions.
+### eligify_criteria
 
-### Columns
+Defines eligibility criteria sets and their metadata.
 
-| Column | Type | Description |
-|--------|------|-------------|
+#### Columns (eligify_criteria)
+
+| Column | Type | Notes |
+|--------|------|-------|
 | id | bigint | Primary key |
-| name | string(255) | Unique criteria name |
-| description | text | Description |
-| rules | json | Array of rule definitions |
-| scoring_method | string | Scoring method |
-| threshold | decimal(5,2) | Minimum passing score |
-| is_active | boolean | Active status |
-| created_at | timestamp | Creation timestamp |
-| updated_at | timestamp | Update timestamp |
+| uuid | uuid | Unique, indexed |
+| name | string(255) | Name (e.g., "Loan Approval") |
+| slug | string(255) | Unique slug |
+| description | text, nullable | Human-readable description |
+| is_active | boolean | Default true |
+| type | string, nullable | e.g., subscription, feature, policy |
+| group | string, nullable | e.g., billing, access-control |
+| category | string, nullable | e.g., basic, premium, enterprise |
+| tags | json, nullable | Flexible classification tags |
+| meta | json, nullable | Arbitrary metadata |
+| created_at/updated_at | timestamps |  |
 
-### Indexes
+#### Indexes (eligify_criteria)
 
-- `PRIMARY KEY (id)`
-- `UNIQUE KEY (name)`
-- `INDEX (is_active)`
+- uuid unique index, name+is_active index
+- indexes on type, group, category
 
-## eligify_audits
+---
 
-Stores evaluation audit logs.
+### eligify_rules
 
-### Columns
+Individual rules within a criteria.
 
-| Column | Type | Description |
-|--------|------|-------------|
+#### Columns (eligify_rules)
+
+| Column | Type | Notes |
+|--------|------|-------|
 | id | bigint | Primary key |
-| criteria_name | string(255) | Evaluated criteria |
-| entity_type | string(255) | Entity class name |
-| entity_id | bigint | Entity ID |
-| user_id | bigint | User who triggered |
-| passed | boolean | Evaluation result |
-| score | decimal(5,2) | Score achieved |
-| passed_rules | json | Rules that passed |
-| failed_rules | json | Rules that failed |
-| snapshot | json | Entity snapshot |
-| created_at | timestamp | Evaluation timestamp |
+| uuid | uuid | Unique, indexed |
+| criteria_id | bigint FK | References eligify_criteria (cascade on delete) |
+| field | string | Field to evaluate (e.g., income) |
+| operator | string | e.g., >=, <=, ==, in, not_in |
+| value | json, nullable | Value to compare against |
+| weight | integer | Default 1 |
+| order | integer | Execution order, default 0 |
+| is_active | boolean | Default true |
+| meta | json, nullable | Rule metadata |
+| created_at/updated_at | timestamps |  |
 
-### Indexes
+#### Indexes (eligify_rules)
 
-- `PRIMARY KEY (id)`
-- `INDEX (criteria_name, created_at)`
-- `INDEX (entity_type, entity_id)`
-- `INDEX (user_id)`
-- `INDEX (passed)`
+- (criteria_id, is_active), (field, operator)
 
-## eligify_snapshots
+---
 
-Stores entity data snapshots.
+### eligify_evaluations
 
-### Columns
+Stores evaluation results and audit-friendly details.
 
-| Column | Type | Description |
-|--------|------|-------------|
+#### Columns (eligify_evaluations)
+
+| Column | Type | Notes |
+|--------|------|-------|
 | id | bigint | Primary key |
-| entity_type | string(255) | Model class |
-| entity_id | bigint | Model ID |
-| context | string(255) | Snapshot context |
-| data | json | Captured data |
-| created_at | timestamp | Creation timestamp |
+| uuid | uuid | Unique, indexed |
+| criteria_id | bigint FK | References eligify_criteria |
+| evaluable_type | string, nullable | Polymorphic type |
+| evaluable_id | bigint, nullable | Polymorphic id |
+| passed | boolean | Final result |
+| score | decimal(8,2) | Calculated score |
+| failed_rules | json, nullable | Failed rule IDs/details |
+| rule_results | json, nullable | Per-rule evaluation details |
+| decision | string, nullable | Human-readable decision |
+| context | json, nullable | Evaluation context/data |
+| meta | json, nullable | Extra metadata |
+| evaluated_at | timestamp | Evaluation timestamp |
+| created_at/updated_at | timestamps |  |
 
-### Indexes
+#### Indexes (eligify_evaluations)
 
-- `PRIMARY KEY (id)`
-- `INDEX (entity_type, entity_id, context)`
-- `INDEX (created_at)`
+- (evaluable_type, evaluable_id), (passed, evaluated_at), (criteria_id, passed)
+
+---
+
+### eligify_audit_logs
+
+Comprehensive audit trail for criteria and evaluation lifecycle events.
+
+#### Columns (eligify_audit_logs)
+
+| Column | Type | Notes |
+|--------|------|-------|
+| id | bigint | Primary key |
+| uuid | uuid | Unique, indexed |
+| event | string | e.g., evaluation_completed, rule_executed |
+| auditable_type | string | Polymorphic type |
+| auditable_id | bigint | Polymorphic id |
+| old_values | json, nullable | Previous state |
+| new_values | json, nullable | New state |
+| context | json, nullable | Additional context |
+| user_type | string, nullable | Actor type |
+| user_id | bigint, nullable | Actor id |
+| ip_address | string, nullable |  |
+| user_agent | string, nullable |  |
+| meta | json, nullable | Extra metadata |
+| created_at/updated_at | timestamps |  |
+
+#### Indexes (eligify_audit_logs)
+
+- (auditable_type, auditable_id), (event, created_at), (user_type, user_id)
+
+---
+
+### eligify_criteriables
+
+Polymorphic pivot for attaching criteria to any model.
+
+#### Columns (eligify_criteriables)
+
+| Column | Type | Notes |
+|--------|------|-------|
+| id | bigint | Primary key |
+| criteria_id | bigint FK | References eligify_criteria (cascade on delete) |
+| criteriable_type | string | Polymorphic type |
+| criteriable_id | bigint | Polymorphic id |
+| created_at/updated_at | timestamps |  |
+
+#### Indexes
+
+- unique(criteria_id, criteriable_type, criteriable_id)
+- index(criteriable_type, criteriable_id)
+
+---
 
 ## Relationships
 
-```
+```text
 eligify_criteria
-    └─ has many → eligify_audits (via criteria_name)
+    ├─ has many → eligify_rules
+    ├─ has many → eligify_evaluations
+    └─ morphToMany → criteriable models (via eligify_criteriables)
 
-eligify_audits
-    ├─ belongs to → users (via user_id)
-    └─ morphs to → entity (via entity_type, entity_id)
+eligify_rules
+    └─ belongs to → eligify_criteria
 
-eligify_snapshots
-    └─ morphs to → entity (via entity_type, entity_id)
+eligify_evaluations
+    ├─ belongs to → eligify_criteria
+    └─ morphs to → evaluable (evaluable_type, evaluable_id)
+
+eligify_audit_logs
+    └─ morphs to → auditable (auditable_type, auditable_id)
+
+eligify_criteriables
+    ├─ belongs to → eligify_criteria
+    └─ morphs to → criteriable (criteriable_type, criteriable_id)
 ```
 
 ## Migration
 
-```php
+```bash
+php artisan vendor:publish --tag="eligify-migrations"
 php artisan migrate
 ```
 
 ## Related
 
 - [Models API](api/models.md)
-- [Data Management](../../04-data-management/README.md)
+- [Core Features: Criteria Attachments](../../03-core-features/criteria-attachments.md)

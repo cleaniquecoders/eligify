@@ -4,6 +4,92 @@ Fluent builder API for defining eligibility criteria.
 
 ## Methods
 
+### `type(string $type): self`
+
+Set the high-level classification for the criteria.
+
+```php
+$builder->type('subscription'); // or 'feature', 'policy', ...
+```
+
+Returns: Builder instance for chaining
+
+---
+
+### `group(string $group): self`
+
+Set the functional area grouping.
+
+```php
+$builder->group('billing'); // e.g., 'billing', 'access-control', 'risk'
+```
+
+Returns: Builder instance for chaining
+
+---
+
+### `category(string $category): self`
+
+Set the tier/variant classification.
+
+```php
+$builder->category('premium'); // e.g., 'basic', 'premium', 'enterprise'
+```
+
+Returns: Builder instance for chaining
+
+---
+
+### `tags(array $tags): self`
+
+Replace the tag list entirely (stored as JSON array).
+
+```php
+$builder->tags(['beta', 'internal']);
+```
+
+Notes: Tags are normalized (trimmed, lowercased, unique)
+
+Returns: Builder instance for chaining
+
+---
+
+### `addTags(string|array ...$tags): self`
+
+Add one or more tags, preserving existing ones (unique after merge).
+
+```php
+$builder->addTags('early-access', ['beta']);
+```
+
+Returns: Builder instance for chaining
+
+---
+
+### `removeTags(string|array ...$tags): self`
+
+Remove one or more tags; missing tags are ignored.
+
+```php
+$builder->removeTags('internal', ['deprecated']);
+```
+
+Returns: Builder instance for chaining
+
+---
+
+### `clearTags(): self`
+
+Remove all tags.
+
+```php
+$builder->clearTags();
+```
+
+Returns: Builder instance for chaining
+
+---
+
 ### `addRule(string $field, string $operator, mixed $value, ?float $weight = null): self`
 
 Add a rule to the criteria.
@@ -113,3 +199,4 @@ $result = $builder->evaluate($applicant);
 
 - [Eligify Facade API](eligify-facade.md)
 - [Evaluation Result API](evaluation-result.md)
+- [Models](models.md)

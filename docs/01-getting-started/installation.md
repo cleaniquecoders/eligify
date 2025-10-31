@@ -46,6 +46,9 @@ This creates the following tables:
 - `eligify_rules` - Stores individual rules within criteria
 - `eligify_evaluations` - Evaluation results and audit trail
 - `eligify_audit_logs` - Comprehensive audit trail for all events
+- `eligify_criteriables` - Polymorphic pivot to attach criteria to any model
+
+Note: Recent versions add classification fields on `eligify_criteria` (`type`, `group`, `category`, `tags`) to organize and query criteria easily.
 
 ### 4. Publish Assets (Optional)
 

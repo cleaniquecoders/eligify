@@ -295,6 +295,50 @@ Eligify::criteria('Loan Approval')
     ->save();
 ```
 
+## Classifying Criteria (type, group, category, tags)
+
+You can categorize criteria for better organization and querying:
+
+- `type` — high-level purpose (e.g., `subscription`, `feature`, `policy`)
+- `group` — functional area (e.g., `billing`, `access-control`, `risk`)
+- `category` — variant/tier (e.g., `basic`, `premium`, `enterprise`)
+- `tags` — flexible labels (JSON array)
+
+You can set these via the builder directly or on the model.
+
+```php
+use CleaniqueCoders\\Eligify\\Models\\Criteria;
+
+// After saving via builder
+$criteria = Criteria::where('slug', 'loan-approval')->first();
+$criteria->type = 'policy';
+$criteria->group = 'risk';
+$criteria->category = 'standard';
+$criteria->tags = ['finance', 'loan'];
+$criteria->save();
+
+// Query by classification
+$policies = Criteria::query()->type('policy')->get();
+$billingPremium = Criteria::query()->group('billing')->category('premium')->get();
+$tagged = Criteria::query()->tagged(['beta'])->get();
+```
+
+### Builder API (preferred when defining new criteria)
+
+```php
+use CleaniqueCoders\\Eligify\\Facades\\Eligify;
+
+Eligify::criteria('Premium Features')
+    ->type('feature')
+    ->group('access-control')
+    ->category('premium')
+    ->tags(['beta'])
+    ->addTags('early-access')
+    ->removeTags('beta')
+    ->addRule('points', '>=', 1000)
+    ->save();
+```
+
 ### Import from Array
 
 ```php

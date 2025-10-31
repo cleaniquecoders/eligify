@@ -24,3 +24,13 @@ if ($result->passed()) {
 ## Related
 
 - [Membership Tiers](membership-tiers.md)
+
+## Tip: Feature gating by type/tags
+
+Mark criteria used for feature gating with `type = 'feature'` and optional tags for rollouts:
+
+```php
+use CleaniqueCoders\Eligify\Models\Criteria;
+
+$featureCriteria = Criteria::query()->type('feature')->tagged(['beta'])->get();
+```

@@ -257,6 +257,32 @@ $evaluations = Evaluation::where('evaluable_type', Application::class)
     ->get();
 ```
 
+### Attaching Criteria to Models
+
+Use the `HasCriteria` trait to assign criteria to any model and query by context fields:
+
+```php
+use CleaniqueCoders\Eligify\Concerns\HasCriteria;
+use CleaniqueCoders\Eligify\Models\Criteria;
+
+class User extends Model
+{
+    use HasCriteria;
+}
+
+// Create or load criteria
+$sub = Criteria::factory()->create(['type' => 'subscription']);
+$feat = Criteria::factory()->create(['type' => 'feature', 'tags' => ['beta']]);
+
+// Attach to a user
+$user->attachCriteria([$sub->id, $feat->id]);
+
+// Query
+$all = $user->criteria()->get();
+$byType = $user->criteriaOfType(['subscription', 'feature'])->get();
+$byTags = $user->criteriaTagged(['beta'])->get();
+```
+
 ## Batch Operations
 
 ### Batch Evaluation
