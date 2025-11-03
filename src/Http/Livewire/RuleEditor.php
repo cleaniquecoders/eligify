@@ -216,9 +216,25 @@ class RuleEditor extends Component
         if (! empty($availableOperators) && ! isset($availableOperators[$this->operator])) {
             $this->operator = array_key_first($availableOperators);
         }
-    }
 
-    /**
+        // For non-array field types, ensure we start with a simple operator that doesn't require multiple values
+        if ($this->fieldType && FieldType::tryFrom($this->fieldType) !== FieldType::ARRAY) {
+            $currentOperatorEnum = $this->getOperatorEnum();
+            if ($currentOperatorEnum && $currentOperatorEnum->requiresMultipleValues()) {
+                // Find the first non-multiple-value operator for this field type
+                foreach ($availableOperators as $op => $label) {
+                    $opEnum = RuleOperator::tryFrom($op);
+                    if ($opEnum && !$opEnum->requiresMultipleValues()) {
+                        $this->operator = $op;
+                        break;
+                    }
+                }
+            }
+        }
+
+        // Clear the value when field type changes to prevent display issues
+        $this->value = '';
+    }    /**
      * Update weight when priority changes
      */
     public function updatedPriority()
@@ -351,6 +367,11 @@ class RuleEditor extends Component
         // If the operator now needs multiple values, clear scalar input so the textarea shows helpful placeholder
         if ($this->requiresMultipleValues) {
             $this->value = is_array($this->value) ? $this->value : '';
+        } else {
+            // If operator no longer needs multiple values, ensure value is scalar
+            if (is_array($this->value)) {
+                $this->value = '';
+            }
         }
     }
 

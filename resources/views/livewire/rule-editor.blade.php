@@ -206,7 +206,14 @@
                 <x-eligify::ui.textarea id="value" wire:model="value" rows="3" placeholder="{{ $this->valuePlaceholder }}" required />
             @else
                 <!-- Standard Input (Text, Number, Date) -->
-                <x-eligify::ui.input type="{{ $this->valueInputType }}" id="value" wire:model="value" @if($this->valueInputType === 'number') step="{{ $this->numericStep }}" @endif placeholder="{{ $this->valuePlaceholder }}" required />
+                <input
+                    type="{{ $this->valueInputType }}"
+                    id="value"
+                    wire:model="value"
+                    @if($this->valueInputType === 'number') step="{{ $this->numericStep }}" @endif
+                    placeholder="{{ $this->valuePlaceholder }}"
+                    class="{{ \CleaniqueCoders\Eligify\Support\Theme::classes('input') }}"
+                    required />
             @endif
 
             @error('value') <span class="text-xs text-red-600">{{ $message }}</span> @enderror
