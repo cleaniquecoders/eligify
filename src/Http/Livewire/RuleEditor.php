@@ -224,7 +224,7 @@ class RuleEditor extends Component
                 // Find the first non-multiple-value operator for this field type
                 foreach ($availableOperators as $op => $label) {
                     $opEnum = RuleOperator::tryFrom($op);
-                    if ($opEnum && !$opEnum->requiresMultipleValues()) {
+                    if ($opEnum && ! $opEnum->requiresMultipleValues()) {
                         $this->operator = $op;
                         break;
                     }
@@ -234,7 +234,9 @@ class RuleEditor extends Component
 
         // Clear the value when field type changes to prevent display issues
         $this->value = '';
-    }    /**
+    }
+
+    /**
      * Update weight when priority changes
      */
     public function updatedPriority()
