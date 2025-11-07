@@ -1,0 +1,76 @@
+name: "Copilot Setup Steps"
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - .github/workflows/copilot-setup-steps.yml
+  pull_request:
+    paths:
+      - .github/workflows/copilot-setup-steps.yml
+
+jobs:
+  # The job MUST be called `copilot-setup-steps` or it will not be picked up by Copilot.
+  copilot-setup-steps:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    strategy:
+      matrix:
+        php: [8.4]
+        laravel: [11.*, 12.*]
+        include:
+          - laravel: 11.*
+            testbench: 9.*
+          - laravel: 12.*
+            testbench: 10.*
+
+    name: PHP ${{ matrix.php }} - Laravel ${{ matrix.laravel }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite, bcmath, soap, intl, gd, exif, iconv, imagick
+          coverage: none
+
+      - name: Setup problem matchers
+        run: |
+          echo "::add-matcher::${{ runner.tool_cache }}/php.json"
+          echo "::add-matcher::${{ runner.tool_cache }}/phpunit.json"
+
+      - name: Install dependencies
+        run: |
+          composer require "laravel/framework:${{ matrix.laravel }}" "orchestra/testbench:${{ matrix.testbench }}" --no-interaction --no-update
+          composer update --prefer-dist --no-interaction
+
+      - name: List Installed Dependencies
+        run: composer show -D
+
+      - name: Execute tests
+        run: vendor/bin/pest --ci
+
+      - name: Run static analysis
+        run: vendor/bin/phpstan analyse --memory-limit=2G
+
+      - name: Check code style
+        run: vendor/bin/pint --test
+
+      - name: Run architecture tests
+        run: vendor/bin/pest --filter=arch
+
+      - name: Test package installation
+        run: |
+          cd /tmp
+          composer create-project laravel/laravel test-app
+          cd test-app
+          composer config repositories.eligify path $GITHUB_WORKSPACE
+          composer require "cleaniquecoders/eligify:*"
+          php artisan vendor:publish --tag="eligify-config" --force
+          php artisan vendor:publish --tag="eligify-migrations" --force
+          php artisan migrate --force
