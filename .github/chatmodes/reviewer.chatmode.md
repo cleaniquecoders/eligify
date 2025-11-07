@@ -1,6 +1,6 @@
 ---
 description: 'Comprehensive code review mode for Eligify package development'
-tools: ['codebase', 'problems', 'runTests', 'search', 'usages']
+tools: ['search/codebase', 'problems', 'runTests', 'search', 'usages']
 model: Claude Sonnet 4
 ---
 
