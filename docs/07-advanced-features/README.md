@@ -4,6 +4,7 @@ This guide covers advanced features and patterns for power users of Eligify.
 
 ## Table of Contents
 
+- [Rule Versioning](#rule-versioning)
 - [Rule Engine](#rule-engine)
 - [Custom Operators](#custom-operators)
 - [Custom Scoring Methods](#custom-scoring-methods)
@@ -14,6 +15,43 @@ This guide covers advanced features and patterns for power users of Eligify.
 - [Event System](#event-system)
 - [Performance Optimization](#performance-optimization)
 - [Multi-Tenancy](#multi-tenancy)
+
+## Rule Versioning
+
+Rule versioning allows you to track changes to your criteria over time and evaluate against historical versions. This is useful for:
+
+- **Audit Trails**: See exactly what rules were in effect for past evaluations
+- **A/B Testing**: Compare how different rule versions affect outcomes
+- **Compliance**: Meet regulatory requirements for decision traceability
+- **Rollback**: Revert to previous rule configurations if needed
+
+**[→ Read the full Rule Versioning guide](rule-versioning.md)**
+
+Quick example:
+
+```php
+use CleaniqueCoders\Eligify\Facades\Eligify;
+
+// Create initial criteria
+$criteria = Eligify::criteria('Loan Approval')
+    ->addRule('credit_score', '>=', 650)
+    ->addRule('income', '>=', 30000)
+    ->save()
+    ->getCriteria();
+
+// Create version snapshot
+$version1 = $criteria->createVersion('Initial Q1 2024 rules');
+
+// Later, modify and create new version
+$criteria->addRule('employment_months', '>=', 12)->save();
+$version2 = $criteria->createVersion('Added employment verification');
+
+// Evaluate against specific version
+$result = Eligify::evaluateVersion('Loan Approval', 1, $applicantData);
+
+// Compare versions
+$diff = $criteria->compareVersions(1, 2);
+```
 
 ## Rule Engine
 

@@ -1,0 +1,44 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        // Add current_version column to criteria table
+        Schema::table('eligify_criteria', function (Blueprint $table) {
+            if (! Schema::hasColumn('eligify_criteria', 'current_version')) {
+                $table->unsignedInteger('current_version')->default(1)->after('is_active');
+            }
+        });
+
+        // Create criteria versions table to store historical snapshots
+        Schema::create('eligify_criteria_versions', function (Blueprint $table) {
+            $table->id();
+            $table->uuid('uuid')->unique()->index();
+            $table->foreignId('criteria_id')->constrained('eligify_criteria')->onDelete('cascade');
+            $table->unsignedInteger('version'); // Version number for this criteria
+            $table->text('description')->nullable(); // Description of what changed in this version
+            $table->json('rules_snapshot'); // Complete snapshot of rules as they were at this version
+            $table->json('meta')->nullable(); // Additional metadata (created_by, tags, etc.)
+            $table->timestamps();
+
+            // Indexes for performance
+            $table->unique(['criteria_id', 'version']);
+            $table->index(['criteria_id', 'version']);
+            $table->index('created_at');
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('eligify_criteria_versions');
+
+        Schema::table('eligify_criteria', function (Blueprint $table) {
+            $table->dropColumn('current_version');
+        });
+    }
+};

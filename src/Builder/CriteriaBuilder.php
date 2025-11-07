@@ -660,5 +660,76 @@ class CriteriaBuilder
         return $this;
     }
 
+    /**
+     * Create a version snapshot of the current criteria and rules
+     *
+     * @param  string  $description  Optional description of this version
+     * @return self For method chaining
+     */
+    public function createSnapshot(string $description = ''): self
+    {
+        $this->save(); // Ensure pending rules are saved first
+
+        $this->criteria->createVersion($description);
+
+        return $this;
+    }
+
+    /**
+     * Retrieve a specific version of criteria for evaluation
+     *
+     * @param  int  $version  The version number to retrieve
+     * @return self For method chaining
+     */
+    public function withVersion(int $version): self
+    {
+        $versionRecord = $this->criteria->version($version);
+
+        if (! $versionRecord) {
+            throw new InvalidArgumentException("Version {$version} not found for criteria {$this->criteria->name}");
+        }
+
+        // Store version info in meta for evaluation
+        $currentMeta = $this->criteria->meta ?? [];
+        $currentMeta['_evaluation_version'] = $version;
+        $currentMeta['_evaluation_version_timestamp'] = now()->timestamp;
+
+        $this->criteria->meta = $currentMeta;
+
+        return $this;
+    }
+
+    /**
+     * Get the current version number
+     *
+     * @return int Current version number
+     */
+    public function getCurrentVersion(): int
+    {
+        return $this->criteria->current_version ?? 1;
+    }
+
+    /**
+     * Get all available versions for this criteria
+     *
+     * @return array Array of version numbers
+     */
+    public function getAvailableVersions(): array
+    {
+        return $this->criteria->getVersionNumbers();
+    }
+
+    /**
+     * Compare two versions and get differences
+     *
+     * @param  int  $version1  First version number
+     * @param  int  $version2  Second version number
+     * @return array Array of differences (added, removed, modified)
+     */
+    public function compareVersions(int $version1, int $version2): array
+    {
+        return $this->criteria->compareVersions($version1, $version2);
+    }
+
     protected ?string $pendingGroupLogic = null;
 }

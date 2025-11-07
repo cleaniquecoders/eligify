@@ -39,6 +39,7 @@ class TestCase extends Orchestra
             'create_eligify_table.php.stub',
             'add_visibility_columns_to_eligify_criteria.php.stub',
             'create_eligify_criteriables_table.php.stub',
+            'add_versioning_to_eligify_criteria.php.stub',
         ];
 
         usort($stubs, function ($a, $b) use ($preferredOrder) {

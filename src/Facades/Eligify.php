@@ -13,6 +13,9 @@ use Illuminate\Support\Facades\Facade;
  * @method static array evaluate(string|\CleaniqueCoders\Eligify\Models\Criteria $criteria, array|\CleaniqueCoders\Eligify\Data\Snapshot $data, bool $saveEvaluation = true, ?bool $useCache = null) Evaluate a criteria against provided data
  * @method static array evaluateWithCallbacks(\CleaniqueCoders\Eligify\Builder\CriteriaBuilder $builder, array|\CleaniqueCoders\Eligify\Data\Snapshot $data) Evaluate with callback execution
  * @method static array evaluateBatch(string|\CleaniqueCoders\Eligify\Models\Criteria $criteria, array $dataCollection, bool $saveEvaluations = true) Evaluate multiple data sets against a criteria (batch evaluation)
+ * @method static array evaluateVersion(string|\CleaniqueCoders\Eligify\Models\Criteria $criteria, int $version, array|\CleaniqueCoders\Eligify\Data\Snapshot $data, bool $saveEvaluation = true) Evaluate against a specific historical version of criteria
+ * @method static array getVersionHistory(string|\CleaniqueCoders\Eligify\Models\Criteria $criteria) Get all versions available for a criteria
+ * @method static array compareVersions(string|\CleaniqueCoders\Eligify\Models\Criteria $criteria, int $version1, int $version2) Compare two versions of criteria
  * @method static void validateSchema(\CleaniqueCoders\Eligify\Models\Criteria $criteria) Validate criteria schema
  * @method static \CleaniqueCoders\Eligify\Models\Criteria getCriteria(string $name) Get criteria by name
  * @method static array getAvailableCriteria() Get all available criteria

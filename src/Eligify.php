@@ -11,6 +11,7 @@ use CleaniqueCoders\Eligify\Engine\AdvancedRuleEngine;
 use CleaniqueCoders\Eligify\Engine\RuleEngine;
 use CleaniqueCoders\Eligify\Models\Criteria;
 use CleaniqueCoders\Eligify\Models\Evaluation;
+use CleaniqueCoders\Eligify\Models\Rule;
 use CleaniqueCoders\Eligify\Support\Cache;
 
 class Eligify
@@ -626,5 +627,177 @@ class Eligify
     public function getCacheStats(): array
     {
         return $this->cache->getStatistics();
+    }
+
+    /**
+     * Evaluate against a specific historical version of criteria
+     *
+     * @param  string|Criteria  $criteria  The criteria name or model
+     * @param  int  $version  The version number to evaluate against
+     * @param  array|Snapshot  $data  The data to evaluate
+     * @param  bool  $saveEvaluation  Whether to save the evaluation result
+     * @return array Evaluation result with passed status and score
+     *
+     * @throws \InvalidArgumentException When criteria or version is not found
+     */
+    public function evaluateVersion(string|Criteria $criteria, int $version, array|Snapshot $data, bool $saveEvaluation = true): array
+    {
+        try {
+            // Get criteria model if string provided
+            if (is_string($criteria)) {
+                $criteriaModel = $this->getCriteriaWithRules($criteria);
+
+                if (! $criteriaModel) {
+                    throw new \InvalidArgumentException("Criteria '{$criteria}' not found");
+                }
+            } else {
+                $criteriaModel = $criteria;
+            }
+
+            // Retrieve the version snapshot
+            $versionRecord = $criteriaModel->version($version);
+
+            if (! $versionRecord) {
+                throw new \InvalidArgumentException(
+                    "Version {$version} not found for criteria '{$criteriaModel->name}'"
+                );
+            }
+
+            // Convert Snapshot to array for storage operations
+            $dataArray = $data instanceof Snapshot ? $data->toArray() : $data;
+
+            // Validate input data
+            $this->validateInputData($dataArray, $criteriaModel);
+
+            // Create temporary rules collection from version snapshot
+            $rulesSnapshot = $versionRecord->getRulesSnapshot();
+
+            // Evaluate against version snapshot
+            $result = $this->evaluateRulesSnapshot($criteriaModel, $rulesSnapshot, $dataArray);
+
+            // Enhance result with version information
+            $result['version'] = $version;
+            $result['version_description'] = $versionRecord->description;
+
+            // Save evaluation record if requested with version info
+            if ($saveEvaluation) {
+                $this->saveEvaluation($criteriaModel, $dataArray, $result);
+            }
+
+            // Log the evaluation for audit
+            $this->logAudit($criteriaModel, $dataArray, $result);
+
+            return $result;
+        } catch (\InvalidArgumentException $e) {
+            throw $e;
+        } catch (\Throwable $e) {
+            logger()->error('Eligify version evaluation failed', [
+                'criteria' => is_string($criteria) ? $criteria : $criteria->name,
+                'version' => $version,
+                'error' => $e->getMessage(),
+            ]);
+
+            throw new \RuntimeException('Version evaluation failed: '.$e->getMessage(), 0, $e);
+        }
+    }
+
+    /**
+     * Evaluate rules snapshot (from a version)
+     *
+     * @param  Criteria  $criteria  The criteria model
+     * @param  array  $rulesSnapshot  Array of rule data from snapshot
+     * @param  array  $dataArray  The data to evaluate
+     * @return array Evaluation result
+     */
+    protected function evaluateRulesSnapshot(Criteria $criteria, array $rulesSnapshot, array $dataArray): array
+    {
+        // Temporarily override criteria rules with snapshot
+        $originalRules = $criteria->rules()->get();
+
+        // Create collection from snapshot by building temporary Rule instances
+        $snapshotRules = collect($rulesSnapshot)->map(function (array $ruleData) {
+            return new Rule($ruleData);
+        });
+
+        // Determine which engine to use
+        $engine = $this->getEngine($criteria);
+
+        // Evaluate using the engine - since Rule instances have the data needed
+        // We evaluate by constructing a temporary criteria-like structure
+        $temporaryCriteria = clone $criteria;
+        $temporaryCriteria->setRelation('rules', $snapshotRules);
+
+        $result = $engine->evaluate($temporaryCriteria, $dataArray);
+
+        return $result;
+    }
+
+    /**
+     * Get all versions available for a criteria
+     *
+     * @param  string|Criteria  $criteria  The criteria name or model
+     * @return array Array of version information
+     */
+    public function getVersionHistory(string|Criteria $criteria): array
+    {
+        // Get criteria model if string provided
+        if (is_string($criteria)) {
+            $criteriaModel = $this->getCriteriaWithRules($criteria);
+
+            if (! $criteriaModel) {
+                throw new \InvalidArgumentException("Criteria '{$criteria}' not found");
+            }
+        } else {
+            $criteriaModel = $criteria;
+        }
+
+        return $criteriaModel->versions()
+            ->orderBy('version')
+            ->get()
+            ->map(fn ($version) => [
+                'version' => $version->version,
+                'description' => $version->description,
+                'created_at' => $version->created_at,
+                'rules_count' => count($version->getRulesSnapshot()),
+                'meta' => $version->meta,
+            ])
+            ->toArray();
+    }
+
+    /**
+     * Compare two versions of criteria
+     *
+     * @param  string|Criteria  $criteria  The criteria name or model
+     * @param  int  $version1  First version number
+     * @param  int  $version2  Second version number
+     * @return array Differences between versions
+     */
+    public function compareVersions(string|Criteria $criteria, int $version1, int $version2): array
+    {
+        // Get criteria model if string provided
+        if (is_string($criteria)) {
+            $criteriaModel = $this->getCriteriaWithRules($criteria);
+
+            if (! $criteriaModel) {
+                throw new \InvalidArgumentException("Criteria '{$criteria}' not found");
+            }
+        } else {
+            $criteriaModel = $criteria;
+        }
+
+        return $criteriaModel->compareVersions($version1, $version2);
+    }
+
+    /**
+     * Get the appropriate engine for criteria evaluation
+     *
+     * @param  Criteria  $criteria  The criteria model
+     * @return RuleEngine The evaluation engine to use
+     */
+    protected function getEngine(Criteria $criteria): RuleEngine
+    {
+        // For versioning, always use base rule engine
+        // Advanced engine can be integrated separately if needed
+        return $this->ruleEngine;
     }
 }
