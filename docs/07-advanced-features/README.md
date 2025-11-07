@@ -523,47 +523,80 @@ $builder->addRule('credit_score', '>=', 650)
 
 ## Rule Groups
 
-Organize rules into logical groups.
+Organize rules into logical groups with advanced combination logic.
 
-### Basic Rule Groups
+Rule Groups allow you to structure complex eligibility decisions by grouping related rules and controlling how those rules (and groups) combine. This is perfect for scenarios with multiple decision paths or different evaluation logic for different rule categories.
+
+**[→ Read the full Rule Groups guide](rule-groups.md)**
+
+### Quick Example
 
 ```php
-$criteria = Eligify::criteria('Comprehensive Check')
-    ->addRuleGroup('identity', [
-        ['field' => 'ssn_verified', 'operator' => '==', 'value' => true, 'weight' => 10],
-        ['field' => 'address_verified', 'operator' => '==', 'value' => true, 'weight' => 8],
-        ['field' => 'id_document', 'operator' => 'exists', 'value' => true, 'weight' => 9],
-    ])
-    ->addRuleGroup('financial', [
-        ['field' => 'credit_score', 'operator' => '>=', 'value' => 650, 'weight' => 10],
-        ['field' => 'income', 'operator' => '>=', 'value' => 30000, 'weight' => 8],
-        ['field' => 'debt_ratio', 'operator' => '<=', 'value' => 0.43, 'weight' => 7],
-    ])
-    ->save();
+$result = Eligify::criteria('Loan Approval')
+    ->group('identity', fn($g) => $g
+        ->addRule('ssn_verified', '==', true)
+        ->addRule('address_verified', '==', true)
+        ->requireAll() // Both identity checks required
+    )
+    ->group('financial', fn($g) => $g
+        ->addRule('credit_score', '>=', 650)
+        ->addRule('income', '>=', 30000)
+        ->requireAll() // Both financial checks required
+    )
+    ->group('verification', fn($g) => $g
+        ->addRule('email_verified', '==', true)
+        ->addRule('phone_verified', '==', true)
+        ->addRule('sms_verified', '==', true)
+        ->requireMin(2) // At least 2 must pass
+    )
+    ->requireAll(['identity', 'financial']) // Both groups required
+    ->evaluate($applicant);
+
+// Check results
+if ($result->passed()) {
+    echo "Approved!";
+}
+
+if ($result->groupPassed('identity')) {
+    echo "Identity verified";
+}
+
+$stats = $result->groupStats();
+echo "Identity: {$stats['identity']['passed']}/{$stats['identity']['total']} passed";
 ```
 
-### Group-Level Requirements
+### Group Logic Types
+
+Groups support multiple combination strategies:
+
+- **`requireAll()`** - All rules in group must pass (AND logic)
+- **`requireAny()`** - At least one rule must pass (OR logic)
+- **`requireMin(n)`** - At least N rules must pass
+- **`requireMajority()`** - More than half the rules must pass
+- **`requireLogic(expr)`** - Custom boolean logic
+
+### Group-Level Features
 
 ```php
-namespace App\Eligibility;
+// Weighted groups for scoring
+->group('critical', fn($g) => $g
+    ->addRule('kyc_complete', '==', true)
+    ->weight(3.0)
+)
 
-class GroupedCriteria
-{
-    public function createWithGroupRequirements()
-    {
-        return Eligify::criteria('Strict Approval')
-            ->addRuleGroup('critical', [
-                ['field' => 'kyc_complete', 'operator' => '==', 'value' => true],
-                ['field' => 'sanctions_clear', 'operator' => '==', 'value' => true],
-            ], minPass: 2) // Both must pass
-            ->addRuleGroup('verification', [
-                ['field' => 'email_verified', 'operator' => '==', 'value' => true],
-                ['field' => 'phone_verified', 'operator' => '==', 'value' => true],
-                ['field' => 'address_verified', 'operator' => '==', 'value' => true],
-            ], minPass: 2) // At least 2 must pass
-            ->save();
-    }
-}
+// Group callbacks
+->group('identity', fn($g) => $g
+    ->addRule('ssn_verified', '==', true)
+    ->onPass(fn($r) => Log::info('Identity verified'))
+    ->onFail(fn($r) => Log::warning('Identity failed'))
+)
+
+// Group metadata
+->group('compliance', fn($g) => $g
+    ->addRule('check_1', '==', true)
+    ->meta('department', 'compliance')
+    ->meta('sla_hours', 4)
+)
 ```
 
 ## Workflow Automation

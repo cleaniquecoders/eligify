@@ -60,6 +60,14 @@ class Criteria extends Model
     }
 
     /**
+     * Groups associated with this criteria
+     */
+    public function groups(): HasMany
+    {
+        return $this->hasMany(RuleGroup::class, 'criteria_id')->orderBy('order');
+    }
+
+    /**
      * Versions of this criteria
      */
     public function versions(): HasMany

@@ -23,6 +23,7 @@ class Rule extends Model
     protected $fillable = [
         'uuid',
         'criteria_id',
+        'group_id',
         'field',
         'operator',
         'value',
@@ -46,6 +47,14 @@ class Rule extends Model
     public function criteria(): BelongsTo
     {
         return $this->belongsTo(Criteria::class);
+    }
+
+    /**
+     * The group this rule belongs to (optional)
+     */
+    public function group(): BelongsTo
+    {
+        return $this->belongsTo(RuleGroup::class, 'group_id');
     }
 
     /**

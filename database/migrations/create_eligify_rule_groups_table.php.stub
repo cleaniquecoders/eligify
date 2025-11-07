@@ -1,0 +1,57 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     *
+     * Creates the eligify_rule_groups table for organizing rules into logical groups
+     * with advanced combination logic (AND, OR, MIN, MAJORITY, BOOLEAN).
+     */
+    public function up(): void
+    {
+        Schema::create('eligify_rule_groups', function (Blueprint $table) {
+            $table->id();
+            $table->uuid('uuid')->unique()->index();
+            $table->foreignId('criteria_id')->constrained('eligify_criteria')->onDelete('cascade');
+            $table->string('name'); // e.g., 'identity', 'financial', 'verification'
+            $table->text('description')->nullable(); // Human-readable description
+            $table->string('logic_type')->default('all'); // all, any, min, majority, boolean
+            $table->unsignedInteger('min_required')->nullable(); // For 'min' logic type
+            $table->string('boolean_expression')->nullable(); // For 'boolean' logic type: "(a AND b) OR c"
+            $table->decimal('weight', 8, 2)->default(1.0); // Group weight for scoring
+            $table->integer('order')->default(0); // Execution order
+            $table->boolean('is_active')->default(true);
+            $table->json('meta')->nullable(); // Group metadata (department, sla_hours, etc.)
+            $table->timestamps();
+
+            $table->index(['criteria_id', 'is_active']);
+            $table->index(['logic_type']);
+            $table->index(['order']);
+        });
+
+        // Add group_id column to existing eligify_rules table
+        Schema::table('eligify_rules', function (Blueprint $table) {
+            $table->foreignId('group_id')->nullable()->constrained('eligify_rule_groups')->onDelete('set null')->after('criteria_id');
+            $table->index(['group_id']);
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::table('eligify_rules', function (Blueprint $table) {
+            $table->dropForeignKeyIfExists(['group_id']);
+            $table->dropIndex(['group_id']);
+            $table->dropColumn('group_id');
+        });
+
+        Schema::dropIfExists('eligify_rule_groups');
+    }
+};

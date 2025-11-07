@@ -36,8 +36,70 @@ Future features and development plans for Eligify.
 - Documentation updates
   - Database schema, Models API, Builder API
   - Core features: Criteria Attachments; Getting Started; Migration guide; Examples
+- **Rule Versioning** ✅ NEW
+  - Version snapshots and historical tracking
+  - Evaluate against historical versions
+  - Version comparison with diffs
+  - Livewire UI integration
 
-## Version 1.x (In Progress)
+## Version 1.4 (In Progress) - Rule Groups
+
+### Planned Features - Rule Groups ⭐ NEXT
+
+**Rule Groups** - Organize rules into logical collections with advanced combination logic:
+
+```php
+// Create grouped criteria
+$result = Eligify::criteria('Loan Approval')
+    ->group('identity', function ($group) {
+        $group->addRule('ssn_verified', '==', true)
+              ->addRule('address_verified', '==', true)
+              ->addRule('id_document', 'exists', true)
+              ->requireAll(); // All rules must pass
+    })
+    ->group('financial', function ($group) {
+        $group->addRule('credit_score', '>=', 650)
+              ->addRule('income', '>=', 30000)
+              ->addRule('debt_ratio', '<=', 0.43)
+              ->requireAll(); // All rules must pass
+    })
+    ->group('verification', function ($group) {
+        $group->addRule('email_verified', '==', true)
+              ->addRule('phone_verified', '==', true)
+              ->addRule('address_verified', '==', true)
+              ->requireMin(2); // At least 2 must pass
+    })
+    ->requireAll(['identity', 'financial']) // Both groups required
+    ->evaluate($applicant);
+
+// Flexible group combination logic
+$result = Eligify::criteria('Premium Membership')
+    ->group('basic', [...rules...])
+    ->group('premium', [...rules...])
+    ->group('enterprise', [...rules...])
+    ->requireAny(['basic', 'premium', 'enterprise']) // At least 1 group passes
+    ->evaluate($customer);
+
+// Advanced logic operators
+$result = Eligify::criteria('Complex')
+    ->group('a', [...])
+    ->group('b', [...])
+    ->group('c', [...])
+    ->requireLogic('(a AND b) OR c') // Boolean logic
+    ->evaluate($data);
+```
+
+**Implementation Scope:**
+
+- RuleGroup Model with nestable structure
+- Group combination logic (AND, OR, NAND, NOR, XOR, MAJORITY, custom)
+- Group weights and priorities
+- Group-level callbacks
+- UI components for group builder
+- Comprehensive test suite
+- Documentation and examples
+
+## Version 1.x (Future)
 
 ### Planned Features
 

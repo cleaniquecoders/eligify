@@ -15,11 +15,33 @@ class AdvancedRuleEngine
 {
     protected RuleEngine $baseEngine;
 
+    protected GroupEvaluationEngine $groupEngine;
+
     protected array $inputData = [];
 
     public function __construct(RuleEngine $baseEngine)
     {
         $this->baseEngine = $baseEngine;
+        $this->groupEngine = new GroupEvaluationEngine($baseEngine);
+    }
+
+    /**
+     * Evaluate rule groups (new group system)
+     */
+    public function evaluateGroups(Criteria $criteria, array|Snapshot $data): array
+    {
+        // Convert Snapshot to array if needed
+        $dataArray = $data instanceof Snapshot ? $data->toArray() : $data;
+
+        return $this->groupEngine->evaluateGroups($criteria, $dataArray);
+    }
+
+    /**
+     * Get group evaluation engine for direct access if needed
+     */
+    public function getGroupEngine(): GroupEvaluationEngine
+    {
+        return $this->groupEngine;
     }
 
     /**

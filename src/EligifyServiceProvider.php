@@ -50,6 +50,7 @@ class EligifyServiceProvider extends PackageServiceProvider
             ->hasMigration('add_visibility_columns_to_eligify_criteria')
             ->hasMigration('create_eligify_criteriables_table')
             ->hasMigration('add_versioning_to_eligify_criteria')
+            ->hasMigration('create_eligify_rule_groups_table')
             ->hasCommands([
                 EligifyCommand::class,
                 CriteriaCommand::class,

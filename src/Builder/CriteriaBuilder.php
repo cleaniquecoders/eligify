@@ -732,4 +732,63 @@ class CriteriaBuilder
     }
 
     protected ?string $pendingGroupLogic = null;
+
+    /**
+     * Start creating a new rule group
+     */
+    public function createGroup(string $groupName, callable $callback): self
+    {
+        $groupBuilder = new GroupBuilder($this, $groupName);
+        $callback($groupBuilder);
+        $groupBuilder->end();
+
+        return $this;
+    }
+
+    /**
+     * Alias for createGroup
+     */
+    public function addGroup(string $groupName, callable $callback): self
+    {
+        return $this->createGroup($groupName, $callback);
+    }
+
+    /**
+     * Set group combination logic to ALL (all groups must pass)
+     */
+    public function requireAllGroups(array $groupNames): self
+    {
+        $meta = $this->criteria->meta ?? [];
+        $meta['group_combination'] = 'all';
+        $meta['group_names'] = $groupNames;
+        $this->criteria->update(['meta' => $meta]);
+
+        return $this;
+    }
+
+    /**
+     * Set group combination logic to ANY (at least one group must pass)
+     */
+    public function requireAnyGroup(array $groupNames): self
+    {
+        $meta = $this->criteria->meta ?? [];
+        $meta['group_combination'] = 'any';
+        $meta['group_names'] = $groupNames;
+        $this->criteria->update(['meta' => $meta]);
+
+        return $this;
+    }
+
+    /**
+     * Set group combination logic to custom boolean expression
+     */
+    public function requireGroupLogic(string $expression): self
+    {
+        $meta = $this->criteria->meta ?? [];
+        $meta['group_combination'] = 'boolean';
+        $meta['group_expression'] = $expression;
+        $this->criteria->update(['meta' => $meta]);
+
+        return $this;
+    }
 }
