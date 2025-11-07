@@ -17,10 +17,28 @@ class CriteriaShow extends Component
 
     public Criteria $criteria;
 
+    public array $versions = [];
+
     public function mount(int $criteriaId): void
     {
         $this->criteriaId = $criteriaId;
         $this->criteria = Criteria::query()->withCount(['rules', 'evaluations'])->findOrFail($criteriaId);
+        $this->loadVersions();
+    }
+
+    protected function loadVersions(): void
+    {
+        $this->versions = $this->criteria->versions()
+            ->orderByDesc('version')
+            ->get()
+            ->map(fn ($v) => [
+                'version' => $v->version,
+                'description' => $v->description,
+                'created_at' => $v->created_at?->diffForHumans(),
+                'rules_count' => count($v->getRulesSnapshot()),
+                'meta' => $v->meta,
+            ])
+            ->toArray();
     }
 
     public function delete()
@@ -49,6 +67,17 @@ class CriteriaShow extends Component
         $this->criteria = Criteria::query()->withCount(['rules', 'evaluations'])->findOrFail($this->criteriaId);
     }
 
+    public function createVersion(string $description = ''): void
+    {
+        try {
+            $this->criteria->createVersion($description ?: 'Manual version snapshot');
+            $this->loadVersions();
+            session()->flash('status', 'Version snapshot created successfully.');
+        } catch (\Exception $e) {
+            session()->flash('error', 'Failed to create version: '.$e->getMessage());
+        }
+    }
+
     public function render()
     {
         $rules = Rule::query()
@@ -58,6 +87,7 @@ class CriteriaShow extends Component
 
         return view('eligify::livewire.criteria-show', [
             'rules' => $rules,
+            'versions' => $this->versions,
         ]);
     }
 }

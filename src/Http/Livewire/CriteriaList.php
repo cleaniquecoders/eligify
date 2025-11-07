@@ -55,7 +55,11 @@ class CriteriaList extends Component
 
     public function getItemsProperty(): LengthAwarePaginator
     {
-        $query = Criteria::query()->withCount(['rules', 'evaluations']);
+        $query = Criteria::query()
+            ->withCount(['rules', 'evaluations', 'versions'])
+            ->with(['versions' => function ($q) {
+                $q->orderByDesc('version')->limit(1);
+            }]);
 
         if ($this->onlyActive) {
             $query->where('is_active', true);

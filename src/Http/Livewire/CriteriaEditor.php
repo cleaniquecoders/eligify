@@ -21,6 +21,11 @@ class CriteriaEditor extends Component
 
     public ?Criteria $criteria = null;
 
+    // Versioning fields
+    public ?int $current_version = null;
+
+    public ?string $version_description = null;
+
     // New classification fields
     public ?string $type = null;
 
@@ -41,6 +46,7 @@ class CriteriaEditor extends Component
             $this->name = (string) $this->criteria->name;
             $this->description = $this->criteria->description;
             $this->is_active = (bool) $this->criteria->is_active;
+            $this->current_version = $this->criteria->current_version;
             $this->type = $this->criteria->type;
             $this->group = $this->criteria->group;
             $this->category = $this->criteria->category;
@@ -79,6 +85,12 @@ class CriteriaEditor extends Component
 
         if ($this->mode === 'edit' && $this->criteria) {
             $this->criteria->update($data);
+
+            // Create version snapshot if description provided
+            if ($this->version_description) {
+                $this->criteria->createVersion($this->version_description);
+            }
+
             session()->flash('status', 'Criteria updated successfully.');
 
             return $this->redirect(route('eligify.criteria.show', $this->criteria->id));

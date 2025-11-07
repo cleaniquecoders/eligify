@@ -58,6 +58,11 @@
                 <div class="mb-2">Evaluations: <span class="font-semibold">{{ $criteria->evaluations_count }}</span></div>
                 <div class="mb-2">Created: <span class="text-gray-500">{{ optional($criteria->created_at)->toDayDateTimeString() }}</span></div>
                 <div class="mb-2">Updated: <span class="text-gray-500">{{ optional($criteria->updated_at)->diffForHumans() }}</span></div>
+                <div class="mb-2 pt-2 border-t border-gray-200">
+                    <div class="text-sm font-semibold text-gray-700">Version Control</div>
+                    <div class="text-sm">Current: <span class="font-semibold text-primary-600">v{{ $criteria->current_version ?? 1 }}</span></div>
+                    <div class="text-xs text-gray-500 mt-1">Total versions: {{ count($versions) }}</div>
+                </div>
             </div>
         </div>
     </div>
@@ -185,6 +190,70 @@
             <div class="text-center py-8 text-gray-500">
                 <p class="mb-4">No rules defined yet.</p>
                 <x-eligify::ui.button as="a" href="{{ route('eligify.rules.create', ['criteria_id' => $criteria->id]) }}">Create First Rule</x-eligify::ui.button>
+            </div>
+        @endif
+    </div>
+
+    <!-- Version History Section -->
+    <div class="bg-white border rounded p-4">
+        <div class="flex items-center justify-between mb-4">
+            <h3 class="font-semibold text-lg">Version History</h3>
+            <x-eligify::ui.button type="button" variant="secondary" wire:click="$dispatch('openVersionModal')">Create Snapshot</x-eligify::ui.button>
+        </div>
+
+        @if(count($versions) > 0)
+            <div class="space-y-2">
+                @foreach($versions as $version)
+                    <div class="border border-gray-100 rounded-lg p-4 hover:bg-gray-50 transition-colors">
+                        <div class="flex items-start justify-between">
+                            <div class="flex-1">
+                                <div class="flex items-center gap-3">
+                                    <span class="inline-flex items-center px-2.5 py-1 text-xs font-bold rounded-full bg-primary-100 text-primary-800">
+                                        v{{ $version['version'] }}
+                                    </span>
+                                    <div class="text-sm text-gray-600">
+                                        {{ $version['description'] ?: 'Version snapshot' }}
+                                    </div>
+                                </div>
+                                <div class="mt-2 text-xs text-gray-500 space-x-4">
+                                    <span>Created: {{ $version['created_at'] }}</span>
+                                    <span>Rules: {{ $version['rules_count'] }}</span>
+                                    @if(!empty($version['meta']['created_by']))
+                                        <span>By: User #{{ $version['meta']['created_by'] }}</span>
+                                    @endif
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                @if($version['version'] !== ($criteria->current_version ?? 1))
+                                    <x-eligify::ui.button
+                                        type="button"
+                                        variant="secondary"
+                                        size="sm"
+                                        wire:click="$dispatch('compareVersions', { version: {{ $version['version'] }} })"
+                                        title="Compare with current"
+                                    >
+                                        Compare
+                                    </x-eligify::ui.button>
+                                @endif
+                                <x-eligify::ui.button
+                                    type="button"
+                                    variant="secondary"
+                                    size="sm"
+                                    wire:click="$dispatch('viewVersion', { version: {{ $version['version'] }} })"
+                                    title="View this version"
+                                >
+                                    View
+                                </x-eligify::ui.button>
+                            </div>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+        @else
+            <div class="text-center py-8 text-gray-500">
+                <p class="mb-4">No versions created yet.</p>
+                <p class="text-sm text-gray-400 mb-4">Create a version snapshot to track changes over time.</p>
+                <x-eligify::ui.button type="button" variant="secondary" wire:click="createVersion('Initial version')">Create First Version</x-eligify::ui.button>
             </div>
         @endif
     </div>

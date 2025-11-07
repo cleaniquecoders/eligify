@@ -204,15 +204,28 @@
                                     <span class="text-gray-600">Evals</span>
                                 </div>
                             </div>
-                            <div class="flex items-center justify-between pt-4 border-t border-gray-100">
-                                <span class="text-xs text-gray-400">{{ optional($criteria->updated_at)->diffForHumans() }}</span>
-                                <a class="text-xs text-primary-600 hover:text-primary-700 font-medium inline-flex items-center gap-1 group-hover:gap-2 transition-all" href="{{ route('eligify.criteria.edit', $criteria->id) }}">
-                                    Edit
-                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                                    </svg>
-                                </a>
+                                                        <div class="flex items-center gap-4 mb-4">
+                                @if(!empty($criteria->type))
+                                    <span class="inline-flex items-center px-2 py-0.5 text-[10px] font-medium rounded bg-sky-50 text-sky-700 border border-sky-200" title="Type">{{ $criteria->type }}</span>
+                                @endif
+                                @if(!empty($criteria->group))
+                                    <span class="inline-flex items-center px-2 py-0.5 text-[10px] font-medium rounded bg-amber-50 text-amber-700 border border-amber-200" title="Group">{{ $criteria->group }}</span>
+                                @endif
+                                @if(!empty($criteria->category))
+                                    <span class="inline-flex items-center px-2 py-0.5 text-[10px] font-medium rounded bg-emerald-50 text-emerald-700 border border-emerald-200" title="Category">{{ $criteria->category }}</span>
+                                @endif
+                                @if($criteria->current_version)
+                                    <span class="inline-flex items-center px-2 py-0.5 text-[10px] font-bold rounded bg-purple-50 text-purple-700 border border-purple-200" title="Current Version">v{{ $criteria->current_version }}</span>
+                                @endif
                             </div>
+                            <div class="flex items-center justify-between pt-4 border-t border-gray-100">
+                                @if($criteria->versions_count > 0)
+                                    <a href="{{ route('eligify.criteria.show', $criteria->id) }}#versions" class="text-xs text-gray-600 hover:text-gray-900">
+                                        📋 {{ $criteria->versions_count }} {{ $criteria->versions_count === 1 ? 'version' : 'versions' }}
+                                    </a>
+                                @else
+                                    <span class="text-xs text-gray-400">No versions yet</span>
+                                @endif
                         </div>
                     @endforeach
                 </div>
