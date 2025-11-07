@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace CleaniqueCoders\Eligify\Data\Mappings;
 
 use CleaniqueCoders\Eligify\Data\Contracts\ModelMapping;

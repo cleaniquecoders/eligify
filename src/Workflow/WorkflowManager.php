@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace CleaniqueCoders\Eligify\Workflow;
 
 use CleaniqueCoders\Eligify\Audit\AuditLogger;

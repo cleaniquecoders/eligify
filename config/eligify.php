@@ -575,4 +575,91 @@ return [
         'default_mapping' => null,
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Rate Limiting Configuration
+    |--------------------------------------------------------------------------
+    |
+    | Protect your application from abuse by limiting the number of evaluations
+    | that can be performed within a given time period.
+    |
+    */
+    'rate_limiting' => [
+        // Enable or disable rate limiting
+        'enabled' => env('ELIGIFY_RATE_LIMITING_ENABLED', true),
+
+        // Maximum number of evaluations per period
+        'max_attempts' => env('ELIGIFY_RATE_LIMITING_MAX_ATTEMPTS', 100),
+
+        // Time period in minutes for rate limiting
+        'decay_minutes' => env('ELIGIFY_RATE_LIMITING_DECAY_MINUTES', 1),
+
+        // Rate limit key prefix
+        'key_prefix' => env('ELIGIFY_RATE_LIMITING_KEY_PREFIX', 'eligify_eval'),
+
+        // Rate limiting by user vs IP vs global
+        'limit_by' => env('ELIGIFY_RATE_LIMITING_BY', 'user'), // 'user', 'ip', 'global'
+
+        // Rate limiting for different operation types
+        'limits' => [
+            'evaluation' => [
+                'max_attempts' => env('ELIGIFY_RATE_LIMIT_EVALUATION', 60),
+                'decay_minutes' => 1,
+            ],
+            'batch_evaluation' => [
+                'max_attempts' => env('ELIGIFY_RATE_LIMIT_BATCH', 10),
+                'decay_minutes' => 5,
+            ],
+            'criteria_creation' => [
+                'max_attempts' => env('ELIGIFY_RATE_LIMIT_CREATION', 20),
+                'decay_minutes' => 10,
+            ],
+            'ui_access' => [
+                'max_attempts' => env('ELIGIFY_RATE_LIMIT_UI', 200),
+                'decay_minutes' => 1,
+            ],
+        ],
+
+        // Response when rate limit is exceeded
+        'exceeded_message' => 'Too many eligibility evaluations. Please try again later.',
+
+        // HTTP status code for rate limit exceeded
+        'exceeded_status_code' => 429,
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Security Configuration
+    |--------------------------------------------------------------------------
+    |
+    | Additional security settings for the Eligify package.
+    |
+    */
+    'security' => [
+        // Enable input validation for all evaluation data
+        'validate_input' => env('ELIGIFY_SECURITY_VALIDATE_INPUT', true),
+
+        // Maximum field name length to prevent buffer overflow attacks
+        'max_field_length' => env('ELIGIFY_SECURITY_MAX_FIELD_LENGTH', 255),
+
+        // Maximum value length for rule values
+        'max_value_length' => env('ELIGIFY_SECURITY_MAX_VALUE_LENGTH', 1000),
+
+        // Maximum number of rules per criteria
+        'max_rules_per_criteria' => env('ELIGIFY_SECURITY_MAX_RULES', 100),
+
+        // Allowed operators (empty array = allow all)
+        'allowed_operators' => [
+            '==', '!=', '>', '>=', '<', '<=',
+            'in', 'not_in', 'between', 'contains',
+            'starts_with', 'ends_with', 'regex', 'not_regex',
+        ],
+
+        // Disable dangerous operators in production
+        'disable_regex_in_production' => env('ELIGIFY_SECURITY_DISABLE_REGEX_PROD', true),
+
+        // Log security violations
+        'log_violations' => env('ELIGIFY_SECURITY_LOG_VIOLATIONS', true),
+    ],
+
 ];

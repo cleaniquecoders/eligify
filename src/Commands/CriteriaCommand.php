@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace CleaniqueCoders\Eligify\Commands;
 
 use CleaniqueCoders\Eligify\Eligify;

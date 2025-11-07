@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace CleaniqueCoders\Eligify;
 
 use CleaniqueCoders\Eligify\Audit\AuditLogger;
@@ -41,36 +43,71 @@ class Eligify
      * @param  bool  $saveEvaluation  Whether to save the evaluation result
      * @param  bool  $useCache  Whether to use cache (defaults to config setting)
      * @return array Evaluation result with passed status, score, and details
+     *
+     * @throws \InvalidArgumentException When criteria is not found or data is invalid
+     * @throws \RuntimeException When evaluation fails
      */
     public function evaluate(string|Criteria $criteria, array|Snapshot $data, bool $saveEvaluation = true, ?bool $useCache = null): array
     {
-        // Get criteria model if string provided
-        if (is_string($criteria)) {
-            $criteriaModel = Criteria::where('slug', str($criteria)->slug())->first();
+        try {
+            // Get criteria model if string provided
+            if (is_string($criteria)) {
+                $criteriaModel = $this->getCriteriaWithRules($criteria);
 
-            if (! $criteriaModel) {
-                throw new \InvalidArgumentException("Criteria '{$criteria}' not found");
+                if (! $criteriaModel) {
+                    throw new \InvalidArgumentException("Criteria '{$criteria}' not found");
+                }
+            } else {
+                $criteriaModel = $criteria;
             }
-        } else {
-            $criteriaModel = $criteria;
+
+            // Convert Snapshot to array for storage operations
+            $dataArray = $data instanceof Snapshot ? $data->toArray() : $data;
+
+            // Basic input validation for security
+            $this->validateInputData($dataArray, $criteriaModel);
+
+            // Determine if we should use cache
+            $shouldUseCache = $useCache ?? $this->cache->isEvaluationCacheEnabled();
+
+            // Use cache if enabled
+            if ($shouldUseCache) {
+                $result = $this->cache->rememberEvaluation($criteriaModel, $data, function () use ($criteriaModel, $data, $dataArray, $saveEvaluation) {
+                    return $this->performEvaluation($criteriaModel, $data, $dataArray, $saveEvaluation);
+                });
+            } else {
+                $result = $this->performEvaluation($criteriaModel, $data, $dataArray, $saveEvaluation);
+            }
+
+            return $result;
+        } catch (\InvalidArgumentException $e) {
+            // Re-throw validation errors as-is
+            throw $e;
+        } catch (\Throwable $e) {
+            // Log unexpected errors
+            logger()->error('Eligify evaluation failed', [
+                'criteria' => is_string($criteria) ? $criteria : $criteria->name,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            // Wrap in runtime exception
+            throw new \RuntimeException('Evaluation failed: '.$e->getMessage(), 0, $e);
         }
+    }
 
-        // Convert Snapshot to array for storage operations
-        $dataArray = $data instanceof Snapshot ? $data->toArray() : $data;
-
-        // Determine if we should use cache
-        $shouldUseCache = $useCache ?? $this->cache->isEvaluationCacheEnabled();
-
-        // Use cache if enabled
-        if ($shouldUseCache) {
-            $result = $this->cache->rememberEvaluation($criteriaModel, $data, function () use ($criteriaModel, $data, $dataArray, $saveEvaluation) {
-                return $this->performEvaluation($criteriaModel, $data, $dataArray, $saveEvaluation);
-            });
-        } else {
-            $result = $this->performEvaluation($criteriaModel, $data, $dataArray, $saveEvaluation);
-        }
-
-        return $result;
+    /**
+     * Get criteria with rules using optimized query
+     */
+    protected function getCriteriaWithRules(string $criteriaName): ?Criteria
+    {
+        return Criteria::with(['rules' => function ($query) {
+            $query->where('is_active', true)
+                ->orderBy('order', 'asc');
+        }])
+            ->where('slug', str($criteriaName)->slug())
+            ->where('is_active', true)
+            ->first();
     }
 
     /**
@@ -150,9 +187,9 @@ class Eligify
      */
     public function evaluateBatch(string|Criteria $criteria, array $dataCollection, bool $saveEvaluations = true): array
     {
-        // Get criteria model if string provided
+        // Get criteria model if string provided with eager loading
         if (is_string($criteria)) {
-            $criteriaModel = Criteria::where('slug', str($criteria)->slug())->first();
+            $criteriaModel = $this->getCriteriaWithRules($criteria);
 
             if (! $criteriaModel) {
                 throw new \InvalidArgumentException("Criteria '{$criteria}' not found");
@@ -518,6 +555,61 @@ class Eligify
         }
 
         return $this->cache->hasEvaluation($criteriaModel, $data);
+    }
+
+    /**
+     * Validate input data for security
+     */
+    protected function validateInputData(array $data, Criteria $criteria): void
+    {
+        if (! config('eligify.security.validate_input', true)) {
+            return;
+        }
+
+        $maxFieldLength = config('eligify.security.max_field_length', 255);
+        $maxValueLength = config('eligify.security.max_value_length', 1000);
+
+        foreach ($data as $key => $value) {
+            // Check field name length
+            if (strlen((string) $key) > $maxFieldLength) {
+                throw new \InvalidArgumentException("Field name '{$key}' exceeds maximum length of {$maxFieldLength}");
+            }
+
+            // Check value length for strings
+            if (is_string($value) && strlen($value) > $maxValueLength) {
+                throw new \InvalidArgumentException("Value for field '{$key}' exceeds maximum length of {$maxValueLength}");
+            }
+
+            // Check for suspicious patterns
+            if (is_string($value) && $this->containsSuspiciousContent($value)) {
+                logger()->warning('Suspicious content detected in evaluation data', [
+                    'field' => $key,
+                    'value_preview' => substr($value, 0, 50),
+                ]);
+            }
+        }
+    }
+
+    /**
+     * Check for suspicious content in input values
+     */
+    protected function containsSuspiciousContent(string $value): bool
+    {
+        $suspiciousPatterns = [
+            '/\b(SELECT|INSERT|UPDATE|DELETE|DROP|UNION)\b/i', // SQL injection
+            '/<script[^>]*>.*?<\/script>/si', // XSS
+            '/javascript:/i', // JavaScript protocols
+            '/vbscript:/i', // VBScript protocols
+            '/on\w+\s*=/i', // Event handlers
+        ];
+
+        foreach ($suspiciousPatterns as $pattern) {
+            if (preg_match($pattern, $value)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**

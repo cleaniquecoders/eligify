@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace CleaniqueCoders\Eligify\Enums;
 
 use CleaniqueCoders\Traitify\Concerns\InteractsWithEnum;

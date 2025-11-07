@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace CleaniqueCoders\Eligify\Data;
 
 use Illuminate\Contracts\Support\Arrayable;

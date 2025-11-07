@@ -56,11 +56,131 @@ $criteria = Eligify::criteria('Loan Approval')
     ->save();
 
 // Evaluate
-$result = Eligify::evaluate('loan_approval', [
-'credit_score' => 720,
-'annual_income' => 55000,
-'debt_ratio' => 35,
-]);
+$result = $criteria->evaluateWithCallbacks($data);
+```
+
+## Security
+
+Eligify includes built-in security features:
+
+- **Input Validation**: All evaluation data is validated for length and suspicious content
+- **Rate Limiting**: Configurable rate limits to prevent abuse
+- **Authorization**: Dashboard access controlled via Gates/closures (similar to Telescope)
+- **Audit Logging**: Complete audit trail of all evaluations and decisions
+- **Safe Operators**: Dangerous operators like regex can be disabled in production
+
+### Security Configuration
+
+```php
+// config/eligify.php
+'security' => [
+    'validate_input' => true,
+    'max_field_length' => 255,
+    'max_value_length' => 1000,
+    'log_violations' => true,
+],
+
+'rate_limiting' => [
+    'enabled' => true,
+    'max_attempts' => 100,
+    'decay_minutes' => 1,
+],
+```
+
+### Dashboard Authorization
+
+```php
+// In AppServiceProvider
+Gate::define('viewEligify', function ($user) {
+    return $user->hasRole('admin');
+});
+```
+
+## Performance
+
+Eligify is optimized for high-performance scenarios:
+
+- **Smart Caching**: Evaluation results and rule compilation caching
+- **Eager Loading**: Optimized database queries to prevent N+1 problems
+- **Batch Processing**: Efficient batch evaluation with memory management
+- **Query Optimization**: Rules are loaded with criteria to minimize database hits
+
+### Performance Configuration
+
+```php
+// config/eligify.php
+'performance' => [
+    'compile_rules' => true,
+    'batch_size' => 100,
+],
+
+'evaluation' => [
+    'cache_enabled' => true,
+    'cache_ttl' => 60, // minutes
+],
+```
+
+
+## Security
+
+Eligify includes built-in security features:
+
+- **Input Validation**: All evaluation data is validated for length and suspicious content
+- **Rate Limiting**: Configurable rate limits to prevent abuse
+- **Authorization**: Dashboard access controlled via Gates/closures (similar to Telescope)
+- **Audit Logging**: Complete audit trail of all evaluations and decisions
+- **Safe Operators**: Dangerous operators like regex can be disabled in production
+
+### Security Configuration
+
+```php
+// config/eligify.php
+'security' => [
+    'validate_input' => true,
+    'max_field_length' => 255,
+    'max_value_length' => 1000,
+    'log_violations' => true,
+],
+
+'rate_limiting' => [
+    'enabled' => true,
+    'max_attempts' => 100,
+    'decay_minutes' => 1,
+],
+```
+
+### Dashboard Authorization
+
+```php
+// In AppServiceProvider
+Gate::define('viewEligify', function ($user) {
+    return $user->hasRole('admin');
+});
+```
+
+## Performance
+
+Eligify is optimized for high-performance scenarios:
+
+- **Smart Caching**: Evaluation results and rule compilation caching
+- **Eager Loading**: Optimized database queries to prevent N+1 problems
+- **Batch Processing**: Efficient batch evaluation with memory management
+- **Query Optimization**: Rules are loaded with criteria to minimize database hits
+
+### Performance Configuration
+
+```php
+// config/eligify.php
+'performance' => [
+    'compile_rules' => true,
+    'batch_size' => 100,
+],
+
+'evaluation' => [
+    'cache_enabled' => true,
+    'cache_ttl' => 60, // minutes
+],
+```
 
 // Result: ['passed' => true, 'score' => 85, 'decision' => 'Approved', ...]
 ```

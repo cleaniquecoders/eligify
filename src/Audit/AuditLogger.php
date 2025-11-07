@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace CleaniqueCoders\Eligify\Audit;
 
 use CleaniqueCoders\Eligify\Models\AuditLog;
@@ -382,7 +384,7 @@ class AuditLogger
 
             // Recursively sanitize nested arrays
             array_walk_recursive($context, function (&$value, $key) use ($sensitiveFields) {
-                if (in_array(strtolower($key), $sensitiveFields)) {
+                if (is_string($key) && in_array(strtolower($key), $sensitiveFields)) {
                     $value = '[REDACTED]';
                 }
             });

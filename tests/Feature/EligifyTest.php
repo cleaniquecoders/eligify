@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use CleaniqueCoders\Eligify\Eligify;
 use CleaniqueCoders\Eligify\Enums\RulePriority;
 
@@ -96,4 +98,64 @@ it('can create criteria from preset', function () {
 
     expect($result['passed'])->toBeTrue();
     expect($result['score'])->toBeGreaterThan(70);
+});
+
+it('throws exception when criteria not found', function () {
+    $eligify = new Eligify;
+
+    expect(fn () => $eligify->evaluate('nonexistent-criteria', []))
+        ->toThrow(InvalidArgumentException::class)
+        ->toThrow('Criteria \'nonexistent-criteria\' not found');
+});
+
+it('validates input data length for security', function () {
+    $builder = Eligify::criteria('Security Test')
+        ->addRule('name', '==', 'test');
+
+    $builder->save();
+
+    $eligify = new Eligify;
+
+    // Test field name too long
+    $longFieldName = str_repeat('a', 300);
+    $dataWithLongField = [$longFieldName => 'value'];
+
+    expect(fn () => $eligify->evaluate($builder->getCriteria(), $dataWithLongField))
+        ->toThrow(InvalidArgumentException::class);
+});
+
+it('detects suspicious content in input data', function () {
+    $builder = Eligify::criteria('XSS Test')
+        ->addRule('comment', '==', 'safe');
+
+    $builder->save();
+
+    $eligify = new Eligify;
+
+    // This should not throw but should log a warning
+    $suspiciousData = [
+        'comment' => '<script>alert("xss")</script>',
+    ];
+
+    // The evaluation should still proceed but log the warning
+    $result = $eligify->evaluate($builder->getCriteria(), $suspiciousData);
+
+    expect($result)->toBeArray();
+    expect($result['passed'])->toBeFalse(); // Will fail because comment != 'safe'
+});
+
+it('handles evaluation errors gracefully', function () {
+    $builder = Eligify::criteria('Error Test')
+        ->addRule('field_that_causes_error', '==', 'value');
+
+    $builder->save();
+
+    $eligify = new Eligify;
+
+    // This might cause an error in evaluation, should be caught and wrapped
+    $result = $eligify->evaluate($builder->getCriteria(), ['valid_data' => 'test']);
+
+    // Should return a result even if some rules fail to evaluate
+    expect($result)->toBeArray();
+    expect($result)->toHaveKey('passed');
 });

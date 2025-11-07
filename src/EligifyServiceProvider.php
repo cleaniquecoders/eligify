@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace CleaniqueCoders\Eligify;
 
 use CleaniqueCoders\Eligify\Audit\AuditLogger;
@@ -64,40 +66,65 @@ class EligifyServiceProvider extends PackageServiceProvider
 
     public function packageBooted(): void
     {
-        // Register model observers for audit logging
+        // Register audit services if enabled
         if (config('eligify.audit.enabled', true)) {
-            Criteria::observe(CriteriaObserver::class);
-            Rule::observe(RuleObserver::class);
-
-            // Register event listeners for comprehensive audit logging
-            Event::listen(EvaluationCompleted::class, LogEvaluationCompleted::class);
-            Event::listen(CriteriaCreated::class, LogCriteriaCreated::class);
-            Event::listen(RuleExecuted::class, LogRuleExecuted::class);
-
-            // Schedule automatic audit cleanup
-            $this->scheduleAuditCleanup();
+            $this->registerAuditServices();
         }
 
-        // Register UI routes and middleware if dashboard is enabled
+        // Register UI services if enabled
         if (config('eligify.ui.enabled', false)) {
-            $this->registerUiAuthorization();
-            $this->registerUiRoutes();
-
-            // Register Livewire components when available
-            if (class_exists(Livewire::class)) {
-                Livewire::component('eligify.criteria-list', \CleaniqueCoders\Eligify\Http\Livewire\CriteriaList::class);
-                Livewire::component('eligify.criteria-editor', \CleaniqueCoders\Eligify\Http\Livewire\CriteriaEditor::class);
-                Livewire::component('eligify.criteria-show', \CleaniqueCoders\Eligify\Http\Livewire\CriteriaShow::class);
-                Livewire::component('eligify.rule-editor', \CleaniqueCoders\Eligify\Http\Livewire\RuleEditor::class);
-                Livewire::component('eligify.rule-library-list', \CleaniqueCoders\Eligify\Http\Livewire\RuleLibraryList::class);
-                Livewire::component('eligify.playground', \CleaniqueCoders\Eligify\Http\Livewire\Playground::class);
-                Livewire::component('eligify.audit-log-list', \CleaniqueCoders\Eligify\Http\Livewire\AuditLogList::class);
-                Livewire::component('eligify.settings-manager', \CleaniqueCoders\Eligify\Http\Livewire\SettingsManager::class);
-            }
+            $this->registerUiServices();
         } else {
             // Provide a safe default Gate if one is not defined, even when UI is disabled
             $this->ensureDefaultGate();
         }
+    }
+
+    /**
+     * Register audit-related services
+     */
+    protected function registerAuditServices(): void
+    {
+        // Register model observers for audit logging
+        Criteria::observe(CriteriaObserver::class);
+        Rule::observe(RuleObserver::class);
+
+        // Register event listeners for comprehensive audit logging
+        Event::listen(EvaluationCompleted::class, LogEvaluationCompleted::class);
+        Event::listen(CriteriaCreated::class, LogCriteriaCreated::class);
+        Event::listen(RuleExecuted::class, LogRuleExecuted::class);
+
+        // Schedule automatic audit cleanup
+        $this->scheduleAuditCleanup();
+    }
+
+    /**
+     * Register UI-related services
+     */
+    protected function registerUiServices(): void
+    {
+        $this->registerUiAuthorization();
+        $this->registerUiRoutes();
+
+        // Register Livewire components when available
+        if (class_exists(Livewire::class)) {
+            $this->registerLivewireComponents();
+        }
+    }
+
+    /**
+     * Register Livewire components
+     */
+    protected function registerLivewireComponents(): void
+    {
+        Livewire::component('eligify.criteria-list', \CleaniqueCoders\Eligify\Http\Livewire\CriteriaList::class);
+        Livewire::component('eligify.criteria-editor', \CleaniqueCoders\Eligify\Http\Livewire\CriteriaEditor::class);
+        Livewire::component('eligify.criteria-show', \CleaniqueCoders\Eligify\Http\Livewire\CriteriaShow::class);
+        Livewire::component('eligify.rule-editor', \CleaniqueCoders\Eligify\Http\Livewire\RuleEditor::class);
+        Livewire::component('eligify.rule-library-list', \CleaniqueCoders\Eligify\Http\Livewire\RuleLibraryList::class);
+        Livewire::component('eligify.playground', \CleaniqueCoders\Eligify\Http\Livewire\Playground::class);
+        Livewire::component('eligify.audit-log-list', \CleaniqueCoders\Eligify\Http\Livewire\AuditLogList::class);
+        Livewire::component('eligify.settings-manager', \CleaniqueCoders\Eligify\Http\Livewire\SettingsManager::class);
     }
 
     /**
@@ -150,6 +177,11 @@ class EligifyServiceProvider extends PackageServiceProvider
         $router = $this->app->make(Router::class);
         if (! array_key_exists('eligify.authorize', $router->getMiddleware())) {
             $router->aliasMiddleware('eligify.authorize', AuthorizeDashboard::class);
+        }
+
+        // Register rate limiting middleware if enabled
+        if (config('eligify.rate_limiting.enabled', true)) {
+            $router->aliasMiddleware('eligify.rate_limit', \Illuminate\Routing\Middleware\ThrottleRequests::class);
         }
 
         // Load package routes

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace CleaniqueCoders\Eligify\Concerns;
 
 use CleaniqueCoders\Eligify\Data\Extractor;
