@@ -42,16 +42,6 @@ return [
             'logo' => env('ELIGIFY_UI_BRAND_LOGO', null), // path/URL or null to use text
         ],
 
-        // Using Gate
-        'gate' => 'viewEligify',
-
-        // Asset strategy defaults for the package UI
-        'assets' => [
-            'use_cdn' => env('ELIGIFY_UI_ASSETS_USE_CDN', true),
-            'tailwind_cdn' => env('ELIGIFY_UI_TAILWIND_CDN', 'https://cdn.tailwindcss.com'),
-            'alpine_cdn' => env('ELIGIFY_UI_ALPINE_CDN', 'https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js'),
-        ],
-
         // Asset CDNs
         'assets' => [
             'use_cdn' => env('ELIGIFY_UI_ASSETS_USE_CDN', true),
