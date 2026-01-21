@@ -226,6 +226,7 @@
                                 @else
                                     <span class="text-xs text-gray-400">No versions yet</span>
                                 @endif
+                            </div>
                         </div>
                     @endforeach
                 </div>

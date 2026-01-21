@@ -2,7 +2,9 @@
   "permissions": {
     "allow": [
       "Bash(composer test:*)",
-      "Bash(composer analyse:*)"
+      "Bash(composer analyse:*)",
+      "Bash(php vendor/bin/testbench migrate:*)",
+      "Bash(php vendor/bin/testbench:*)"
     ]
   }
 }
