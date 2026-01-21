@@ -19,7 +19,7 @@
         </div>
         <div class="p-6">
             @if (class_exists(\Livewire\Livewire::class))
-                <livewire:eligify.settings-manager />
+                <livewire:eligify::settings-manager />
             @else
                 <div class="text-center py-12">
                     <div class="w-16 h-16 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-4">

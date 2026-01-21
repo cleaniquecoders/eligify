@@ -24,7 +24,7 @@
             </div>
         </div>
         <div class="p-6">
-            <livewire:eligify.criteria-editor mode="create" />
+            <livewire:eligify::criteria-editor mode="create" />
         </div>
     </div>
 </x-eligify::layout>

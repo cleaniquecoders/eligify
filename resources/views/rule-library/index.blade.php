@@ -3,7 +3,7 @@
     <x-slot:subtitle>Browse and manage reusable rule templates</x-slot:subtitle>
 
     @if (class_exists(\Livewire\Livewire::class))
-        <livewire:eligify.rule-library-list />
+        <livewire:eligify::rule-library-list />
     @else
         <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
             <div class="text-center">

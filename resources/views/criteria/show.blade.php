@@ -25,7 +25,7 @@
             </div>
         </div>
         <div class="p-6">
-            <livewire:eligify.criteria-show :criteria-id="$id" />
+            <livewire:eligify::criteria-show :criteria-id="$id" />
         </div>
     </div>
 </x-eligify::layout>

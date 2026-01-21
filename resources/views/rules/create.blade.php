@@ -24,7 +24,7 @@
             </div>
         </div>
         <div class="p-6">
-            <livewire:eligify.rule-editor mode="create" :criteria-id="$criteriaId" />
+            <livewire:eligify::rule-editor mode="create" :criteria-id="$criteriaId" />
         </div>
     </div>
 </x-eligify::layout>

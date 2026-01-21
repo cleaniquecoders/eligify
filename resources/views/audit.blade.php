@@ -3,7 +3,7 @@
     <x-slot:subtitle>Track and review all eligibility evaluations and decisions</x-slot:subtitle>
 
     @if (class_exists(\Livewire\Livewire::class))
-        <livewire:eligify.audit-log-list />
+        <livewire:eligify::audit-log-list />
     @else
         <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
             <div class="text-center">

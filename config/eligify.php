@@ -10,6 +10,18 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Livewire Version Configuration
+    |--------------------------------------------------------------------------
+    |
+    | Configure which Livewire version to use for component registration.
+    | Options: 'auto' (auto-detect), 'v3', 'v4'
+    | 'auto' will detect if Livewire 4's addNamespace method is available.
+    |
+    */
+    'livewire' => env('ELIGIFY_LIVEWIRE_VERSION', 'auto'),
+
+    /*
+    |--------------------------------------------------------------------------
     | UI / Dashboard Configuration
     |--------------------------------------------------------------------------
     |

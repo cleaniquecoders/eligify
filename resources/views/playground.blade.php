@@ -18,7 +18,7 @@
             </div>
         </div>
         <div class="p-6">
-            <livewire:eligify.playground />
+            <livewire:eligify::playground />
         </div>
     </div>
 </x-eligify::layout>

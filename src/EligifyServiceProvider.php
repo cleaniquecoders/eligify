@@ -115,18 +115,38 @@ class EligifyServiceProvider extends PackageServiceProvider
     }
 
     /**
-     * Register Livewire components
+     * Register Livewire components with version-aware registration
      */
     protected function registerLivewireComponents(): void
     {
-        Livewire::component('eligify.criteria-list', \CleaniqueCoders\Eligify\Http\Livewire\CriteriaList::class);
-        Livewire::component('eligify.criteria-editor', \CleaniqueCoders\Eligify\Http\Livewire\CriteriaEditor::class);
-        Livewire::component('eligify.criteria-show', \CleaniqueCoders\Eligify\Http\Livewire\CriteriaShow::class);
-        Livewire::component('eligify.rule-editor', \CleaniqueCoders\Eligify\Http\Livewire\RuleEditor::class);
-        Livewire::component('eligify.rule-library-list', \CleaniqueCoders\Eligify\Http\Livewire\RuleLibraryList::class);
-        Livewire::component('eligify.playground', \CleaniqueCoders\Eligify\Http\Livewire\Playground::class);
-        Livewire::component('eligify.audit-log-list', \CleaniqueCoders\Eligify\Http\Livewire\AuditLogList::class);
-        Livewire::component('eligify.settings-manager', \CleaniqueCoders\Eligify\Http\Livewire\SettingsManager::class);
+        $version = config('eligify.livewire', 'auto');
+
+        if ($this->shouldUseLivewire4($version)) {
+            // Livewire 4: Register by namespace
+            Livewire::addNamespace('eligify', classNamespace: 'CleaniqueCoders\\Eligify\\Http\\Livewire');
+        } else {
+            // Livewire 3: Register individually (using :: notation for consistency)
+            Livewire::component('eligify::criteria-list', \CleaniqueCoders\Eligify\Http\Livewire\CriteriaList::class);
+            Livewire::component('eligify::criteria-editor', \CleaniqueCoders\Eligify\Http\Livewire\CriteriaEditor::class);
+            Livewire::component('eligify::criteria-show', \CleaniqueCoders\Eligify\Http\Livewire\CriteriaShow::class);
+            Livewire::component('eligify::rule-editor', \CleaniqueCoders\Eligify\Http\Livewire\RuleEditor::class);
+            Livewire::component('eligify::rule-library-list', \CleaniqueCoders\Eligify\Http\Livewire\RuleLibraryList::class);
+            Livewire::component('eligify::playground', \CleaniqueCoders\Eligify\Http\Livewire\Playground::class);
+            Livewire::component('eligify::audit-log-list', \CleaniqueCoders\Eligify\Http\Livewire\AuditLogList::class);
+            Livewire::component('eligify::settings-manager', \CleaniqueCoders\Eligify\Http\Livewire\SettingsManager::class);
+        }
+    }
+
+    /**
+     * Determine if Livewire 4 should be used based on configuration and availability
+     */
+    protected function shouldUseLivewire4(string $version): bool
+    {
+        return match ($version) {
+            'v4' => true,
+            'v3' => false,
+            default => method_exists(Livewire::getFacadeRoot(), 'addNamespace'),
+        };
     }
 
     /**

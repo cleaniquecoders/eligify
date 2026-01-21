@@ -22,7 +22,7 @@
     </div>
 
     @if (class_exists(\Livewire\Livewire::class))
-        <livewire:eligify.criteria-list />
+        <livewire:eligify::criteria-list />
     @else
         <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
             <div class="text-center">
