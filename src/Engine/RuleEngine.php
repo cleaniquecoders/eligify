@@ -307,7 +307,9 @@ class RuleEngine
      */
     protected function getPassThreshold(Criteria $criteria): float
     {
-        return $criteria->meta['pass_threshold'] ?? $this->config['scoring']['pass_threshold'];
+        $threshold = $criteria->meta['pass_threshold'] ?? $this->config['scoring']['pass_threshold'] ?? 65;
+
+        return (float) $threshold;
     }
 
     /**

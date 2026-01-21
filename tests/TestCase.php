@@ -30,6 +30,9 @@ class TestCase extends Orchestra
     {
         config()->set('database.default', 'testing');
 
+        // Use array cache driver for testing (avoids needing cache table)
+        config()->set('cache.default', 'array');
+
         // Load and run all migration stubs in a deterministic order
         $migrationsPath = __DIR__.'/../database/migrations';
         $stubs = glob($migrationsPath.'/*.php.stub') ?: [];

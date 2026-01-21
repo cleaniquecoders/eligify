@@ -4,7 +4,8 @@
       "Bash(composer test:*)",
       "Bash(composer analyse:*)",
       "Bash(php vendor/bin/testbench migrate:*)",
-      "Bash(php vendor/bin/testbench:*)"
+      "Bash(php vendor/bin/testbench:*)",
+      "Bash(./vendor/bin/pest:*)"
     ]
   }
 }

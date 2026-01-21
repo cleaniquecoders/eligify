@@ -119,21 +119,42 @@ class EligifyServiceProvider extends PackageServiceProvider
      */
     protected function registerLivewireComponents(): void
     {
+        // Ensure Livewire is properly initialized before registering components
+        if (! $this->isLivewireInitialized()) {
+            return;
+        }
+
         $version = config('eligify.livewire', 'auto');
 
-        if ($this->shouldUseLivewire4($version)) {
-            // Livewire 4: Register by namespace
-            Livewire::addNamespace('eligify', classNamespace: 'CleaniqueCoders\\Eligify\\Http\\Livewire');
-        } else {
-            // Livewire 3: Register individually (using :: notation for consistency)
-            Livewire::component('eligify::criteria-list', \CleaniqueCoders\Eligify\Http\Livewire\CriteriaList::class);
-            Livewire::component('eligify::criteria-editor', \CleaniqueCoders\Eligify\Http\Livewire\CriteriaEditor::class);
-            Livewire::component('eligify::criteria-show', \CleaniqueCoders\Eligify\Http\Livewire\CriteriaShow::class);
-            Livewire::component('eligify::rule-editor', \CleaniqueCoders\Eligify\Http\Livewire\RuleEditor::class);
-            Livewire::component('eligify::rule-library-list', \CleaniqueCoders\Eligify\Http\Livewire\RuleLibraryList::class);
-            Livewire::component('eligify::playground', \CleaniqueCoders\Eligify\Http\Livewire\Playground::class);
-            Livewire::component('eligify::audit-log-list', \CleaniqueCoders\Eligify\Http\Livewire\AuditLogList::class);
-            Livewire::component('eligify::settings-manager', \CleaniqueCoders\Eligify\Http\Livewire\SettingsManager::class);
+        try {
+            if ($this->shouldUseLivewire4($version)) {
+                // Livewire 4: Register by namespace
+                Livewire::addNamespace('eligify', classNamespace: 'CleaniqueCoders\\Eligify\\Http\\Livewire');
+            } else {
+                // Livewire 3: Register individually (using :: notation for consistency)
+                Livewire::component('eligify::criteria-list', \CleaniqueCoders\Eligify\Http\Livewire\CriteriaList::class);
+                Livewire::component('eligify::criteria-editor', \CleaniqueCoders\Eligify\Http\Livewire\CriteriaEditor::class);
+                Livewire::component('eligify::criteria-show', \CleaniqueCoders\Eligify\Http\Livewire\CriteriaShow::class);
+                Livewire::component('eligify::rule-editor', \CleaniqueCoders\Eligify\Http\Livewire\RuleEditor::class);
+                Livewire::component('eligify::rule-library-list', \CleaniqueCoders\Eligify\Http\Livewire\RuleLibraryList::class);
+                Livewire::component('eligify::playground', \CleaniqueCoders\Eligify\Http\Livewire\Playground::class);
+                Livewire::component('eligify::audit-log-list', \CleaniqueCoders\Eligify\Http\Livewire\AuditLogList::class);
+                Livewire::component('eligify::settings-manager', \CleaniqueCoders\Eligify\Http\Livewire\SettingsManager::class);
+            }
+        } catch (\Throwable) {
+            // Livewire not fully initialized, skip component registration
+        }
+    }
+
+    /**
+     * Check if Livewire is properly initialized and ready for component registration
+     */
+    protected function isLivewireInitialized(): bool
+    {
+        try {
+            return Livewire::getFacadeRoot() !== null;
+        } catch (\Throwable) {
+            return false;
         }
     }
 
@@ -145,8 +166,23 @@ class EligifyServiceProvider extends PackageServiceProvider
         return match ($version) {
             'v4' => true,
             'v3' => false,
-            default => method_exists(Livewire::getFacadeRoot(), 'addNamespace'),
+            default => $this->detectLivewire4(),
         };
+    }
+
+    /**
+     * Detect if Livewire 4 is available by checking for addNamespace method
+     */
+    protected function detectLivewire4(): bool
+    {
+        try {
+            $root = Livewire::getFacadeRoot();
+
+            return $root && method_exists($root, 'addNamespace');
+        } catch (\Throwable) {
+            // Livewire not fully initialized, default to v3 registration
+            return false;
+        }
     }
 
     /**
