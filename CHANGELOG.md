@@ -2,6 +2,131 @@
 
 All notable changes to `eligify` will be documented in this file.
 
+## Persistent Snapshot - 2026-01-22
+
+### New Feature: Persistent Snapshot Storage
+
+Eligify now supports persistent storage of data snapshots via the new `eligify_snapshots` table and `Snapshot` Eloquent model. This enables comprehensive audit trails, historical evaluation, and compliance record-keeping.
+
+
+---
+
+#### What's New
+
+##### New `eligify_snapshots` Table
+
+Store point-in-time data captures with built-in integrity verification:
+
+| Column | Description |
+|--------|-------------|
+| `snapshotable_type/id` | Polymorphic reference to the source entity |
+| `data` | JSON snapshot of captured data |
+| `checksum` | SHA-256 hash for data integrity verification |
+| `meta` | Additional metadata (source, IP, etc.) |
+| `captured_at` | Timestamp when snapshot was captured |
+
+##### New `Snapshot` Model
+
+```php
+use CleaniqueCoders\Eligify\Models\Snapshot;
+
+// Create with automatic deduplication
+$snapshot = Snapshot::findOrCreateFromData(
+    data: ['income' => 50000, 'credit_score' => 720],
+    snapshotableType: User::class,
+    snapshotableId: $user->id,
+);
+
+// Verify data integrity
+if ($snapshot->verifyIntegrity()) {
+    // Data hasn't been tampered with
+}
+
+// Convert to DTO for evaluation
+$result = $criteria->evaluate($snapshot->toSnapshotData()->toArray());
+
+```
+##### Evaluation-Snapshot Linkage
+
+Evaluations can now reference the snapshot they were based on:
+
+```php
+// Link evaluation to snapshot
+$evaluation = Evaluation::create([
+    'criteria_id' => $criteria->id,
+    'snapshot_id' => $snapshot->id,  // NEW
+    'passed' => $result->passed(),
+    // ...
+]);
+
+// Retrieve snapshot from evaluation
+$snapshot = $evaluation->snapshot;
+
+// Get all evaluations for a snapshot
+$evaluations = $snapshot->evaluations;
+
+```
+
+---
+
+#### Key Features
+
+- **Data Integrity**: SHA-256 checksum automatically calculated and verifiable via `verifyIntegrity()`
+- **Deduplication**: `findOrCreateFromData()` prevents duplicate snapshots using checksum matching
+- **Polymorphic Relations**: Snapshots can be attached to any model type
+- **DTO Interoperability**: Seamless conversion between persistent model and in-memory DTO
+- **Audit Ready**: Full linkage between snapshots and evaluations for compliance
+
+
+---
+
+#### Migration
+
+Publish and run the new migrations:
+
+```bash
+php artisan vendor:publish --tag="eligify-migrations"
+php artisan migrate
+
+```
+This will create:
+
+- `eligify_snapshots` table
+- Add `snapshot_id` foreign key to `eligify_evaluations`
+
+
+---
+
+#### Files Added/Modified
+
+**New Files:**
+
+- `database/migrations/create_eligify_snapshots_table.php.stub`
+- `database/migrations/add_snapshot_id_to_eligify_evaluations.php.stub`
+- `src/Models/Snapshot.php`
+- `database/factories/SnapshotFactory.php`
+- `docs/04-data-management/snapshot/persistence.md`
+
+**Modified Files:**
+
+- `src/Models/Evaluation.php` - Added `snapshot_id` and `snapshot()` relationship
+
+
+---
+
+#### Breaking Changes
+
+None. The `snapshot_id` column on evaluations is nullable, so existing evaluations remain valid.
+
+
+---
+
+#### Documentation
+
+- `docs/04-data-management/snapshot/persistence.md`
+- `docs/14-reference/database-schema.md`
+- `docs/14-reference/api/models.md`
+
 ## Added Livewire 4 Support - 2026-01-21
 
 ### Release Notes - v1.5.0 (2026-01-21)
@@ -41,6 +166,7 @@ New configuration option in `config/eligify.php`:
 ```php
 'livewire' => env('ELIGIFY_LIVEWIRE_VERSION', 'auto'),
 
+
 ```
 Options:
 
@@ -54,6 +180,7 @@ Run migrations to add the new criteria versions table:
 
 ```bash
 php artisan migrate
+
 
 ```
 #### Files Changed
@@ -85,6 +212,7 @@ Eligify::criteria('Loan Approval')
     ->evaluate($applicant);
 
 
+
 ```
 **Features:**
 
@@ -106,6 +234,7 @@ Eligify::evaluateVersion($criteria, 2, $applicant);
 // Compare versions
 $diff = Eligify::compareVersions($criteria, 1, 2);
 // Returns: ['added' => [...], 'removed' => [...], 'modified' => [...]]
+
 
 
 ```
@@ -132,6 +261,7 @@ $diff = Eligify::compareVersions($criteria, 1, 2);
 ```bash
 composer update cleaniquecoders/eligify
 php artisan migrate
+
 
 
 ```
@@ -193,7 +323,6 @@ Upgrade notes:
 - If you previously used `eligify_find_criteria($keyword, $field)`, update calls to the new signature or use slugs/names directly.
 - To enable Bootstrap UI, set `ELIGIFY_UI_THEME=bootstrap` (or `config('eligify.ui.theme') = 'bootstrap'`).
 ## Criteria classification & polymorphic attachments - 2025-10-31
-
 ### Eligify v1.3.4 (2025-10-31)
 
 - Added criteria classification fields: type, group, category, tags (nullable) on eligify_criteria.
@@ -255,6 +384,7 @@ use CleaniqueCoders\Eligify\Data\Contracts\ModelMapping;
 
 
 
+
 ```
 This change better organizes the package structure by grouping all data-related functionality under the `Data` namespace alongside `Extractor` and `Snapshot` classes.
 
@@ -281,6 +411,7 @@ php artisan eligify:make-mapping "App\Models\User"
 php artisan eligify:make-all-mappings
 php artisan eligify:make-all-mappings --dry-run
 php artisan eligify:make-all-mappings --path=modules/User/Models --namespace=Modules\\User\\Models
+
 
 
 
@@ -336,6 +467,7 @@ $extractor->setRelationshipMappings([
 
 
 
+
 ```
 **Pattern 2: Spread Operator (Include All Fields)**
 
@@ -344,6 +476,7 @@ $profileMapping = app(ProfileModelMapping::class);
 $extractor->setRelationshipMappings([
     'profile' => $profileMapping->getFieldMappings(),
 ]);
+
 
 
 
@@ -368,6 +501,7 @@ foreach ($addressFields as $original => $mapped) {
 
 
 
+
 ```
 **Pattern 4: Multi-Level Nested Relationships**
 
@@ -376,6 +510,7 @@ $extractor->setRelationshipMappings([
     'customer' => ['email_address' => 'customer_email'],
     'customer.address' => ['street_address' => 'shipping_street'],
 ]);
+
 
 
 
@@ -417,7 +552,6 @@ $extractor = new Extractor(['include_relationships' => true]);
 $snapshot = $extractor->extract($model);
 ```
 **Benefits:**
-
 - More flexible data extraction
 - Support for custom mappings
 - Relationship data inclusion
@@ -442,6 +576,7 @@ $result = Eligify::evaluate($criteria, $data, false, false); // Bypass cache
 Eligify::flushCache();
 Eligify::warmupCache($criteria, $sampleDataSets);
 Eligify::invalidateCache($criteria);
+
 
 
 
@@ -547,6 +682,7 @@ php artisan eligify:make-all-mappings
 
 
 
+
 ```
 #### Use in Eligibility Rules
 
@@ -563,6 +699,7 @@ Eligify::criteria('Loan Approval')
     ->addRule('applicant.credit_report.score', '>=', 650)
 
     ->evaluate($applicant);
+
 
 
 
@@ -612,6 +749,7 @@ class UserMapping extends AbstractModelMapping
 
 
 
+
 ```
 **After:**
 
@@ -620,6 +758,7 @@ class UserMapping extends AbstractModelMapping
 php artisan eligify:make-mapping "App\Models\User"
 
 # Review and customize generated mapping
+
 
 
 
@@ -647,6 +786,7 @@ protected array $relationshipMappings = [
 
 
 
+
 ```
 **After (Reuse Existing Mapping):**
 
@@ -659,6 +799,7 @@ public function configure(Extractor $extractor): Extractor
     ]);
     return $extractor;
 }
+
 
 
 
@@ -716,6 +857,7 @@ php artisan eligify:make-all-mappings --dry-run  # Preview first
 php artisan eligify:make-all-mappings            # Generate
 
 # 4. Review and customize generated mappings
+
 
 
 
@@ -817,6 +959,7 @@ matrix:
 
 
 
+
 ```
 **Timeout**: 5 minutes
 **Testbench**: 10.* (for Laravel 12)
@@ -849,6 +992,7 @@ No action required. This is a CI/CD-only update with no impact on package functi
 
 ```bash
 composer update cleaniquecoders/eligify
+
 
 
 
@@ -898,6 +1042,7 @@ php artisan eligify:make-mapping "App\Models\User" --force
 
 
 
+
 ```
 ##### Key Features
 
@@ -924,6 +1069,7 @@ Automatically generates mappings for common patterns:
 'orders.count' => 'orders_count',
 'orders.sum:amount' => 'total_order_amount',
 'posts.avg:rating' => 'avg_post_rating',
+
 
 
 
@@ -995,6 +1141,7 @@ class UserMapping extends AbstractModelMapping
 
 
 
+
 ```
 ##### Command Options
 
@@ -1011,6 +1158,7 @@ class UserMapping extends AbstractModelMapping
    
    ```bash
    php artisan eligify:make-mapping "App\Models\User"
+   
    
    
    
@@ -1046,11 +1194,13 @@ class UserMapping extends AbstractModelMapping
    
    
    
+   
    ```
 4. **Use in Evaluations**
    
    ```php
    $data = ModelDataExtractor::forModel(User::class)->extract($user);
+   
    
    
    
@@ -1121,6 +1271,7 @@ composer update cleaniquecoders/eligify
 
 # Start generating mappings
 php artisan eligify:make-mapping "App\Models\User"
+
 
 
 
@@ -1204,7 +1355,6 @@ New built-in performance testing and optimization toolkit:
 # Run all benchmarks with default settings (100 iterations)
 php artisan eligify:benchmark
 # Quick test with fewer iterations
-
 php artisan eligify:benchmark --iterations=10
 
 # Test specific scenarios
@@ -1286,6 +1436,7 @@ php artisan migrate
 
 
 
+
 ```
 No breaking changes - fully backward compatible with v1.1.x
 
@@ -1317,6 +1468,7 @@ php artisan eligify:benchmark --iterations=1000 --format=json > benchmark-result
 
 
 
+
 ```
 ##### Before Production Deployment
 
@@ -1326,6 +1478,7 @@ php artisan eligify:benchmark --iterations=1000 --type=all
 
 # Test expected production load
 php artisan eligify:benchmark --type=batch --iterations=1000
+
 
 
 
@@ -1391,6 +1544,7 @@ Eligify::criteria('Loan Approval')->evaluate($data);
 
 
 
+
 ```
 ##### The Solution: ModelDataExtractor
 
@@ -1401,6 +1555,7 @@ Now, with v1.1.0:
 $data = ModelDataExtractor::forModel(User::class)->extract($user);
 
 Eligify::criteria('Loan Approval')->evaluate($data);
+
 
 
 
@@ -1438,6 +1593,7 @@ $data = (new ModelDataExtractor())->extract($user);
 
 
 
+
 ```
 **Pattern 2: Custom Configuration (One-off)**
 
@@ -1458,12 +1614,14 @@ $data = (new ModelDataExtractor())
 
 
 
+
 ```
 **Pattern 3: Production-Ready (Recommended)**
 
 ```php
 // Configure once in config/eligify.php
 $data = ModelDataExtractor::forModel(User::class)->extract($user);
+
 
 
 
@@ -1530,6 +1688,7 @@ $data = $extractor
 
 
 
+
 ```
 ###### AbstractModelMapping Class
 
@@ -1580,6 +1739,7 @@ class CustomerModelMapping extends AbstractModelMapping
 
 
 
+
 ```
 ###### ModelMapping Contract
 
@@ -1605,6 +1765,7 @@ interface ModelMapping
 
 
 
+
 ```
 ###### Built-in Model Mappings
 
@@ -1615,6 +1776,7 @@ interface ModelMapping
 // - email_verified_at → email_verified_timestamp
 // - created_at → registration_date
 // - is_verified → computed field (true/false)
+
 
 
 
@@ -1719,6 +1881,7 @@ $result = Eligify::criteria('Loan Approval')
 
 
 
+
 ```
 ##### Example 2: Scholarship Eligibility
 
@@ -1752,6 +1915,7 @@ $result = Eligify::criteria('Scholarship Eligibility')
     ->addRule('extracurricular_count', '>=', 2)
     ->addRule('has_financial_need', '==', true)
     ->evaluate($data);
+
 
 
 
@@ -1801,6 +1965,7 @@ $result = Eligify::criteria('Vip Tier')
     ->addRule('return_rate', '<=', 0.05)
     ->setScoringMethod(ScoringMethod::WEIGHTED_AVERAGE)
     ->evaluate($data);
+
 
 
 
@@ -1867,6 +2032,7 @@ return [
 
 
 
+
 ```
 #### 🔄 Migration Guide
 
@@ -1892,11 +2058,13 @@ php artisan vendor:publish --tag="eligify-config" --force
 
 
 
+
 ```
 2. **Create your first model mapping:**
 
 ```php
 php artisan make:eligify-mapping CustomerMapping
+
 
 
 
@@ -1929,12 +2097,14 @@ php artisan make:eligify-mapping CustomerMapping
 
 
 
+
 ```
 4. **Start using it:**
 
 ```php
 $data = ModelDataExtractor::forModel(Customer::class)->extract($customer);
 Eligify::criteria('vip_program')->evaluate($data);
+
 
 
 
@@ -1966,6 +2136,7 @@ composer require cleaniquecoders/eligify:^1.1
 
 
 
+
 ```
 **Upgrade from v1.0.x:**
 
@@ -1973,6 +2144,7 @@ composer require cleaniquecoders/eligify:^1.1
 composer update cleaniquecoders/eligify
 php artisan vendor:publish --tag="eligify-config" --force
 php artisan optimize:clear
+
 
 
 
@@ -2007,6 +2179,7 @@ use CleaniqueCoders\Eligify\Support\ModelDataExtractor;
 $data = ModelDataExtractor::forModel(User::class)->extract($user);
 $this->assertArrayHasKey('is_verified', $data);
 $this->assertTrue($data['is_verified']);
+
 
 
 
@@ -2135,6 +2308,7 @@ Eligify::criteria('Loan Approval')
 
 
 
+
 ```
 #### 🧠 Advanced Rule Engine
 
@@ -2234,6 +2408,7 @@ Eligify::criteria('complex_approval')
 
 
 
+
 ```
 #### Policy Integration
 
@@ -2254,6 +2429,7 @@ class LoanPolicy
         );
     }
 }
+
 
 
 
@@ -2298,6 +2474,7 @@ php artisan eligify:cleanup-audit --days=90
 
 
 
+
 ```
 
 ---
@@ -2328,11 +2505,13 @@ composer require cleaniquecoders/eligify
 
 
 
+
 ```
 ```bash
 php artisan vendor:publish --tag="eligify-migrations"
 php artisan vendor:publish --tag="eligify-config"
 php artisan migrate
+
 
 
 
