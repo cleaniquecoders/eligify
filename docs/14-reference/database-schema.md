@@ -58,6 +58,33 @@ Individual rules within a criteria.
 
 ---
 
+### eligify_snapshots
+
+Stores point-in-time data captures for audit trails and historical evaluation.
+
+#### Columns (eligify_snapshots)
+
+| Column | Type | Notes |
+|--------|------|-------|
+| id | bigint | Primary key |
+| uuid | uuid | Unique, indexed |
+| snapshotable_type | string | Polymorphic type (e.g., App\Models\User) |
+| snapshotable_id | bigint | Polymorphic id |
+| data | json | The captured snapshot data |
+| checksum | string(64) | SHA-256 hash for data integrity verification |
+| meta | json, nullable | Additional metadata |
+| captured_at | timestamp | When snapshot was captured |
+| created_at/updated_at | timestamps |  |
+
+#### Indexes (eligify_snapshots)
+
+- uuid unique index
+- (snapshotable_type, snapshotable_id)
+- checksum index
+- (checksum, snapshotable_type, snapshotable_id) for deduplication
+
+---
+
 ### eligify_evaluations
 
 Stores evaluation results and audit-friendly details.
@@ -69,6 +96,7 @@ Stores evaluation results and audit-friendly details.
 | id | bigint | Primary key |
 | uuid | uuid | Unique, indexed |
 | criteria_id | bigint FK | References eligify_criteria |
+| snapshot_id | bigint FK, nullable | References eligify_snapshots |
 | evaluable_type | string, nullable | Polymorphic type |
 | evaluable_id | bigint, nullable | Polymorphic id |
 | passed | boolean | Final result |
@@ -83,7 +111,7 @@ Stores evaluation results and audit-friendly details.
 
 #### Indexes (eligify_evaluations)
 
-- (evaluable_type, evaluable_id), (passed, evaluated_at), (criteria_id, passed)
+- (evaluable_type, evaluable_id), (passed, evaluated_at), (criteria_id, passed), snapshot_id
 
 ---
 
@@ -148,8 +176,13 @@ eligify_criteria
 eligify_rules
     └─ belongs to → eligify_criteria
 
+eligify_snapshots
+    ├─ has many → eligify_evaluations
+    └─ morphs to → snapshotable (snapshotable_type, snapshotable_id)
+
 eligify_evaluations
     ├─ belongs to → eligify_criteria
+    ├─ belongs to → eligify_snapshots (nullable)
     └─ morphs to → evaluable (evaluable_type, evaluable_id)
 
 eligify_audit_logs

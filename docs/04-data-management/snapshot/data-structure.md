@@ -1,12 +1,16 @@
 # Snapshot Data Structure
 
-This document describes the structure and properties of Snapshot objects in Eligify.
+This document describes the structure and properties of the Snapshot **DTO** (Data Transfer Object) in Eligify.
+
+> **Note:** Eligify has two snapshot components:
+> - **Snapshot DTO** (`CleaniqueCoders\Eligify\Data\Snapshot`) - Immutable in-memory object (this document)
+> - **Snapshot Model** (`CleaniqueCoders\Eligify\Models\Snapshot`) - Eloquent model for persistence (see [Persistence](persistence.md))
 
 ## Overview
 
-Snapshots are immutable data objects that capture the state of a subject at a specific point in time. They preserve data for audit trails, historical evaluation, and compliance.
+The Snapshot DTO is an immutable data object that captures the state of a subject at a specific point in time. It's used for runtime operations like data extraction, transformation, and passing to the evaluation engine.
 
-## Snapshot Object
+## Snapshot DTO
 
 ### Structure
 
@@ -164,47 +168,28 @@ $evaluatedBy = $snapshot->metadata['evaluated_by'] ?? null;
 
 ## Persistence
 
-### Save to Database
+The Snapshot DTO is an in-memory object. To persist snapshots to the database, use the **Snapshot Model**.
+
+See [Persistence](persistence.md) for complete documentation on database storage.
+
+### Quick Example
 
 ```php
-$snapshot = Snapshot::create($user);
-$snapshot->save();
-```
+use CleaniqueCoders\Eligify\Data\Snapshot as SnapshotDto;
+use CleaniqueCoders\Eligify\Models\Snapshot as SnapshotModel;
 
-Snapshots are stored in the `eligify_snapshots` table:
+// Create DTO
+$dto = new SnapshotDto(['income' => 50000, 'age' => 35]);
 
-```php
-Schema::create('eligify_snapshots', function (Blueprint $table) {
-    $table->uuid('id')->primary();
-    $table->string('subject_type');
-    $table->unsignedBigInteger('subject_id')->nullable();
-    $table->json('data');
-    $table->json('metadata')->nullable();
-    $table->timestamp('created_at');
-    $table->timestamp('expires_at')->nullable();
+// Persist using the Model
+$model = SnapshotModel::fromSnapshotData(
+    snapshotData: $dto,
+    snapshotableType: User::class,
+    snapshotableId: $user->id,
+);
 
-    $table->index(['subject_type', 'subject_id']);
-    $table->index('created_at');
-    $table->index('expires_at');
-});
-```
-
-### Load from Database
-
-```php
-$snapshot = Snapshot::find($id);
-```
-
-### Find by Subject
-
-```php
-$snapshots = Snapshot::forSubject($user)->get();
-```
-
-### Find Latest
-
-```php
-$snapshot = Snapshot::forSubject($user)->latest()->first();
+// Convert back to DTO
+$dto = $model->toSnapshotData();
 ```
 
 ## Using Snapshots in Evaluation

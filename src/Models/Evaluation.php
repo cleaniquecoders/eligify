@@ -26,6 +26,7 @@ class Evaluation extends Model
     protected $fillable = [
         'uuid',
         'criteria_id',
+        'snapshot_id',
         'evaluable_type',
         'evaluable_id',
         'slug',
@@ -65,6 +66,14 @@ class Evaluation extends Model
     public function criteria(): BelongsTo
     {
         return $this->belongsTo(Criteria::class);
+    }
+
+    /**
+     * The snapshot used for this evaluation
+     */
+    public function snapshot(): BelongsTo
+    {
+        return $this->belongsTo(Snapshot::class);
     }
 
     /**

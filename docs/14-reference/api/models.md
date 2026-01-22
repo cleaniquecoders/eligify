@@ -75,6 +75,70 @@ Individual rule belonging to a criteria.
 
 ---
 
+## Snapshot
+
+Persistent storage for point-in-time data captures.
+
+### Attributes (Snapshot)
+
+- `uuid` (string, uuid)
+- `snapshotable_type` (string)
+- `snapshotable_id` (int)
+- `data` (array) - The captured snapshot data
+- `checksum` (string) - SHA-256 hash for data integrity
+- `meta` (array|null)
+- `captured_at` (datetime)
+
+### Relationships (Snapshot)
+
+- `snapshotable(): MorphTo`
+- `evaluations(): HasMany`
+
+### Scopes (Snapshot)
+
+- `forSnapshotable(string $type, int $id)`
+- `capturedBetween($startDate, $endDate)`
+- `byChecksum(string $checksum)`
+
+### Helpers (Snapshot)
+
+- `calculateChecksum(): string` - Calculate SHA-256 hash of data
+- `verifyIntegrity(): bool` - Verify data hasn't been modified
+- `toSnapshotData(): SnapshotData` - Convert to in-memory DTO
+- `getDataField(string $key, mixed $default = null): mixed`
+- `hasDataField(string $key): bool`
+- `getSummary(): array`
+
+### Static Methods (Snapshot)
+
+- `fromSnapshotData(SnapshotData $data, string $type, int $id, array $meta = []): Snapshot`
+- `findOrCreateFromData(array $data, string $type, int $id, array $meta = []): Snapshot`
+
+### Example (Snapshot)
+
+```php
+use CleaniqueCoders\Eligify\Models\Snapshot;
+
+// Create with deduplication
+$snapshot = Snapshot::findOrCreateFromData(
+    data: ['income' => 50000, 'credit_score' => 720],
+    snapshotableType: User::class,
+    snapshotableId: $user->id,
+);
+
+// Verify integrity
+if ($snapshot->verifyIntegrity()) {
+    $dto = $snapshot->toSnapshotData();
+}
+
+// Query snapshots
+$snapshots = Snapshot::forSnapshotable(User::class, $userId)
+    ->capturedBetween(now()->subMonth(), now())
+    ->get();
+```
+
+---
+
 ## Evaluation
 
 Stored evaluation results with context and scoring details.
@@ -83,6 +147,7 @@ Stored evaluation results with context and scoring details.
 
 - `uuid` (string, uuid)
 - `criteria_id` (int)
+- `snapshot_id` (int|null) - Reference to snapshot used for evaluation
 - `evaluable_type` (string|null)
 - `evaluable_id` (int|null)
 - `passed` (bool)
@@ -97,6 +162,7 @@ Stored evaluation results with context and scoring details.
 ### Relationships (Evaluation)
 
 - `criteria(): BelongsTo`
+- `snapshot(): BelongsTo`
 - `evaluable(): MorphTo`
 
 ### Helpers
