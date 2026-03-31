@@ -6,7 +6,9 @@ namespace CleaniqueCoders\Eligify\Storage;
 
 use CleaniqueCoders\Eligify\Models\Criteria;
 use CleaniqueCoders\Eligify\Models\Rule;
+use CleaniqueCoders\Eligify\Models\RuleGroup;
 use CleaniqueCoders\Eligify\Storage\Contracts\StorageDriver;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 
@@ -81,7 +83,7 @@ class DatabaseStorageDriver implements StorageDriver
 
     public function storeGroup(Criteria $criteria, array $groupData, array $rules = []): mixed
     {
-        /** @var \CleaniqueCoders\Eligify\Models\RuleGroup $group */
+        /** @var RuleGroup $group */
         $group = $criteria->groups()->firstOrCreate(
             ['name' => $groupData['name']],
             array_merge([
@@ -120,7 +122,7 @@ class DatabaseStorageDriver implements StorageDriver
             return null;
         }
 
-        $mapRule = fn (\Illuminate\Database\Eloquent\Model $rule): array => [
+        $mapRule = fn (Model $rule): array => [
             'uuid' => $rule->getAttribute('uuid'),
             'field' => $rule->getAttribute('field'),
             'operator' => $rule->getAttribute('operator'),
@@ -144,7 +146,7 @@ class DatabaseStorageDriver implements StorageDriver
             'meta' => $criteria->getAttribute('meta'),
             'rules' => $criteria->rules->map($mapRule)->toArray(),
             'groups' => $criteria->groups->map(function ($group) use ($mapRule): array {
-                /** @var \CleaniqueCoders\Eligify\Models\RuleGroup $group */
+                /** @var RuleGroup $group */
                 return [
                     'uuid' => $group->getAttribute('uuid'),
                     'name' => $group->getAttribute('name'),
