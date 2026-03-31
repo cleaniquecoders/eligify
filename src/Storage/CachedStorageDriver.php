@@ -117,7 +117,7 @@ class CachedStorageDriver implements StorageDriver
 
         if (in_array($driver, ['redis', 'memcached', 'dynamodb', 'octane'])) {
             try {
-                return \Illuminate\Support\Facades\Cache::tags([$this->prefix])->flush();
+                return Cache::tags([$this->prefix])->flush();
             } catch (\Throwable) {
                 // Tags not supported by this driver
             }

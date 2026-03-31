@@ -5,10 +5,12 @@ declare(strict_types=1);
 namespace CleaniqueCoders\Eligify\Models;
 
 use CleaniqueCoders\Eligify\Enums\GroupCombination;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Carbon;
 
 /**
  * RuleGroup Model
@@ -28,10 +30,10 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property int $order
  * @property bool $is_active
  * @property array|null $meta
- * @property \Illuminate\Support\Carbon $created_at
- * @property \Illuminate\Support\Carbon $updated_at
- * @property-read \CleaniqueCoders\Eligify\Models\Criteria $criteria
- * @property-read \Illuminate\Database\Eloquent\Collection<Rule> $rules
+ * @property Carbon $created_at
+ * @property Carbon $updated_at
+ * @property-read Criteria $criteria
+ * @property-read Collection<Rule> $rules
  */
 class RuleGroup extends Model
 {

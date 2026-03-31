@@ -9,7 +9,7 @@ use CleaniqueCoders\Eligify\Models\CriteriaVersion;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\CleaniqueCoders\Eligify\Models\CriteriaVersion>
+ * @extends Factory<CriteriaVersion>
  */
 class CriteriaVersionFactory extends Factory
 {

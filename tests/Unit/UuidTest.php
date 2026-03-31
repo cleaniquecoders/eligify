@@ -1,5 +1,7 @@
 <?php
 
+use CleaniqueCoders\Eligify\Builder\CriteriaBuilder;
+use CleaniqueCoders\Eligify\Eligify;
 use CleaniqueCoders\Eligify\Models\Criteria;
 
 it('can create criteria with uuid', function () {
@@ -17,9 +19,9 @@ it('can create criteria with uuid', function () {
 });
 
 it('can use criteria builder without uuid errors', function () {
-    $builder = \CleaniqueCoders\Eligify\Eligify::criteria('test-uuid-fix');
+    $builder = Eligify::criteria('test-uuid-fix');
 
-    expect($builder)->toBeInstanceOf(\CleaniqueCoders\Eligify\Builder\CriteriaBuilder::class);
+    expect($builder)->toBeInstanceOf(CriteriaBuilder::class);
     expect($builder->getCriteria())->toBeInstanceOf(Criteria::class);
     expect($builder->getCriteria()->uuid)->not->toBeNull();
 });

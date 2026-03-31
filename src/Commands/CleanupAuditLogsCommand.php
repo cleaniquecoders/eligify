@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace CleaniqueCoders\Eligify\Commands;
 
 use CleaniqueCoders\Eligify\Audit\AuditLogger;
+use CleaniqueCoders\Eligify\Models\AuditLog;
 use Illuminate\Console\Command;
 
 class CleanupAuditLogsCommand extends Command
@@ -32,7 +33,7 @@ class CleanupAuditLogsCommand extends Command
 
             // Show what would be deleted
             $cutoffDate = now()->subDays($retentionDays);
-            $count = \CleaniqueCoders\Eligify\Models\AuditLog::where('created_at', '<', $cutoffDate)->count();
+            $count = AuditLog::where('created_at', '<', $cutoffDate)->count();
 
             $this->info("Would delete {$count} audit log records created before {$cutoffDate->format('Y-m-d H:i:s')}");
 

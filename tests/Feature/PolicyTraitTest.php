@@ -20,7 +20,7 @@ class TestPolicy
         return $this->checkEligibility($model, $criteriaName);
     }
 
-    public function publicCheckCriteria(Model $model, \Closure $criteriaBuilder): array
+    public function publicCheckCriteria(Model $model, Closure $criteriaBuilder): array
     {
         return $this->checkCriteria($model, $criteriaBuilder);
     }

@@ -16,11 +16,17 @@ use CleaniqueCoders\Eligify\Commands\MakeMappingCommand;
 use CleaniqueCoders\Eligify\Commands\StorageExportCommand;
 use CleaniqueCoders\Eligify\Commands\StorageImportCommand;
 use CleaniqueCoders\Eligify\Engine\RuleEngine;
-use CleaniqueCoders\Eligify\Storage\Contracts\StorageDriver;
-use CleaniqueCoders\Eligify\Storage\StorageManager;
 use CleaniqueCoders\Eligify\Events\CriteriaCreated;
 use CleaniqueCoders\Eligify\Events\EvaluationCompleted;
 use CleaniqueCoders\Eligify\Events\RuleExecuted;
+use CleaniqueCoders\Eligify\Http\Livewire\AuditLogList;
+use CleaniqueCoders\Eligify\Http\Livewire\CriteriaEditor;
+use CleaniqueCoders\Eligify\Http\Livewire\CriteriaList;
+use CleaniqueCoders\Eligify\Http\Livewire\CriteriaShow;
+use CleaniqueCoders\Eligify\Http\Livewire\Playground;
+use CleaniqueCoders\Eligify\Http\Livewire\RuleEditor;
+use CleaniqueCoders\Eligify\Http\Livewire\RuleLibraryList;
+use CleaniqueCoders\Eligify\Http\Livewire\SettingsManager;
 use CleaniqueCoders\Eligify\Http\Middleware\AuthorizeDashboard;
 use CleaniqueCoders\Eligify\Listeners\LogCriteriaCreated;
 use CleaniqueCoders\Eligify\Listeners\LogEvaluationCompleted;
@@ -29,7 +35,10 @@ use CleaniqueCoders\Eligify\Models\Criteria;
 use CleaniqueCoders\Eligify\Models\Rule;
 use CleaniqueCoders\Eligify\Observers\CriteriaObserver;
 use CleaniqueCoders\Eligify\Observers\RuleObserver;
+use CleaniqueCoders\Eligify\Storage\Contracts\StorageDriver;
+use CleaniqueCoders\Eligify\Storage\StorageManager;
 use Illuminate\Console\Scheduling\Schedule;
+use Illuminate\Routing\Middleware\ThrottleRequests;
 use Illuminate\Routing\Router;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
@@ -134,14 +143,14 @@ class EligifyServiceProvider extends PackageServiceProvider
                 Livewire::addNamespace('eligify', classNamespace: 'CleaniqueCoders\\Eligify\\Http\\Livewire');
             } else {
                 // Livewire 3: Register individually (using :: notation for consistency)
-                Livewire::component('eligify::criteria-list', \CleaniqueCoders\Eligify\Http\Livewire\CriteriaList::class);
-                Livewire::component('eligify::criteria-editor', \CleaniqueCoders\Eligify\Http\Livewire\CriteriaEditor::class);
-                Livewire::component('eligify::criteria-show', \CleaniqueCoders\Eligify\Http\Livewire\CriteriaShow::class);
-                Livewire::component('eligify::rule-editor', \CleaniqueCoders\Eligify\Http\Livewire\RuleEditor::class);
-                Livewire::component('eligify::rule-library-list', \CleaniqueCoders\Eligify\Http\Livewire\RuleLibraryList::class);
-                Livewire::component('eligify::playground', \CleaniqueCoders\Eligify\Http\Livewire\Playground::class);
-                Livewire::component('eligify::audit-log-list', \CleaniqueCoders\Eligify\Http\Livewire\AuditLogList::class);
-                Livewire::component('eligify::settings-manager', \CleaniqueCoders\Eligify\Http\Livewire\SettingsManager::class);
+                Livewire::component('eligify::criteria-list', CriteriaList::class);
+                Livewire::component('eligify::criteria-editor', CriteriaEditor::class);
+                Livewire::component('eligify::criteria-show', CriteriaShow::class);
+                Livewire::component('eligify::rule-editor', RuleEditor::class);
+                Livewire::component('eligify::rule-library-list', RuleLibraryList::class);
+                Livewire::component('eligify::playground', Playground::class);
+                Livewire::component('eligify::audit-log-list', AuditLogList::class);
+                Livewire::component('eligify::settings-manager', SettingsManager::class);
             }
         } catch (\Throwable) {
             // Livewire not fully initialized, skip component registration
@@ -251,7 +260,7 @@ class EligifyServiceProvider extends PackageServiceProvider
 
         // Register rate limiting middleware if enabled
         if (config('eligify.rate_limiting.enabled', true)) {
-            $router->aliasMiddleware('eligify.rate_limit', \Illuminate\Routing\Middleware\ThrottleRequests::class);
+            $router->aliasMiddleware('eligify.rate_limit', ThrottleRequests::class);
         }
 
         // Load package routes

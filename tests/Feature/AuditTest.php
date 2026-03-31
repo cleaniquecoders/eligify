@@ -132,7 +132,7 @@ it('can cleanup old audit logs', function () {
     config(['eligify.audit.retention_days' => 365]);
 
     // Create a fresh AuditLogger instance with the new config
-    $auditLogger = new \CleaniqueCoders\Eligify\Audit\AuditLogger;
+    $auditLogger = new AuditLogger;
 
     $criteria = Criteria::factory()->create();
 

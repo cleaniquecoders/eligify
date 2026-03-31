@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace CleaniqueCoders\Eligify\Data;
 
+use Carbon\Carbon;
 use CleaniqueCoders\Eligify\Data\Contracts\ModelMapping;
 use Illuminate\Database\Eloquent\Model;
 
@@ -50,7 +51,7 @@ use Illuminate\Database\Eloquent\Model;
  * - `setRelationshipMappings()` - Defines custom relationship data mappings
  * - `setComputedFields()` - Adds custom computed fields via closures
  *
- * @see \CleaniqueCoders\Eligify\Data\Contracts\ModelMapping For creating custom model mappings
+ * @see ModelMapping For creating custom model mappings
  */
 class Extractor
 {
@@ -382,7 +383,7 @@ class Extractor
         $dateFields = $this->getDateFields($collection);
         foreach ($dateFields as $field) {
             $dates = collect($collection)->pluck($field)->filter()->map(function ($date) {
-                return $date instanceof \Carbon\Carbon ? $date : \Carbon\Carbon::parse($date);
+                return $date instanceof Carbon ? $date : Carbon::parse($date);
             });
 
             if ($dates->isNotEmpty()) {
@@ -542,7 +543,7 @@ class Extractor
      * $loanData = ModelDataExtractor::forModel(LoanApplication::class)->extract($loan);
      * ```
      *
-     * @see \CleaniqueCoders\Eligify\Data\Contracts\ModelMapping For creating custom mapping classes
+     * @see ModelMapping For creating custom mapping classes
      */
     public static function forModel(string $modelClass): self
     {

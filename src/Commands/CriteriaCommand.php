@@ -8,6 +8,7 @@ use CleaniqueCoders\Eligify\Eligify;
 use CleaniqueCoders\Eligify\Enums\RuleOperator;
 use CleaniqueCoders\Eligify\Enums\RulePriority;
 use CleaniqueCoders\Eligify\Models\Criteria;
+use CleaniqueCoders\Eligify\Models\Evaluation;
 use Illuminate\Console\Command;
 use Illuminate\Support\Str;
 
@@ -197,8 +198,8 @@ class CriteriaCommand extends Command
         }
 
         // Usage statistics
-        $evaluationCount = \CleaniqueCoders\Eligify\Models\Evaluation::where('criteria_uuid', $criteria->uuid)->count();
-        $successCount = \CleaniqueCoders\Eligify\Models\Evaluation::where('criteria_uuid', $criteria->uuid)
+        $evaluationCount = Evaluation::where('criteria_uuid', $criteria->uuid)->count();
+        $successCount = Evaluation::where('criteria_uuid', $criteria->uuid)
             ->where('passed', true)->count();
 
         if ($evaluationCount > 0) {
@@ -271,7 +272,7 @@ class CriteriaCommand extends Command
         }
 
         // Check for evaluations
-        $evaluationCount = \CleaniqueCoders\Eligify\Models\Evaluation::where('criteria_uuid', $criteria->uuid)->count();
+        $evaluationCount = Evaluation::where('criteria_uuid', $criteria->uuid)->count();
 
         if ($evaluationCount > 0 && ! $this->option('force')) {
             $this->warn("This criteria has {$evaluationCount} evaluations associated with it.");

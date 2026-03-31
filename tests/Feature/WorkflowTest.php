@@ -205,7 +205,7 @@ it('handles callback errors gracefully', function () {
     $builder = Eligify::criteria('error_handling_test')
         ->addRule('score', '>=', 80)
         ->onPass(function ($data, $result) {
-            throw new \Exception('Callback error');
+            throw new Exception('Callback error');
         });
 
     $eligify = new Eligify;

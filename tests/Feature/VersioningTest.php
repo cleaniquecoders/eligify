@@ -167,7 +167,7 @@ it('throws exception when evaluating non-existent version', function () {
 
     expect(function () use ($eligify) {
         $eligify->evaluateVersion('Error Test', 999, []);
-    })->toThrow(\InvalidArgumentException::class);
+    })->toThrow(InvalidArgumentException::class);
 });
 
 it('can retrieve version with version() method on builder', function () {

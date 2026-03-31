@@ -6,6 +6,7 @@ namespace CleaniqueCoders\Eligify\Data\Mappings;
 
 use CleaniqueCoders\Eligify\Data\Contracts\ModelMapping;
 use CleaniqueCoders\Eligify\Data\Extractor;
+use Illuminate\Support\Str;
 
 /**
  * Abstract base class for model mappings
@@ -288,7 +289,7 @@ abstract class AbstractModelMapping implements ModelMapping
         $modelClass = $this->getModelClass();
         $modelName = class_basename($modelClass);
 
-        return \Illuminate\Support\Str::snake($modelName, '.');
+        return Str::snake($modelName, '.');
     }
 
     /**

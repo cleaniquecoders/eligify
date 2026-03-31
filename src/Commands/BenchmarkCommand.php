@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace CleaniqueCoders\Eligify\Commands;
 
+use CleaniqueCoders\Eligify\Models\Criteria;
 use CleaniqueCoders\Eligify\Support\Benchmark;
 use Illuminate\Console\Command;
 
@@ -238,7 +239,7 @@ class BenchmarkCommand extends Command
     protected function cleanupBenchmarkData(): void
     {
         try {
-            $deleted = \CleaniqueCoders\Eligify\Models\Criteria::whereIn('slug', [
+            $deleted = Criteria::whereIn('slug', [
                 'benchmark_simple',
                 'benchmark_complex',
                 'benchmark_batch',

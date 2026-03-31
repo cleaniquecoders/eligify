@@ -1,5 +1,6 @@
 <?php
 
+use CleaniqueCoders\Eligify\Data\Mappings\UserModelMapping;
 use CleaniqueCoders\Eligify\Enums\FieldType;
 use CleaniqueCoders\Eligify\Enums\RuleOperator;
 use CleaniqueCoders\Eligify\Enums\RulePriority;
@@ -602,7 +603,7 @@ return [
         // Model mapping classes
         // Map model class names to their mapping class implementations
         'model_mappings' => [
-            'App\Models\User' => \CleaniqueCoders\Eligify\Data\Mappings\UserModelMapping::class,
+            'App\Models\User' => UserModelMapping::class,
             // Add more mappings here:
             // 'App\Models\Order' => \App\Eligify\Mappings\OrderModelMapping::class,
             // 'App\Models\Customer' => \App\Eligify\Mappings\CustomerModelMapping::class,

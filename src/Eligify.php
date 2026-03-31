@@ -14,6 +14,7 @@ use CleaniqueCoders\Eligify\Models\Evaluation;
 use CleaniqueCoders\Eligify\Models\Rule;
 use CleaniqueCoders\Eligify\Storage\Contracts\StorageDriver;
 use CleaniqueCoders\Eligify\Support\Cache;
+use Illuminate\Support\Collection;
 
 class Eligify
 {
@@ -298,7 +299,7 @@ class Eligify
     /**
      * Get all available criteria
      */
-    public static function getAllCriteria(): \Illuminate\Support\Collection
+    public static function getAllCriteria(): Collection
     {
         return app(StorageDriver::class)->getAllActiveCriteria();
     }

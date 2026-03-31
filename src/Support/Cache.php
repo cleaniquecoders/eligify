@@ -6,6 +6,7 @@ namespace CleaniqueCoders\Eligify\Support;
 
 use CleaniqueCoders\Eligify\Data\Snapshot;
 use CleaniqueCoders\Eligify\Models\Criteria;
+use Illuminate\Cache\RedisStore;
 use Illuminate\Support\Facades\Cache as CacheFacade;
 
 class Cache
@@ -283,7 +284,7 @@ class Cache
     protected function flushRedisByPattern(string $pattern): bool
     {
         try {
-            /** @var \Illuminate\Cache\RedisStore $store */
+            /** @var RedisStore $store */
             $store = CacheFacade::getStore();
             $redis = $store->connection();
             $keys = $redis->keys($pattern);
@@ -344,7 +345,7 @@ class Cache
 
         // Note: Not all cache drivers support retrieving TTL
         try {
-            /** @var \Illuminate\Cache\RedisStore $store */
+            /** @var RedisStore $store */
             $store = CacheFacade::getStore();
             $redis = $store->connection();
             $ttl = $redis->ttl($key);

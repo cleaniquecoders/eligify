@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace CleaniqueCoders\Eligify\Commands;
 
+use Carbon\Carbon;
 use CleaniqueCoders\Eligify\Audit\AuditLogger;
+use CleaniqueCoders\Eligify\Models\AuditLog;
 use Illuminate\Console\Command;
 
 class AuditQueryCommand extends Command
@@ -38,14 +40,14 @@ class AuditQueryCommand extends Command
         } elseif ($this->option('user')) {
             $audits = $auditLogger->getAuditsByUser((int) $this->option('user'), $limit);
         } elseif ($this->option('from') && $this->option('to')) {
-            $from = \Carbon\Carbon::parse($this->option('from'));
-            $to = \Carbon\Carbon::parse($this->option('to'));
+            $from = Carbon::parse($this->option('from'));
+            $to = Carbon::parse($this->option('to'));
             $audits = $auditLogger->getAuditsByDateRange($from, $to, $limit);
         } elseif ($this->option('search')) {
             $audits = $auditLogger->searchAudits($this->option('search'), $limit);
         } else {
             // Get recent audits
-            $audits = \CleaniqueCoders\Eligify\Models\AuditLog::orderBy('created_at', 'desc')
+            $audits = AuditLog::orderBy('created_at', 'desc')
                 ->limit($limit)
                 ->get();
         }

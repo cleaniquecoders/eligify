@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace CleaniqueCoders\Eligify\Storage\Contracts;
 
 use CleaniqueCoders\Eligify\Models\Criteria;
+use Illuminate\Support\Collection;
 
 interface StorageDriver
 {
@@ -21,9 +22,9 @@ interface StorageDriver
     /**
      * Get all active criteria
      *
-     * @return \Illuminate\Support\Collection<int, Criteria>
+     * @return Collection<int, Criteria>
      */
-    public function getAllActiveCriteria(): \Illuminate\Support\Collection;
+    public function getAllActiveCriteria(): Collection;
 
     /**
      * Store criteria (upsert by slug)

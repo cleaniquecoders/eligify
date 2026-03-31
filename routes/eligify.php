@@ -1,5 +1,6 @@
 <?php
 
+use CleaniqueCoders\Eligify\Actions\GetDashboardMetrics;
 use Illuminate\Support\Facades\Route;
 
 Route::group([
@@ -9,7 +10,7 @@ Route::group([
 ], function () {
     // Dashboard route (renders Blade view; Livewire components can be added later)
     Route::get('/', function () {
-        $metrics = \CleaniqueCoders\Eligify\Actions\GetDashboardMetrics::run();
+        $metrics = GetDashboardMetrics::run();
 
         return view('eligify::dashboard', compact('metrics'));
     })->name('dashboard');

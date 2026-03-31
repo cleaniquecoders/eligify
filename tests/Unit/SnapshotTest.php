@@ -1,6 +1,8 @@
 <?php
 
 use CleaniqueCoders\Eligify\Data\Snapshot;
+use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Contracts\Support\Jsonable;
 
 test('can create snapshot instance', function () {
     $data = ['income' => 50000, 'credit_score' => 720];
@@ -226,14 +228,14 @@ test('is immutable when setting properties', function () {
     $snapshot = new Snapshot(['income' => 50000]);
 
     expect(fn () => $snapshot->income = 60000)
-        ->toThrow(\BadMethodCallException::class);
+        ->toThrow(BadMethodCallException::class);
 });
 
 test('is immutable when setting array offsets', function () {
     $snapshot = new Snapshot(['income' => 50000]);
 
     expect(fn () => $snapshot['income'] = 60000)
-        ->toThrow(\BadMethodCallException::class);
+        ->toThrow(BadMethodCallException::class);
 });
 
 test('is immutable when unsetting array offsets', function () {
@@ -242,8 +244,8 @@ test('is immutable when unsetting array offsets', function () {
     try {
         unset($snapshot['income']);
         expect(false)->toBeTrue('Expected exception was not thrown');
-    } catch (\BadMethodCallException $e) {
-        expect($e)->toBeInstanceOf(\BadMethodCallException::class);
+    } catch (BadMethodCallException $e) {
+        expect($e)->toBeInstanceOf(BadMethodCallException::class);
     }
 });
 
@@ -259,31 +261,31 @@ test('can convert to string', function () {
 test('implements arrayable interface', function () {
     $snapshot = new Snapshot(['income' => 50000]);
 
-    expect($snapshot)->toBeInstanceOf(\Illuminate\Contracts\Support\Arrayable::class);
+    expect($snapshot)->toBeInstanceOf(Arrayable::class);
 });
 
 test('implements jsonable interface', function () {
     $snapshot = new Snapshot(['income' => 50000]);
 
-    expect($snapshot)->toBeInstanceOf(\Illuminate\Contracts\Support\Jsonable::class);
+    expect($snapshot)->toBeInstanceOf(Jsonable::class);
 });
 
 test('implements json serializable', function () {
     $snapshot = new Snapshot(['income' => 50000]);
 
-    expect($snapshot)->toBeInstanceOf(\JsonSerializable::class);
+    expect($snapshot)->toBeInstanceOf(JsonSerializable::class);
 });
 
 test('implements array access', function () {
     $snapshot = new Snapshot(['income' => 50000]);
 
-    expect($snapshot)->toBeInstanceOf(\ArrayAccess::class);
+    expect($snapshot)->toBeInstanceOf(ArrayAccess::class);
 });
 
 test('implements countable', function () {
     $snapshot = new Snapshot(['income' => 50000]);
 
-    expect($snapshot)->toBeInstanceOf(\Countable::class);
+    expect($snapshot)->toBeInstanceOf(Countable::class);
 });
 
 test('can chain multiple operations', function () {

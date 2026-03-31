@@ -6,6 +6,7 @@ namespace CleaniqueCoders\Eligify\Concerns;
 
 use CleaniqueCoders\Eligify\Models\Criteria;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
+use Illuminate\Support\Collection;
 
 trait HasCriteria
 {
@@ -25,7 +26,7 @@ trait HasCriteria
     /**
      * Attach one or more criteria IDs without detaching existing ones.
      */
-    public function attachCriteria(int|array|\Illuminate\Support\Collection $criteriaIds): void
+    public function attachCriteria(int|array|Collection $criteriaIds): void
     {
         $this->criteria()->syncWithoutDetaching($criteriaIds);
     }
@@ -33,7 +34,7 @@ trait HasCriteria
     /**
      * Detach one or more criteria IDs.
      */
-    public function detachCriteria(int|array|\Illuminate\Support\Collection $criteriaIds): void
+    public function detachCriteria(int|array|Collection $criteriaIds): void
     {
         $this->criteria()->detach($criteriaIds);
     }
