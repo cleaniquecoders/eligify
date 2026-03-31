@@ -61,11 +61,12 @@ class StorageExportCommand extends Command
 
         $count = 0;
         foreach ($allCriteria as $criteria) {
-            $data = $dbDriver->exportCriteria($criteria->slug);
+            $slug = $criteria->getAttribute('slug');
+            $data = $dbDriver->exportCriteria($slug);
             if ($data) {
                 $fileDriver->importCriteria($data);
                 $count++;
-                $this->line("  Exported: {$criteria->slug}");
+                $this->line("  Exported: {$slug}");
             }
         }
 

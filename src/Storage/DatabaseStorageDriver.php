@@ -61,7 +61,7 @@ class DatabaseStorageDriver implements StorageDriver
     {
         Rule::create(array_merge($ruleData, [
             'uuid' => (string) Str::uuid(),
-            'criteria_id' => $criteria->id,
+            'criteria_id' => $criteria->getAttribute('id'),
         ]));
     }
 
@@ -76,11 +76,12 @@ class DatabaseStorageDriver implements StorageDriver
         $criteria->rules()->delete();
         $criteria->evaluations()->delete();
 
-        return $criteria->delete();
+        return (bool) $criteria->delete();
     }
 
     public function storeGroup(Criteria $criteria, array $groupData, array $rules = []): mixed
     {
+        /** @var \CleaniqueCoders\Eligify\Models\RuleGroup $group */
         $group = $criteria->groups()->firstOrCreate(
             ['name' => $groupData['name']],
             array_merge([
@@ -100,7 +101,7 @@ class DatabaseStorageDriver implements StorageDriver
         foreach ($rules as $index => $ruleData) {
             $group->rules()->create(array_merge($ruleData, [
                 'uuid' => (string) Str::uuid(),
-                'criteria_id' => $criteria->id,
+                'criteria_id' => $criteria->getAttribute('id'),
                 'order' => $index,
             ]));
         }
@@ -110,6 +111,7 @@ class DatabaseStorageDriver implements StorageDriver
 
     public function exportCriteria(string $slug): ?array
     {
+        /** @var Criteria|null $criteria */
         $criteria = Criteria::with(['rules', 'groups.rules'])
             ->where('slug', $slug)
             ->first();
@@ -118,51 +120,47 @@ class DatabaseStorageDriver implements StorageDriver
             return null;
         }
 
+        $mapRule = fn (\Illuminate\Database\Eloquent\Model $rule): array => [
+            'uuid' => $rule->getAttribute('uuid'),
+            'field' => $rule->getAttribute('field'),
+            'operator' => $rule->getAttribute('operator'),
+            'value' => $rule->getAttribute('value'),
+            'weight' => $rule->getAttribute('weight'),
+            'order' => $rule->getAttribute('order'),
+            'is_active' => $rule->getAttribute('is_active'),
+            'meta' => $rule->getAttribute('meta'),
+        ];
+
         return [
-            'uuid' => $criteria->uuid,
-            'name' => $criteria->name,
-            'slug' => $criteria->slug,
-            'description' => $criteria->description,
-            'is_active' => $criteria->is_active,
-            'type' => $criteria->type,
-            'group' => $criteria->group,
-            'category' => $criteria->category,
-            'tags' => $criteria->tags,
-            'meta' => $criteria->meta,
-            'rules' => $criteria->rules->map(fn (Rule $rule) => [
-                'uuid' => $rule->uuid,
-                'field' => $rule->field,
-                'operator' => $rule->operator,
-                'value' => $rule->value,
-                'weight' => $rule->weight,
-                'order' => $rule->order,
-                'is_active' => $rule->is_active,
-                'meta' => $rule->meta,
-            ])->toArray(),
-            'groups' => $criteria->groups->map(fn ($group) => [
-                'uuid' => $group->uuid,
-                'name' => $group->name,
-                'description' => $group->description,
-                'logic_type' => $group->logic_type,
-                'min_required' => $group->min_required,
-                'boolean_expression' => $group->boolean_expression,
-                'weight' => $group->weight,
-                'order' => $group->order,
-                'is_active' => $group->is_active,
-                'meta' => $group->meta,
-                'rules' => $group->rules->map(fn (Rule $rule) => [
-                    'uuid' => $rule->uuid,
-                    'field' => $rule->field,
-                    'operator' => $rule->operator,
-                    'value' => $rule->value,
-                    'weight' => $rule->weight,
-                    'order' => $rule->order,
-                    'is_active' => $rule->is_active,
-                    'meta' => $rule->meta,
-                ])->toArray(),
-            ])->toArray(),
-            'created_at' => $criteria->created_at?->toISOString(),
-            'updated_at' => $criteria->updated_at?->toISOString(),
+            'uuid' => $criteria->getAttribute('uuid'),
+            'name' => $criteria->getAttribute('name'),
+            'slug' => $criteria->getAttribute('slug'),
+            'description' => $criteria->getAttribute('description'),
+            'is_active' => $criteria->getAttribute('is_active'),
+            'type' => $criteria->getAttribute('type'),
+            'group' => $criteria->getAttribute('group'),
+            'category' => $criteria->getAttribute('category'),
+            'tags' => $criteria->getAttribute('tags'),
+            'meta' => $criteria->getAttribute('meta'),
+            'rules' => $criteria->rules->map($mapRule)->toArray(),
+            'groups' => $criteria->groups->map(function ($group) use ($mapRule): array {
+                /** @var \CleaniqueCoders\Eligify\Models\RuleGroup $group */
+                return [
+                    'uuid' => $group->getAttribute('uuid'),
+                    'name' => $group->getAttribute('name'),
+                    'description' => $group->getAttribute('description'),
+                    'logic_type' => $group->getAttribute('logic_type'),
+                    'min_required' => $group->getAttribute('min_required'),
+                    'boolean_expression' => $group->getAttribute('boolean_expression'),
+                    'weight' => $group->getAttribute('weight'),
+                    'order' => $group->getAttribute('order'),
+                    'is_active' => $group->getAttribute('is_active'),
+                    'meta' => $group->getAttribute('meta'),
+                    'rules' => $group->rules->map(fn ($rule) => $mapRule($rule))->toArray(),
+                ];
+            })->toArray(),
+            'created_at' => $criteria->getAttribute('created_at')?->toISOString(),
+            'updated_at' => $criteria->getAttribute('updated_at')?->toISOString(),
         ];
     }
 

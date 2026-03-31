@@ -99,7 +99,7 @@ class FilesystemStorageDriver implements StorageDriver
 
     public function storeRule(Criteria $criteria, array $ruleData): void
     {
-        $slug = $criteria->slug;
+        $slug = $criteria->getAttribute('slug');
         $data = $this->readFile($slug) ?? [];
 
         $rules = $data['rules'] ?? [];
@@ -135,7 +135,7 @@ class FilesystemStorageDriver implements StorageDriver
 
     public function storeGroup(Criteria $criteria, array $groupData, array $rules = []): mixed
     {
-        $slug = $criteria->slug;
+        $slug = $criteria->getAttribute('slug');
         $data = $this->readFile($slug) ?? [];
 
         $groups = $data['groups'] ?? [];
@@ -239,7 +239,7 @@ class FilesystemStorageDriver implements StorageDriver
         $rule = new Rule;
         $rule->forceFill([
             'uuid' => $data['uuid'] ?? (string) Str::uuid(),
-            'criteria_id' => $criteria->id,
+            'criteria_id' => $criteria->getAttribute('id'),
             'field' => $data['field'],
             'operator' => $data['operator'],
             'value' => $data['value'] ?? null,
@@ -261,7 +261,7 @@ class FilesystemStorageDriver implements StorageDriver
         $group = new RuleGroup;
         $group->forceFill([
             'uuid' => $data['uuid'] ?? (string) Str::uuid(),
-            'criteria_id' => $criteria->id,
+            'criteria_id' => $criteria->getAttribute('id'),
             'name' => $data['name'],
             'description' => $data['description'] ?? null,
             'logic_type' => $data['logic_type'] ?? 'all',

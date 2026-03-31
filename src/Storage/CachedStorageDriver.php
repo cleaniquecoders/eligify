@@ -60,7 +60,7 @@ class CachedStorageDriver implements StorageDriver
     {
         $this->inner->storeRule($criteria, $ruleData);
 
-        $this->bustCriteriaCache($criteria->slug);
+        $this->bustCriteriaCache($criteria->getAttribute('slug'));
     }
 
     public function deleteCriteria(string $identifier): bool
@@ -77,7 +77,7 @@ class CachedStorageDriver implements StorageDriver
     {
         $result = $this->inner->storeGroup($criteria, $groupData, $rules);
 
-        $this->bustCriteriaCache($criteria->slug);
+        $this->bustCriteriaCache($criteria->getAttribute('slug'));
 
         return $result;
     }

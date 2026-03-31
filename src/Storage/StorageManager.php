@@ -15,35 +15,38 @@ class StorageManager
      */
     public function driver(?string $name = null): StorageDriver
     {
-        if ($name === null && $this->resolvedDriver !== null) {
+        $isDefaultDriver = $name === null;
+
+        if ($isDefaultDriver && $this->resolvedDriver !== null) {
             return $this->resolvedDriver;
         }
 
-        $name = $name ?? config('eligify.storage.driver', 'database');
+        /** @var string $driverName */
+        $driverName = $name ?? config('eligify.storage.driver', 'database');
 
-        $driver = match ($name) {
+        $driver = match ($driverName) {
             'database' => new DatabaseStorageDriver,
             'file' => new FilesystemStorageDriver(
-                config('eligify.storage.file.disk', 'local'),
-                config('eligify.storage.file.path', 'eligify'),
+                (string) config('eligify.storage.file.disk', 'local'),
+                (string) config('eligify.storage.file.path', 'eligify'),
             ),
             's3' => new FilesystemStorageDriver(
-                config('eligify.storage.s3.disk', 's3'),
-                config('eligify.storage.s3.path', 'eligify'),
+                (string) config('eligify.storage.s3.disk', 's3'),
+                (string) config('eligify.storage.s3.path', 'eligify'),
             ),
-            default => throw new \InvalidArgumentException("Unknown Eligify storage driver: {$name}"),
+            default => throw new \InvalidArgumentException("Unknown Eligify storage driver: {$driverName}"),
         };
 
-        // Wrap with cache decorator if enabled
-        if (config('eligify.storage.cache.enabled', true) && $name !== 'database') {
+        // Wrap with cache decorator if enabled (non-database drivers only)
+        if (config('eligify.storage.cache.enabled', true) && $driverName !== 'database') {
             $driver = new CachedStorageDriver(
                 $driver,
-                config('eligify.storage.cache.prefix', 'eligify_storage'),
+                (string) config('eligify.storage.cache.prefix', 'eligify_storage'),
                 (int) config('eligify.storage.cache.ttl', 1440) * 60,
             );
         }
 
-        if ($name === null || $name === config('eligify.storage.driver', 'database')) {
+        if ($isDefaultDriver) {
             $this->resolvedDriver = $driver;
         }
 
