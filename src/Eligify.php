@@ -12,6 +12,7 @@ use CleaniqueCoders\Eligify\Engine\RuleEngine;
 use CleaniqueCoders\Eligify\Models\Criteria;
 use CleaniqueCoders\Eligify\Models\Evaluation;
 use CleaniqueCoders\Eligify\Models\Rule;
+use CleaniqueCoders\Eligify\Storage\Contracts\StorageDriver;
 use CleaniqueCoders\Eligify\Support\Cache;
 
 class Eligify
@@ -22,10 +23,13 @@ class Eligify
 
     protected Cache $cache;
 
+    protected StorageDriver $storage;
+
     public function __construct()
     {
         $this->ruleEngine = new RuleEngine;
         $this->cache = new Cache;
+        $this->storage = app(StorageDriver::class);
     }
 
     /**
@@ -98,17 +102,11 @@ class Eligify
     }
 
     /**
-     * Get criteria with rules using optimized query
+     * Get criteria with rules using the storage driver
      */
     protected function getCriteriaWithRules(string $criteriaName): ?Criteria
     {
-        return Criteria::with(['rules' => function ($query) {
-            $query->where('is_active', true)
-                ->orderBy('order', 'asc');
-        }])
-            ->where('slug', str($criteriaName)->slug())
-            ->where('is_active', true)
-            ->first();
+        return $this->storage->findCriteriaBySlug($criteriaName);
     }
 
     /**
@@ -300,9 +298,9 @@ class Eligify
     /**
      * Get all available criteria
      */
-    public static function getAllCriteria(): \Illuminate\Database\Eloquent\Collection
+    public static function getAllCriteria(): \Illuminate\Support\Collection
     {
-        return Criteria::where('is_active', true)->get();
+        return app(StorageDriver::class)->getAllActiveCriteria();
     }
 
     /**
@@ -310,9 +308,7 @@ class Eligify
      */
     public static function getCriteria(string $identifier): ?Criteria
     {
-        return Criteria::where('name', $identifier)
-            ->orWhere('slug', $identifier)
-            ->first();
+        return app(StorageDriver::class)->findCriteria($identifier);
     }
 
     /**
@@ -320,17 +316,7 @@ class Eligify
      */
     public static function deleteCriteria(string $identifier): bool
     {
-        $criteria = static::getCriteria($identifier);
-
-        if (! $criteria) {
-            return false;
-        }
-
-        // Delete associated rules and evaluations
-        $criteria->rules()->delete();
-        $criteria->evaluations()->delete();
-
-        return $criteria->delete();
+        return app(StorageDriver::class)->deleteCriteria($identifier);
     }
 
     /**
@@ -479,8 +465,14 @@ class Eligify
         // Also check if criteria has complex features that require advanced engine
         $hasComplexFeatures =
             isset($criteria->meta['group_combination_logic']) ||
-            isset($criteria->meta['decision_thresholds']) ||
-            $criteria->rules()->whereNotNull('meta')->exists();
+            isset($criteria->meta['decision_thresholds']);
+
+        // Check rules for metadata - use loaded relation when available
+        if (! $hasComplexFeatures) {
+            $hasComplexFeatures = $criteria->relationLoaded('rules')
+                ? $criteria->rules->whereNotNull('meta')->where('meta', '!=', [])->isNotEmpty()
+                : $criteria->rules()->whereNotNull('meta')->exists();
+        }
 
         return ($useAdvanced || $hasComplexFeatures)
             ? $this->getAdvancedRuleEngine()

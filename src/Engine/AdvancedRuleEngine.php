@@ -77,7 +77,9 @@ class AdvancedRuleEngine
      */
     protected function parseRuleGroups(Criteria $criteria): array
     {
-        $rules = $criteria->rules()->orderBy('order')->get();
+        $rules = $criteria->relationLoaded('rules')
+            ? $criteria->rules->sortBy('order')->values()
+            : $criteria->rules()->orderBy('order')->get();
         $groups = [];
         $currentGroup = null;
         $lastGroupId = null;

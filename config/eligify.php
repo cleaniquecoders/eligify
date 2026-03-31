@@ -66,6 +66,41 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Storage Configuration
+    |--------------------------------------------------------------------------
+    |
+    | Configure how eligibility criteria and rules are stored.
+    | Supported drivers: 'database', 'file', 's3'
+    |
+    | - database: Default. Stores criteria/rules in Eloquent tables.
+    | - file: Stores each criteria as a JSON file on a Laravel filesystem disk.
+    | - s3: Same as file, but uses an S3 disk.
+    |
+    | Cache wraps non-database drivers so files are read once and cached.
+    |
+    */
+    'storage' => [
+        'driver' => env('ELIGIFY_STORAGE_DRIVER', 'database'),
+
+        'file' => [
+            'disk' => env('ELIGIFY_STORAGE_DISK', 'local'),
+            'path' => env('ELIGIFY_STORAGE_PATH', 'eligify'),
+        ],
+
+        's3' => [
+            'disk' => env('ELIGIFY_STORAGE_S3_DISK', 's3'),
+            'path' => env('ELIGIFY_STORAGE_S3_PATH', 'eligify'),
+        ],
+
+        'cache' => [
+            'enabled' => env('ELIGIFY_STORAGE_CACHE_ENABLED', true),
+            'ttl' => env('ELIGIFY_STORAGE_CACHE_TTL', 1440), // minutes (24 hours)
+            'prefix' => 'eligify_storage',
+        ],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | Default Scoring Configuration
     |--------------------------------------------------------------------------
     |

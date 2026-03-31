@@ -61,9 +61,20 @@ class RuleEngine
 
     /**
      * Get compiled rules for a criteria (with caching)
+     *
+     * Uses pre-loaded relation when available (e.g. from file-based storage),
+     * otherwise falls back to database query with optional caching.
      */
     protected function getCompiledRules(Criteria $criteria): Collection
     {
+        // If rules are already loaded (e.g. from file driver or eager-loaded), use them directly
+        if ($criteria->relationLoaded('rules')) {
+            return $criteria->rules
+                ->where('is_active', true)
+                ->sortBy('order')
+                ->values();
+        }
+
         if (! $this->cache->isCompilationCacheEnabled()) {
             return $criteria->rules()->where('is_active', true)->orderBy('order')->get();
         }

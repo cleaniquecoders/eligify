@@ -13,7 +13,11 @@ use CleaniqueCoders\Eligify\Commands\EligifyCommand;
 use CleaniqueCoders\Eligify\Commands\EvaluateCommand;
 use CleaniqueCoders\Eligify\Commands\MakeAllMappingsCommand;
 use CleaniqueCoders\Eligify\Commands\MakeMappingCommand;
+use CleaniqueCoders\Eligify\Commands\StorageExportCommand;
+use CleaniqueCoders\Eligify\Commands\StorageImportCommand;
 use CleaniqueCoders\Eligify\Engine\RuleEngine;
+use CleaniqueCoders\Eligify\Storage\Contracts\StorageDriver;
+use CleaniqueCoders\Eligify\Storage\StorageManager;
 use CleaniqueCoders\Eligify\Events\CriteriaCreated;
 use CleaniqueCoders\Eligify\Events\EvaluationCompleted;
 use CleaniqueCoders\Eligify\Events\RuleExecuted;
@@ -59,6 +63,8 @@ class EligifyServiceProvider extends PackageServiceProvider
                 Commands\CacheClearCommand::class,
                 Commands\CacheWarmupCommand::class,
                 Commands\CacheStatsCommand::class,
+                StorageExportCommand::class,
+                StorageImportCommand::class,
             ]);
     }
 
@@ -205,6 +211,16 @@ class EligifyServiceProvider extends PackageServiceProvider
 
     public function packageRegistered(): void
     {
+        // Register the storage manager as a singleton
+        $this->app->singleton(StorageManager::class, function ($app) {
+            return new StorageManager;
+        });
+
+        // Register the storage driver (resolved from manager)
+        $this->app->singleton(StorageDriver::class, function ($app) {
+            return $app->make(StorageManager::class)->driver();
+        });
+
         // Register the audit logger as a singleton
         $this->app->singleton(AuditLogger::class, function ($app) {
             return new AuditLogger;

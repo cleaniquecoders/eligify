@@ -8,6 +8,7 @@ use CleaniqueCoders\Eligify\Enums\RuleOperator;
 use CleaniqueCoders\Eligify\Enums\RulePriority;
 use CleaniqueCoders\Eligify\Models\Criteria;
 use CleaniqueCoders\Eligify\Models\Rule;
+use CleaniqueCoders\Eligify\Storage\Contracts\StorageDriver;
 use CleaniqueCoders\Eligify\Support\Config;
 use CleaniqueCoders\Eligify\Workflow\WorkflowManager;
 use Illuminate\Support\Collection;
@@ -27,23 +28,20 @@ class CriteriaBuilder
 
     protected array $config;
 
+    protected StorageDriver $storage;
+
     public function __construct(string $criteriaName)
     {
         $this->config = config('eligify');
         $this->pendingRules = collect();
         $this->workflowManager = new WorkflowManager;
+        $this->storage = app(StorageDriver::class);
 
-        // Find or create criteria
-        $this->criteria = Criteria::firstOrCreate(
-            ['slug' => str($criteriaName)->lower()->slug()],
-            [
-                'uuid' => (string) str()->uuid(),
-                'name' => $criteriaName,
-                'slug' => str($criteriaName)->slug(),
-                'description' => "Auto-generated criteria for {$criteriaName}",
-                'is_active' => true,
-            ]
-        );
+        // Find or create criteria via storage driver
+        $this->criteria = $this->storage->storeCriteria([
+            'name' => $criteriaName,
+            'slug' => str($criteriaName)->slug()->toString(),
+        ]);
     }
 
     /**
@@ -406,15 +404,12 @@ class CriteriaBuilder
     }
 
     /**
-     * Save all pending rules to the database
+     * Save all pending rules via the storage driver
      */
     public function save(): self
     {
         $this->pendingRules->each(function (array $ruleData) {
-            Rule::create(array_merge($ruleData, [
-                'uuid' => (string) str()->uuid(),
-                'criteria_id' => $this->criteria->id,
-            ]));
+            $this->storage->storeRule($this->criteria, $ruleData);
         });
 
         $this->pendingRules = collect();

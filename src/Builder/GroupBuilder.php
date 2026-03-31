@@ -8,6 +8,7 @@ use CleaniqueCoders\Eligify\Enums\GroupCombination;
 use CleaniqueCoders\Eligify\Enums\RuleOperator;
 use CleaniqueCoders\Eligify\Enums\RulePriority;
 use CleaniqueCoders\Eligify\Models\RuleGroup;
+use CleaniqueCoders\Eligify\Storage\Contracts\StorageDriver;
 use Illuminate\Support\Collection;
 use InvalidArgumentException;
 
@@ -41,6 +42,8 @@ class GroupBuilder
 
     protected $onFailCallback = null;
 
+    protected StorageDriver $storage;
+
     /**
      * Create a new GroupBuilder instance
      */
@@ -48,16 +51,15 @@ class GroupBuilder
     {
         $this->parentBuilder = $parentBuilder;
         $this->pendingRules = collect();
+        $this->storage = app(StorageDriver::class);
 
-        // Create or get the rule group
-        $this->group = $parentBuilder->getCriteria()->groups()->firstOrCreate(
-            ['name' => $groupName],
+        // Create or get the rule group via storage driver
+        $this->group = $this->storage->storeGroup(
+            $parentBuilder->getCriteria(),
             [
-                'uuid' => (string) str()->uuid(),
-                'description' => null,
+                'name' => $groupName,
                 'logic_type' => GroupCombination::ALL->value,
                 'weight' => 1.0,
-                'order' => $parentBuilder->getCriteria()->groups()->count(),
                 'is_active' => true,
                 'meta' => [],
             ]
@@ -282,14 +284,21 @@ class GroupBuilder
      */
     public function end(): CriteriaBuilder
     {
-        // Save all pending rules to this group
-        $this->pendingRules->each(function (array $ruleData, int $index) {
-            $this->group->rules()->create(array_merge($ruleData, [
-                'uuid' => (string) str()->uuid(),
-                'criteria_id' => $this->group->criteria_id,
-                'order' => $index,
-            ]));
-        });
+        // Save all pending rules to this group via storage driver
+        $criteria = $this->parentBuilder->getCriteria();
+        $rulesArray = $this->pendingRules->map(fn (array $ruleData, int $index) => array_merge($ruleData, [
+            'order' => $index,
+        ]))->toArray();
+
+        if (! empty($rulesArray)) {
+            $this->storage->storeGroup($criteria, [
+                'name' => $this->group->name,
+                'logic_type' => $this->group->logic_type,
+                'weight' => $this->group->weight,
+                'is_active' => $this->group->is_active,
+                'meta' => $this->group->meta ?? [],
+            ], $rulesArray);
+        }
 
         $this->pendingRules = collect();
 
