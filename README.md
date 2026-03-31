@@ -17,6 +17,7 @@ Eligify is a flexible rule and criteria engine that determines whether an entity
 - 🧩 **Model Integration** - Seamless Laravel Eloquent integration
 - 📊 **Flexible Scoring** - Weighted, pass/fail, percentage, and custom methods
 - ⚡ **Smart Caching** - Built-in evaluation and rule compilation caching for optimal performance (experimental)
+- 💾 **Multi-Driver Storage** - Store criteria/rules in database, local filesystem, or S3 with caching
 
 ## Installation
 
@@ -59,6 +60,71 @@ $criteria = Eligify::criteria('Loan Approval')
 $result = $criteria->evaluateWithCallbacks($data);
 ```
 
+## Storage Drivers
+
+By default, Eligify stores criteria and rules in the database. You can switch to file-based or S3 storage for scenarios where rules grow large or you prefer storing configuration outside the database.
+
+| Driver | Description |
+|--------|-------------|
+| `database` | Default. Uses Eloquent models (zero change for existing users) |
+| `file` | Stores each criteria as a JSON file on any Laravel filesystem disk |
+| `s3` | Same as file driver, using an S3 disk |
+
+> **Note:** Evaluations and audit logs always remain in the database regardless of the storage driver.
+
+### Configuration
+
+```php
+// config/eligify.php
+'storage' => [
+    'driver' => env('ELIGIFY_STORAGE_DRIVER', 'database'),
+
+    'file' => [
+        'disk' => env('ELIGIFY_STORAGE_DISK', 'local'),
+        'path' => env('ELIGIFY_STORAGE_PATH', 'eligify'),
+    ],
+
+    's3' => [
+        'disk' => env('ELIGIFY_STORAGE_S3_DISK', 's3'),
+        'path' => env('ELIGIFY_STORAGE_S3_PATH', 'eligify'),
+    ],
+
+    'cache' => [
+        'enabled' => env('ELIGIFY_STORAGE_CACHE_ENABLED', true),
+        'ttl' => env('ELIGIFY_STORAGE_CACHE_TTL', 1440), // minutes
+        'prefix' => 'eligify_storage',
+    ],
+],
+```
+
+### Switching Storage Drivers
+
+```bash
+# .env
+ELIGIFY_STORAGE_DRIVER=file
+```
+
+### Migrating Between Drivers
+
+Export existing criteria from database to JSON files:
+
+```bash
+php artisan eligify:storage-export
+```
+
+Import JSON files into database:
+
+```bash
+php artisan eligify:storage-import
+```
+
+You can also target a specific criteria and disk:
+
+```bash
+php artisan eligify:storage-export loan-approval --disk=s3 --path=eligify
+php artisan eligify:storage-import loan-approval --disk=s3 --path=eligify
+```
+
 ## Security
 
 Eligify includes built-in security features:
@@ -118,71 +184,6 @@ Eligify is optimized for high-performance scenarios:
     'cache_enabled' => true,
     'cache_ttl' => 60, // minutes
 ],
-```
-
-
-## Security
-
-Eligify includes built-in security features:
-
-- **Input Validation**: All evaluation data is validated for length and suspicious content
-- **Rate Limiting**: Configurable rate limits to prevent abuse
-- **Authorization**: Dashboard access controlled via Gates/closures (similar to Telescope)
-- **Audit Logging**: Complete audit trail of all evaluations and decisions
-- **Safe Operators**: Dangerous operators like regex can be disabled in production
-
-### Security Configuration
-
-```php
-// config/eligify.php
-'security' => [
-    'validate_input' => true,
-    'max_field_length' => 255,
-    'max_value_length' => 1000,
-    'log_violations' => true,
-],
-
-'rate_limiting' => [
-    'enabled' => true,
-    'max_attempts' => 100,
-    'decay_minutes' => 1,
-],
-```
-
-### Dashboard Authorization
-
-```php
-// In AppServiceProvider
-Gate::define('viewEligify', function ($user) {
-    return $user->hasRole('admin');
-});
-```
-
-## Performance
-
-Eligify is optimized for high-performance scenarios:
-
-- **Smart Caching**: Evaluation results and rule compilation caching
-- **Eager Loading**: Optimized database queries to prevent N+1 problems
-- **Batch Processing**: Efficient batch evaluation with memory management
-- **Query Optimization**: Rules are loaded with criteria to minimize database hits
-
-### Performance Configuration
-
-```php
-// config/eligify.php
-'performance' => [
-    'compile_rules' => true,
-    'batch_size' => 100,
-],
-
-'evaluation' => [
-    'cache_enabled' => true,
-    'cache_ttl' => 60, // minutes
-],
-```
-
-// Result: ['passed' => true, 'score' => 85, 'decision' => 'Approved', ...]
 ```
 
 ### Optional Web Dashboard
@@ -216,6 +217,10 @@ Gate::define('viewEligify', function ($user) {
 ```bash
 composer test
 ```
+
+## Upgrade Guide
+
+Please see [UPGRADE](UPGRADE.md) for step-by-step instructions when upgrading between versions.
 
 ## Changelog
 

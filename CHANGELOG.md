@@ -2,6 +2,43 @@
 
 All notable changes to `eligify` will be documented in this file.
 
+## 1.7.0 - 2026-03-31
+
+### What's Changed
+
+#### Added
+
+- **Multi-driver storage** for criteria and rules (`database`, `file`, `s3`) with caching on first use
+  - `StorageDriver` contract (`src/Storage/Contracts/StorageDriver.php`)
+  - `DatabaseStorageDriver` - default, wraps existing Eloquent logic
+  - `FilesystemStorageDriver` - stores criteria as JSON files on any Laravel filesystem disk
+  - `CachedStorageDriver` - decorator that caches reads for non-database drivers
+  - `StorageManager` - factory that resolves the configured driver
+- New `storage` configuration block in `config/eligify.php`
+- `eligify:storage-export` command - export criteria from database to JSON files
+- `eligify:storage-import` command - import criteria from JSON files to database
+- New migration `alter_user_agent_column_in_eligify_audit_logs` - changes `user_agent` from `VARCHAR(255)` to `TEXT` to fix SQL Server truncation errors
+- PHP 8.5 and Laravel 13 added to CI test matrix
+- `UPGRADE.md` - upgrade guide for all versions
+
+#### Changed
+
+- `Eligify` main class now uses `StorageDriver` instead of direct Eloquent queries
+- `CriteriaBuilder` and `GroupBuilder` use `StorageDriver` for persistence
+- `RuleEngine` and `AdvancedRuleEngine` use pre-loaded relations when available (avoids extra DB queries for file-based storage)
+- `EligifyServiceProvider` registers `StorageManager` and `StorageDriver` singletons
+
+#### Fixed
+
+- `user_agent` column truncation on SQL Server when storing long mobile browser User-Agent strings
+- Removed duplicate config keys in README (PR #2 by @ziming)
+
+#### No Breaking Changes
+
+This release is fully backward compatible. The default storage driver is `database`, which wraps the exact same Eloquent operations as before. Existing users do not need to change anything.
+
+**Full Changelog**: https://github.com/cleaniquecoders/eligify/compare/1.6.0...1.7.0
+
 ## 1.6.0 - 2026-03-31
 
 ### What's Changed
